@@ -1,11 +1,33 @@
 {
   "title": "工作空间",
   "create_title": "创建工作空间",
+  "edit_title": "编辑工作空间",
   "name": "名称",
+  "name_placeholder": "工作空间名称",
+  "icon_label": "图标",
+  "color_label": "颜色",
   "platform": "平台",
   "content_type": "内容类型",
   "publish_goal": "发布目标",
+  "publish_goal_placeholder": "每",
+  "publish_period": {
+    "day": "天",
+    "week": "周",
+    "month": "月"
+  },
   "timezone": "时区",
+  "step1_title": "基本信息",
+  "step2_title": "平台与类型",
+  "step3_title": "目标设置",
+  "next": "下一步",
+  "prev": "上一步",
+  "submit": "创建工作空间",
+  "save": "保存",
+  "cancel": "取消",
+  "new_workspace": "新建工作空间",
+  "edit": "编辑",
+  "no_workspaces": "暂无工作空间",
+  "no_workspaces_desc": "创建您的第一个工作空间开始管理内容",
   "content_types": {
     "video_short": "短视频",
     "video_long": "长视频",
@@ -13,5 +35,15 @@
     "article": "长文章",
     "podcast": "播客",
     "live": "直播"
+  },
+  "platforms": {
+    "douyin": "抖音",
+    "xiaohongshu": "小红书",
+    "weixin": "微信公众号",
+    "weixin_video": "微信视频号",
+    "bilibili": "哔哩哔哩",
+    "x": "X (Twitter)",
+    "youtube": "YouTube",
+    "instagram": "Instagram"
   }
 }

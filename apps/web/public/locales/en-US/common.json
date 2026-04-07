@@ -6,7 +6,8 @@
     "calendar": "Calendar",
     "publications": "Publications",
     "analytics": "Analytics",
-    "settings": "Settings"
+    "settings": "Settings",
+    "workspaces": "Workspaces"
   },
   "action": {
     "save": "Save",
