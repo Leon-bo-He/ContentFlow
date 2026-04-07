@@ -19,7 +19,7 @@ export function AppShell() {
   useOfflineSync();
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-surface">
+    <div className="flex flex-col h-screen overflow-hidden bg-surface dark:bg-slate-950">
       {/* Banners */}
       {!isOnline && <OfflineBanner />}
       <NotificationPermissionBanner />
@@ -37,7 +37,7 @@ export function AppShell() {
       </div>
 
       {/* Mobile bottom nav */}
-      <div className="fixed bottom-0 inset-x-0 md:hidden border-t border-gray-200">
+      <div className="fixed bottom-0 inset-x-0 md:hidden border-t border-gray-200 dark:border-slate-700">
         <MobileBottomNav />
       </div>
 

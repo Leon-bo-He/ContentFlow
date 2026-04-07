@@ -54,7 +54,7 @@ function EditWorkspaceModal({ workspace, onClose }: { workspace: Workspace; onCl
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[60] p-4">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-slate-700">
           <h2 className="text-base font-semibold">{t('edit_title')}</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">✕</button>
         </div>
@@ -128,12 +128,12 @@ function GeneralPanel() {
     <div className="space-y-6">
       <div>
         {/* Language */}
-        <div className="flex items-center justify-between py-3 border-b border-gray-100">
-          <p className="text-sm font-medium text-gray-900">{tc('action.language') || 'Language'}</p>
+        <div className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-slate-700 dark:border-slate-700">
+          <p className="text-sm font-medium text-gray-900 dark:text-slate-200">{tc('action.language') || 'Language'}</p>
           <select
             value={locale}
             onChange={(e) => handleLocale(e.target.value as SupportedLocale)}
-            className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 outline-none focus:ring-2 focus:ring-indigo-200 bg-white"
+            className="text-sm border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-1.5 outline-none focus:ring-2 focus:ring-indigo-200 bg-white dark:bg-slate-800 dark:text-slate-200"
           >
             {SUPPORTED_LOCALES.map((l) => (
               <option key={l} value={l}>
@@ -144,17 +144,17 @@ function GeneralPanel() {
         </div>
 
         {/* Timezone (display only) */}
-        <div className="flex items-center justify-between py-3 border-b border-gray-100">
-          <p className="text-sm font-medium text-gray-900">Timezone</p>
-          <span className="text-sm text-gray-500">
+        <div className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-slate-700 dark:border-slate-700">
+          <p className="text-sm font-medium text-gray-900 dark:text-slate-200">Timezone</p>
+          <span className="text-sm text-gray-500 dark:text-slate-400">
             {Intl.DateTimeFormat().resolvedOptions().timeZone}
           </span>
         </div>
 
         {/* Appearance */}
-        <div className="flex items-center justify-between py-3 border-b border-gray-100">
-          <p className="text-sm font-medium text-gray-900">Appearance</p>
-          <div className="flex items-center rounded-lg border border-gray-200 overflow-hidden">
+        <div className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-slate-700 dark:border-slate-700">
+          <p className="text-sm font-medium text-gray-900 dark:text-slate-200">Appearance</p>
+          <div className="flex items-center rounded-lg border border-gray-200 dark:border-slate-600 overflow-hidden">
             {THEME_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
@@ -162,7 +162,7 @@ function GeneralPanel() {
                 className={`flex items-center gap-1.5 px-3 py-1.5 text-sm transition-colors ${
                   theme === opt.value
                     ? 'bg-indigo-600 text-white font-medium'
-                    : 'bg-white text-gray-600 hover:bg-gray-50'
+                    : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-700'
                 }`}
               >
                 <span>{opt.icon}</span>
@@ -193,9 +193,9 @@ function NotificationsPanel() {
 
   return (
     <div className="space-y-1">
-      <div className="flex items-center justify-between py-3 border-b border-gray-100">
+      <div className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-slate-700">
         <div>
-          <p className="text-sm font-medium text-gray-900">Publish reminders</p>
+          <p className="text-sm font-medium text-gray-900 dark:text-slate-200">Publish reminders</p>
           <p className="text-xs text-gray-400 mt-0.5">Get notified before a scheduled publication</p>
         </div>
         <button
@@ -207,8 +207,8 @@ function NotificationsPanel() {
       </div>
 
       {enabled && (
-        <div className="flex items-center justify-between py-3 border-b border-gray-100">
-          <p className="text-sm font-medium text-gray-900">Reminder lead time</p>
+        <div className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-slate-700">
+          <p className="text-sm font-medium text-gray-900 dark:text-slate-200">Reminder lead time</p>
           <div className="flex items-center gap-2">
             <select
               value={leadTime}
@@ -301,7 +301,7 @@ function AccountPanel() {
   return (
     <div className="space-y-1">
       {/* Avatar */}
-      <div className="flex items-center gap-4 py-4 border-b border-gray-100">
+      <div className="flex items-center gap-4 py-4 border-b border-gray-100 dark:border-slate-700">
         <div className="w-14 h-14 rounded-full bg-indigo-600 text-white flex items-center justify-center text-2xl font-semibold flex-shrink-0">
           {initial}
         </div>
@@ -311,18 +311,18 @@ function AccountPanel() {
         </div>
       </div>
 
-      <div className="flex items-center justify-between py-3 border-b border-gray-100">
-        <p className="text-sm font-medium text-gray-900">Name</p>
+      <div className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-slate-700">
+        <p className="text-sm font-medium text-gray-900 dark:text-slate-200">Name</p>
         <span className="text-sm text-gray-500">{user?.name}</span>
       </div>
 
-      <div className="flex items-center justify-between py-3 border-b border-gray-100">
-        <p className="text-sm font-medium text-gray-900">Email</p>
+      <div className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-slate-700">
+        <p className="text-sm font-medium text-gray-900 dark:text-slate-200">Email</p>
         <span className="text-sm text-gray-500">{user?.email}</span>
       </div>
 
-      <div className="flex items-center justify-between py-3 border-b border-gray-100">
-        <p className="text-sm font-medium text-gray-900">Password</p>
+      <div className="flex items-center justify-between py-3 border-b border-gray-100 dark:border-slate-700">
+        <p className="text-sm font-medium text-gray-900 dark:text-slate-200">Password</p>
         <button className="text-sm text-indigo-600 hover:text-indigo-700">Change password</button>
       </div>
 
@@ -370,16 +370,16 @@ export default function Settings() {
     >
       {/* Dialog */}
       <div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl flex overflow-hidden"
+        className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-2xl flex overflow-hidden"
         style={{ height: 480 }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Left nav */}
-        <div className="w-48 flex-shrink-0 bg-gray-50 border-r border-gray-200 flex flex-col py-3">
+        <div className="w-48 flex-shrink-0 bg-gray-50 dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 flex flex-col py-3">
           {/* Close button */}
           <button
             onClick={() => navigate(-1)}
-            className="mx-3 mb-3 w-7 h-7 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 text-gray-600 text-sm transition-colors"
+            className="mx-3 mb-3 w-7 h-7 flex items-center justify-center rounded-full bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 text-gray-600 dark:text-slate-300 text-sm transition-colors"
             aria-label="Close settings"
           >
             ✕
@@ -392,8 +392,8 @@ export default function Settings() {
                 onClick={() => setSection(item.id)}
                 className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors text-left ${
                   section === item.id
-                    ? 'bg-gray-200 text-gray-900 font-medium'
-                    : 'text-gray-600 hover:bg-gray-100'
+                    ? 'bg-gray-200 dark:bg-slate-700 text-gray-900 dark:text-slate-100 font-medium'
+                    : 'text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-700/60'
                 }`}
               >
                 <span>{item.icon}</span>
@@ -406,8 +406,8 @@ export default function Settings() {
         {/* Right content */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Header */}
-          <div className="px-6 pt-5 pb-3 border-b border-gray-100 flex-shrink-0">
-            <h2 className="text-base font-semibold text-gray-900">{SECTION_TITLES[section]}</h2>
+          <div className="px-6 pt-5 pb-3 border-b border-gray-100 dark:border-slate-700 dark:border-slate-700 flex-shrink-0">
+            <h2 className="text-base font-semibold text-gray-900 dark:text-slate-100">{SECTION_TITLES[section]}</h2>
           </div>
 
           {/* Scrollable body */}
