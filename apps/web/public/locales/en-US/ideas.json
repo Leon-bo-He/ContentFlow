@@ -1,0 +1,17 @@
+{
+  "title": "",
+  "quick_capture": "",
+  "placeholder": "",
+  "convert": "",
+  "filter": {
+    "all": "",
+    "active": "",
+    "converted": "",
+    "archived": ""
+  },
+  "priority": {
+    "low": "",
+    "medium": "",
+    "high": ""
+  }
+}

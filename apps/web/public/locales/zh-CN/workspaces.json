@@ -1,0 +1,17 @@
+{
+  "title": "工作空间",
+  "create_title": "创建工作空间",
+  "name": "名称",
+  "platform": "平台",
+  "content_type": "内容类型",
+  "publish_goal": "发布目标",
+  "timezone": "时区",
+  "content_types": {
+    "video_short": "短视频",
+    "video_long": "长视频",
+    "image_text": "图文",
+    "article": "长文章",
+    "podcast": "播客",
+    "live": "直播"
+  }
+}

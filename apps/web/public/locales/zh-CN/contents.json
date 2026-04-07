@@ -1,0 +1,22 @@
+{
+  "title": "内容看板",
+  "create": "新建内容",
+  "stages": {
+    "planned": "选题确认",
+    "planning": "内容策划",
+    "creating": "制作中",
+    "ready": "待发布",
+    "publishing": "发布管理",
+    "published": "已发布",
+    "reviewed": "复盘完成"
+  },
+  "brief": {
+    "title": "内容策划",
+    "audience": "目标受众",
+    "goals": "内容目标",
+    "hooks": "爆点提炼",
+    "titles": "标题候选",
+    "outline": "内容大纲",
+    "references": "竞品参考"
+  }
+}

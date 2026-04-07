@@ -1,0 +1,31 @@
+{
+  "nav": {
+    "dashboard": "总览",
+    "ideas": "灵感库",
+    "board": "内容看板",
+    "calendar": "排期日历",
+    "publications": "发布管理",
+    "analytics": "数据分析",
+    "settings": "设置"
+  },
+  "action": {
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "create": "新建",
+    "confirm": "确认",
+    "add": "添加"
+  },
+  "status": {
+    "loading": "加载中…",
+    "error": "发生错误",
+    "empty": "暂无数据",
+    "saved": "已保存"
+  },
+  "workspace": {
+    "switcher_label": "切换工作空间",
+    "create": "创建工作空间",
+    "no_workspace": "暂无工作空间"
+  }
+}

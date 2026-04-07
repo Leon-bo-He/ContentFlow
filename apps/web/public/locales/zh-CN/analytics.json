@@ -1,0 +1,17 @@
+{
+  "title": "数据分析",
+  "dashboard": "全局仪表盘",
+  "metrics": {
+    "views": "播放/阅读量",
+    "likes": "点赞",
+    "comments": "评论",
+    "shares": "转发",
+    "saves": "收藏",
+    "followers_gained": "新增粉丝"
+  },
+  "period": {
+    "week": "本周",
+    "month": "本月",
+    "all": "全部"
+  }
+}
