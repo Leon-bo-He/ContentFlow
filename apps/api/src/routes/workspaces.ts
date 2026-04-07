@@ -1,8 +1,8 @@
 import type { FastifyPluginAsync } from 'fastify';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { db } from '../db/client.js';
 import { workspaces } from '../db/schema/workspaces.js';
-import { createWorkspaceSchema } from '@contentflow/shared';
+import { createWorkspaceSchema, updateWorkspaceSchema } from '@contentflow/shared';
 
 const NI = { error: 'Not implemented' };
 
@@ -44,7 +44,33 @@ export const workspacesRoutes: FastifyPluginAsync = async (app) => {
     return reply.send(rows);
   });
 
-  app.patch('/api/workspaces/:id', { onRequest: [app.authenticate] }, async (_r, reply) => reply.code(501).send(NI));
+  // PATCH /api/workspaces/:id
+  app.patch('/api/workspaces/:id', { onRequest: [app.authenticate] }, async (req, reply) => {
+    const user = req.user as { sub: string };
+    const { id } = req.params as { id: string };
+    const body = updateWorkspaceSchema.parse(req.body);
+
+    const updateData: Partial<typeof workspaces.$inferInsert> = {};
+    if (body.name !== undefined) updateData.name = body.name;
+    if (body.icon !== undefined) updateData.icon = body.icon;
+    if (body.publishGoal !== undefined) updateData.publishGoal = body.publishGoal ?? null;
+    if (body.defaultLocale !== undefined) updateData.defaultLocale = body.defaultLocale;
+    if (body.timezone !== undefined) updateData.timezone = body.timezone;
+    if (body.stageConfig !== undefined) updateData.stageConfig = body.stageConfig;
+
+    const [updated] = await db
+      .update(workspaces)
+      .set(updateData)
+      .where(and(eq(workspaces.id, id), eq(workspaces.userId, user.sub)))
+      .returning();
+
+    if (!updated) {
+      return reply.code(404).send({ error: 'Workspace not found' });
+    }
+
+    return reply.send(updated);
+  });
+
   app.post('/api/workspaces/:id/plan-templates', { onRequest: [app.authenticate] }, async (_r, reply) => reply.code(501).send(NI));
   app.get('/api/workspaces/:id/plan-templates', { onRequest: [app.authenticate] }, async (_r, reply) => reply.code(501).send(NI));
 };
