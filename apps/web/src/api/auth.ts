@@ -45,6 +45,16 @@ export function useRefreshToken() {
   });
 }
 
+export function useUpdateProfile() {
+  return useMutation<AuthUser, ApiError, { name?: string; email?: string }>({
+    mutationFn: (body) =>
+      apiFetch<AuthUser>('/api/auth/profile', {
+        method: 'PATCH',
+        body: JSON.stringify(body),
+      }),
+  });
+}
+
 export function useMe(accessToken: string | null) {
   return useQuery<AuthUser, ApiError>({
     queryKey: ['auth', 'me'],

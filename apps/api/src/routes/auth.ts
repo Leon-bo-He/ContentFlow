@@ -138,6 +138,48 @@ export const authRoutes: FastifyPluginAsync = async (app) => {
       });
   });
 
+  // PATCH /api/auth/profile
+  app.patch<{ Body: unknown }>(
+    '/api/auth/profile',
+    { onRequest: [app.authenticate] },
+    async (req, reply) => {
+      const schema = z.object({
+        name:  z.string().min(1).max(100).optional(),
+        email: z.string().email().optional(),
+      }).refine((d) => d.name !== undefined || d.email !== undefined, {
+        message: 'At least one field required',
+      });
+
+      const parsed = schema.safeParse(req.body);
+      if (!parsed.success) {
+        return reply.code(400).send({ error: parsed.error.errors[0]?.message ?? 'Invalid input' });
+      }
+
+      const { sub } = req.user as { sub: string };
+      const updates = parsed.data;
+
+      if (updates.email) {
+        const [conflict] = await db
+          .select({ id: users.id })
+          .from(users)
+          .where(eq(users.email, updates.email))
+          .limit(1);
+        if (conflict && conflict.id !== sub) {
+          return reply.code(409).send({ error: 'Email already in use' });
+        }
+      }
+
+      const [updated] = await db
+        .update(users)
+        .set(updates)
+        .where(eq(users.id, sub))
+        .returning({ id: users.id, email: users.email, name: users.name, locale: users.locale });
+
+      if (!updated) return reply.code(404).send({ error: 'User not found' });
+      return reply.send(updated);
+    }
+  );
+
   // GET /api/auth/me
   app.get(
     '/api/auth/me',

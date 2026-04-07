@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { Workspace } from '@contentflow/shared';
 import { useWorkspaces, useUpdateWorkspace } from '../api/workspaces.js';
+import { useUpdateProfile } from '../api/auth.js';
 import { useAuthStore } from '../store/auth.store.js';
 import { useUiStore, type Theme } from '../store/ui.store.js';
 import { CreateWorkspaceModal } from '../components/workspaces/CreateWorkspaceModal.js';
@@ -279,9 +280,105 @@ function WorkspacesPanel() {
   );
 }
 
+function EditableField({
+  label,
+  value,
+  type = 'text',
+  onSave,
+  saving,
+}: {
+  label: string;
+  value: string;
+  type?: string;
+  onSave: (val: string) => Promise<void>;
+  saving: boolean;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(value);
+  const [error, setError] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  function startEdit() {
+    setDraft(value);
+    setError('');
+    setEditing(true);
+    setTimeout(() => inputRef.current?.select(), 0);
+  }
+
+  async function handleSave() {
+    if (draft.trim() === value) { setEditing(false); return; }
+    setError('');
+    try {
+      await onSave(draft.trim());
+      setEditing(false);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Failed to save');
+    }
+  }
+
+  function handleKey(e: React.KeyboardEvent) {
+    if (e.key === 'Enter') void handleSave();
+    if (e.key === 'Escape') setEditing(false);
+  }
+
+  return (
+    <div className={ROW}>
+      <span className={LABEL}>{label}</span>
+      {editing ? (
+        <div className="flex items-center gap-2">
+          <input
+            ref={inputRef}
+            type={type}
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={handleKey}
+            className="text-sm border border-gray-200 rounded-md px-2 py-1 w-44 outline-none focus:ring-2 focus:ring-indigo-200"
+          />
+          <button
+            onClick={() => void handleSave()}
+            disabled={saving || !draft.trim()}
+            className="text-xs px-2 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
+          >
+            {saving ? '…' : 'Save'}
+          </button>
+          <button
+            onClick={() => setEditing(false)}
+            className="text-xs text-gray-500 hover:text-gray-700"
+          >
+            Cancel
+          </button>
+          {error && <span className="text-xs text-red-500">{error}</span>}
+        </div>
+      ) : (
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-500">{value}</span>
+          <button
+            onClick={startEdit}
+            className="text-xs text-gray-400 hover:text-indigo-600 px-1.5 py-0.5 rounded hover:bg-gray-100 transition-colors"
+          >
+            Edit
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function AccountPanel() {
   const user = useAuthStore((s) => s.user);
+  const updateUser = useAuthStore((s) => s.updateUser);
+  const updateProfile = useUpdateProfile();
   const initial = user?.name ? (user.name[0]?.toUpperCase() ?? 'U') : 'U';
+
+  async function saveName(name: string) {
+    const updated = await updateProfile.mutateAsync({ name });
+    updateUser(updated);
+  }
+
+  async function saveEmail(email: string) {
+    const updated = await updateProfile.mutateAsync({ email });
+    updateUser(updated);
+  }
 
   return (
     <div>
@@ -295,14 +392,20 @@ function AccountPanel() {
         </div>
       </div>
 
-      <div className={ROW}>
-        <span className={LABEL}>Name</span>
-        <span className="text-sm text-gray-500">{user?.name}</span>
-      </div>
-      <div className={ROW}>
-        <span className={LABEL}>Email</span>
-        <span className="text-sm text-gray-500">{user?.email}</span>
-      </div>
+      <EditableField
+        label="Name"
+        value={user?.name ?? ''}
+        onSave={saveName}
+        saving={updateProfile.isPending}
+      />
+      <EditableField
+        label="Email"
+        type="email"
+        value={user?.email ?? ''}
+        onSave={saveEmail}
+        saving={updateProfile.isPending}
+      />
+
       <div className={ROW}>
         <span className={LABEL}>Password</span>
         <button className="text-sm text-indigo-600 hover:text-indigo-700">Change password</button>
