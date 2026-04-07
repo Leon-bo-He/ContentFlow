@@ -7,6 +7,17 @@
   --color-surface-raised: #ffffff;
 }
 
+.dark {
+  color-scheme: dark;
+  --color-surface: #0f172a;
+  --color-surface-raised: #1e293b;
+}
+
+.dark body {
+  background-color: var(--color-surface);
+  color: #f1f5f9;
+}
+
 * {
   box-sizing: border-box;
 }
