@@ -22,7 +22,7 @@ function wrap(C: React.ComponentType) {
   );
 }
 
-export const router = createBrowserRouter([
+export const router: ReturnType<typeof createBrowserRouter> = createBrowserRouter([
   {
     path: '/',
     element: <AppShell />,
