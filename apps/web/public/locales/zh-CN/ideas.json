@@ -1,6 +1,6 @@
 {
   "title": "灵感库",
-  "quick_capture": "快速记录",
+  "quick_capture": "新建灵感",
   "placeholder": "记录一个想法…",
   "convert": "升级为内容",
   "filter": {
@@ -13,5 +13,21 @@
     "low": "低",
     "medium": "中",
     "high": "高"
-  }
+  },
+  "fields": {
+    "title": "标题",
+    "title_placeholder": "这个想法是什么？",
+    "note": "备注",
+    "note_placeholder": "添加详情…",
+    "tags": "标签",
+    "tags_placeholder": "输入后按 Enter",
+    "priority": "优先级",
+    "workspace": "工作空间",
+    "no_workspace": "无工作空间"
+  },
+  "empty": {
+    "heading": "还没有灵感",
+    "body": "点击「新建灵感」或按 Cmd+Shift+I 记录你的第一个想法。"
+  },
+  "login_required": "请先登录以查看您的灵感。"
 }
