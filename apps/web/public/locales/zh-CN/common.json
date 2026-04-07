@@ -6,7 +6,8 @@
     "calendar": "排期日历",
     "publications": "发布管理",
     "analytics": "数据分析",
-    "settings": "设置"
+    "settings": "设置",
+    "workspaces": "工作空间"
   },
   "action": {
     "save": "保存",
