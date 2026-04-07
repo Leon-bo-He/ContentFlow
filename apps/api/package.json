@@ -1,0 +1,37 @@
+{
+  "name": "api",
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "migrate": "drizzle-kit migrate",
+    "generate": "drizzle-kit generate"
+  },
+  "dependencies": {
+    "@contentflow/shared": "workspace:*",
+    "@fastify/cookie": "^9.3.0",
+    "@fastify/cors": "^9.0.0",
+    "@fastify/jwt": "^8.0.0",
+    "bcryptjs": "^2.4.3",
+    "bullmq": "^5.0.0",
+    "drizzle-orm": "^0.30.0",
+    "fastify": "^4.26.0",
+    "fastify-plugin": "^4.5.0",
+    "ioredis": "^5.3.0",
+    "pg": "^8.11.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20.0.0",
+    "@types/pg": "^8.11.0",
+    "drizzle-kit": "^0.20.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.4.0"
+  }
+}
