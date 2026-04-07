@@ -1,0 +1,25 @@
+{
+  "title": "",
+  "queue": "",
+  "add_platform": "",
+  "mark_published": "",
+  "status": {
+    "draft": "",
+    "queued": "",
+    "ready": "",
+    "posting": "",
+    "published": "",
+    "failed": "",
+    "skipped": ""
+  },
+  "platforms": {
+    "douyin": "",
+    "xiaohongshu": "",
+    "weixin": "",
+    "weixin_video": "",
+    "bilibili": "",
+    "x": "",
+    "youtube": "",
+    "instagram": ""
+  }
+}

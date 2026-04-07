@@ -1,0 +1,17 @@
+{
+  "title": "灵感库",
+  "quick_capture": "快速记录",
+  "placeholder": "记录一个想法…",
+  "convert": "升级为内容",
+  "filter": {
+    "all": "全部",
+    "active": "待处理",
+    "converted": "已转化",
+    "archived": "已归档"
+  },
+  "priority": {
+    "low": "低",
+    "medium": "中",
+    "high": "高"
+  }
+}

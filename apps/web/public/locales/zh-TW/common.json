@@ -1,0 +1,31 @@
+{
+  "nav": {
+    "dashboard": "",
+    "ideas": "",
+    "board": "",
+    "calendar": "",
+    "publications": "",
+    "analytics": "",
+    "settings": ""
+  },
+  "action": {
+    "save": "",
+    "cancel": "",
+    "delete": "",
+    "edit": "",
+    "create": "",
+    "confirm": "",
+    "add": ""
+  },
+  "status": {
+    "loading": "",
+    "error": "",
+    "empty": "",
+    "saved": ""
+  },
+  "workspace": {
+    "switcher_label": "",
+    "create": "",
+    "no_workspace": ""
+  }
+}

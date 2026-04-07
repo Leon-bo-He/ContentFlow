@@ -1,0 +1,31 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "ideas": "Ideas",
+    "board": "Content Board",
+    "calendar": "Calendar",
+    "publications": "Publications",
+    "analytics": "Analytics",
+    "settings": "Settings"
+  },
+  "action": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "confirm": "Confirm",
+    "add": "Add"
+  },
+  "status": {
+    "loading": "Loading…",
+    "error": "An error occurred",
+    "empty": "No data",
+    "saved": "Saved"
+  },
+  "workspace": {
+    "switcher_label": "Switch workspace",
+    "create": "Create workspace",
+    "no_workspace": "No workspaces yet"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "title": "",
+  "create_title": "",
+  "name": "",
+  "platform": "",
+  "content_type": "",
+  "publish_goal": "",
+  "timezone": "",
+  "content_types": {
+    "video_short": "",
+    "video_long": "",
+    "image_text": "",
+    "article": "",
+    "podcast": "",
+    "live": ""
+  }
+}

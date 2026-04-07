@@ -1,0 +1,25 @@
+{
+  "title": "发布管理",
+  "queue": "发布队列",
+  "add_platform": "添加发布平台",
+  "mark_published": "标记已发布",
+  "status": {
+    "draft": "草稿",
+    "queued": "排队中",
+    "ready": "待发布",
+    "posting": "发布中",
+    "published": "已发布",
+    "failed": "发布失败",
+    "skipped": "已跳过"
+  },
+  "platforms": {
+    "douyin": "抖音",
+    "xiaohongshu": "小红书",
+    "weixin": "微信公众号",
+    "weixin_video": "视频号",
+    "bilibili": "哔哩哔哩",
+    "x": "X (Twitter)",
+    "youtube": "YouTube",
+    "instagram": "Instagram"
+  }
+}
