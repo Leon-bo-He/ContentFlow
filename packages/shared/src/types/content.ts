@@ -1,0 +1,62 @@
+import type { Stage } from '../enums/stage.js';
+import type { ContentType } from '../enums/content-type.js';
+import type { Platform } from '../enums/platform.js';
+
+export interface LocaleVariant {
+  locale: string;
+  contentId: string;
+}
+
+export interface ContentAttachment {
+  type: 'image' | 'video' | 'link' | 'file';
+  url: string;
+  name: string;
+}
+
+export interface Content {
+  id: string;
+  workspaceId: string;
+  ideaId: string | null;
+  title: string;
+  description: string | null;
+  contentType: ContentType;
+  stage: Stage;
+  tags: string[];
+  targetPlatforms: Platform[];
+  locale: string;
+  localeVariants: LocaleVariant[];
+  scheduledAt: Date | null;
+  publishedAt: Date | null;
+  notes: string | null;
+  reviewNotes: string | null;
+  attachments: ContentAttachment[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type CreateContentInput = Pick<Content, 'workspaceId' | 'title' | 'contentType'> & {
+  ideaId?: string;
+  description?: string;
+  tags?: string[];
+  targetPlatforms?: Platform[];
+  locale?: string;
+  scheduledAt?: Date;
+  notes?: string;
+};
+
+export type UpdateContentInput = Partial<
+  Pick<
+    Content,
+    | 'title'
+    | 'description'
+    | 'contentType'
+    | 'stage'
+    | 'tags'
+    | 'targetPlatforms'
+    | 'locale'
+    | 'scheduledAt'
+    | 'notes'
+    | 'reviewNotes'
+    | 'attachments'
+  >
+>;
