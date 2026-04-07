@@ -17,6 +17,7 @@ void i18n
     ns: ['common', 'ideas', 'workspaces', 'contents', 'publications', 'analytics'],
     backend: {
       loadPath: '/locales/{{lng}}/{{ns}}.json',
+      requestOptions: { cache: 'no-store' },
     },
     detection: {
       order: ['localStorage', 'navigator'],
