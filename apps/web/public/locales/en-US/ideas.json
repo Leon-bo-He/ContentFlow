@@ -1,17 +1,33 @@
 {
-  "title": "",
-  "quick_capture": "",
-  "placeholder": "",
-  "convert": "",
+  "title": "Ideas",
+  "quick_capture": "New Idea",
+  "placeholder": "Capture an idea…",
+  "convert": "Convert to Content",
   "filter": {
-    "all": "",
-    "active": "",
-    "converted": "",
-    "archived": ""
+    "all": "All",
+    "active": "Active",
+    "converted": "Converted",
+    "archived": "Archived"
   },
   "priority": {
-    "low": "",
-    "medium": "",
-    "high": ""
-  }
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High"
+  },
+  "fields": {
+    "title": "Title",
+    "title_placeholder": "What's the idea?",
+    "note": "Note",
+    "note_placeholder": "Add details…",
+    "tags": "Tags",
+    "tags_placeholder": "Type and press Enter",
+    "priority": "Priority",
+    "workspace": "Workspace",
+    "no_workspace": "No workspace"
+  },
+  "empty": {
+    "heading": "No ideas yet",
+    "body": "Press New Idea or Cmd+Shift+I to capture your first idea."
+  },
+  "login_required": "Please log in to view your ideas."
 }
