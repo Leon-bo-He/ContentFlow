@@ -87,6 +87,7 @@ export const contentsRoutes: FastifyPluginAsync = async (app) => {
         title: body.title,
         contentType: body.contentType,
         stage: 'planned',
+        stageHistory: [{ stage: 'planned', timestamp: new Date().toISOString() }],
         description: body.description ?? null,
         tags: body.tags,
         targetPlatforms: body.targetPlatforms,
@@ -140,6 +141,33 @@ export const contentsRoutes: FastifyPluginAsync = async (app) => {
     return reply.send(rows.reverse());
   });
 
+  // DELETE /api/contents/:id
+  app.delete('/api/contents/:id', { onRequest: [app.authenticate] }, async (req, reply) => {
+    const user = req.user as { sub: string };
+    const { id } = req.params as { id: string };
+
+    const [existing] = await db
+      .select({ id: contents.id, workspaceId: contents.workspaceId })
+      .from(contents)
+      .where(eq(contents.id, id));
+
+    if (!existing) {
+      return reply.code(404).send({ error: 'Content not found' });
+    }
+
+    const [ws] = await db
+      .select({ id: workspaces.id })
+      .from(workspaces)
+      .where(and(eq(workspaces.id, existing.workspaceId), eq(workspaces.userId, user.sub)));
+
+    if (!ws) {
+      return reply.code(403).send({ error: 'Forbidden' });
+    }
+
+    await db.delete(contents).where(eq(contents.id, id));
+    return reply.code(204).send();
+  });
+
   // PATCH /api/contents/:id
   app.patch('/api/contents/:id', { onRequest: [app.authenticate] }, async (req, reply) => {
     const user = req.user as { sub: string };
@@ -172,6 +200,21 @@ export const contentsRoutes: FastifyPluginAsync = async (app) => {
     if (body.stage !== undefined) {
       updateData.stage = body.stage;
       updateData.updatedAt = new Date();
+      // Append to stage history
+      const [current] = await db.select({ stageHistory: contents.stageHistory }).from(contents).where(eq(contents.id, id));
+      const history = (current?.stageHistory as { stage: string; timestamp: string }[] ?? []);
+      history.push({ stage: body.stage, timestamp: new Date().toISOString() });
+      updateData.stageHistory = history;
+    }
+    if (body.stageHistory !== undefined) {
+      const entries = body.stageHistory as { stage: string; timestamp: string }[];
+      const sorted = [...entries].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+      for (let i = 1; i < sorted.length; i++) {
+        if (new Date(sorted[i].timestamp).getTime() <= new Date(sorted[i - 1].timestamp).getTime()) {
+          return reply.code(400).send({ error: 'Timeline entries must be in chronological order' });
+        }
+      }
+      updateData.stageHistory = entries;
     }
     if (body.tags !== undefined) updateData.tags = body.tags;
     if (body.targetPlatforms !== undefined) updateData.targetPlatforms = body.targetPlatforms;

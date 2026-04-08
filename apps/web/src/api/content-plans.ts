@@ -93,3 +93,30 @@ export function useCreatePlanTemplate(workspaceId: string) {
     },
   });
 }
+
+export function useRenamePlanTemplate(workspaceId: string) {
+  const qc = useQueryClient();
+  return useMutation<PlanTemplate, ApiError, { templateId: string; name: string }>({
+    mutationFn: ({ templateId, name }) =>
+      apiFetch<PlanTemplate>(`/api/workspaces/${workspaceId}/plan-templates/${templateId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ name }),
+      }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['plan-templates', workspaceId] });
+    },
+  });
+}
+
+export function useDeletePlanTemplate(workspaceId: string) {
+  const qc = useQueryClient();
+  return useMutation<void, ApiError, string>({
+    mutationFn: (templateId) =>
+      apiFetch<void>(`/api/workspaces/${workspaceId}/plan-templates/${templateId}`, {
+        method: 'DELETE',
+      }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['plan-templates', workspaceId] });
+    },
+  });
+}

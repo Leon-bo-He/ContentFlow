@@ -2,6 +2,11 @@ import type { Stage } from '../enums/stage.js';
 import type { ContentType } from '../enums/content-type.js';
 import type { Platform } from '../enums/platform.js';
 
+export interface StageHistoryEntry {
+  stage: Stage;
+  timestamp: string; // ISO 8601
+}
+
 export interface LocaleVariant {
   locale: string;
   contentId: string;
@@ -30,6 +35,7 @@ export interface Content {
   notes: string | null;
   reviewNotes: string | null;
   attachments: ContentAttachment[];
+  stageHistory: StageHistoryEntry[];
   createdAt: Date;
   updatedAt: Date;
 }

@@ -5,12 +5,7 @@ const contentTypeValues = [
 ] as const;
 
 const stageValues = [
-  'planned', 'planning', 'creating', 'ready', 'publishing', 'published', 'reviewed',
-] as const;
-
-const platformValues = [
-  'douyin', 'xiaohongshu', 'weixin', 'weixin_video',
-  'bilibili', 'x', 'youtube', 'instagram',
+  'planned', 'planning', 'creating', 'ready', 'publishing', 'published', 'reviewed', 'archived',
 ] as const;
 
 export const createContentSchema = z.object({
@@ -20,7 +15,7 @@ export const createContentSchema = z.object({
   ideaId: z.string().uuid().optional(),
   description: z.string().optional(),
   tags: z.array(z.string()).default([]),
-  targetPlatforms: z.array(z.enum(platformValues)).default([]),
+  targetPlatforms: z.array(z.string()).default([]),
   locale: z.string().default('zh-CN'),
   scheduledAt: z.coerce.date().optional(),
   notes: z.string().optional(),
@@ -32,9 +27,10 @@ export const updateContentSchema = z.object({
   contentType: z.enum(contentTypeValues).optional(),
   stage: z.enum(stageValues).optional(),
   tags: z.array(z.string()).optional(),
-  targetPlatforms: z.array(z.enum(platformValues)).optional(),
+  targetPlatforms: z.array(z.string()).optional(),
   locale: z.string().optional(),
   scheduledAt: z.coerce.date().nullable().optional(),
   notes: z.string().nullable().optional(),
   reviewNotes: z.string().nullable().optional(),
+  stageHistory: z.array(z.object({ stage: z.string(), timestamp: z.string() })).optional(),
 });

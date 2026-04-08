@@ -18,20 +18,24 @@
   },
   "platforms": {
     "douyin": "Douyin",
-    "xiaohongshu": "Xiaohongshu",
+    "xiaohongshu": "RedNote",
     "weixin": "WeChat OA",
     "weixin_video": "WeChat Video",
     "bilibili": "Bilibili",
     "x": "X (Twitter)",
     "youtube": "YouTube",
-    "instagram": "Instagram"
+    "instagram": "Instagram",
+    "tiktok": "TikTok",
+    "custom": "Custom"
   },
   "action": {
     "configure": "Configure",
     "mark_published": "Mark Published",
     "remove": "Remove",
     "view": "View",
-    "retry": "Retry"
+    "retry": "Retry",
+    "restore": "Restore",
+    "cancel": "Cancel"
   },
   "queue_page": {
     "title": "Publish Queue",
@@ -42,6 +46,8 @@
     "tomorrow": "Tomorrow",
     "empty": "No scheduled publications",
     "all_statuses": "All statuses",
+    "queued_and_ready": "Queued + Ready",
+    "refresh": "Refresh",
     "btn_mark_published": "Mark Published",
     "btn_view": "View",
     "btn_retry": "Retry"
@@ -59,15 +65,38 @@
     "visibility_friends": "Friends Only",
     "allow_comments": "Allow Comments",
     "save": "Save",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "title": "Configure"
   },
   "add": {
     "title": "Add Platform",
     "select_platform": "Select a platform",
     "all_added": "All platforms already added",
+    "manage_settings": "Manage platforms in Settings",
+    "add_custom": "Add custom platform",
     "set_schedule": "Set scheduled time",
     "submit": "Add",
     "cancel": "Cancel"
+  },
+  "bundle": {
+    "button": "Bundles",
+    "title": "Platform Bundles",
+    "empty": "No bundles saved yet",
+    "empty_hint": "Create a bundle to add multiple platforms with set times in one click",
+    "new": "New Bundle",
+    "save_current": "Save Current Platforms as Bundle",
+    "save": "Save Bundle",
+    "cancel": "Cancel",
+    "name_placeholder": "e.g. Weekly Social Pack",
+    "delete": "Delete",
+    "apply": "Apply",
+    "apply_title": "Apply Bundle",
+    "apply_date": "Base Date",
+    "apply_confirm": "Apply",
+    "applying": "Applying…",
+    "no_time": "No time",
+    "time_label": "Time",
+    "skipped": "already added, skipped"
   },
   "mark": {
     "title": "Mark as Published",
@@ -78,5 +107,24 @@
     "published_at": "Published At",
     "submit": "Confirm",
     "cancel": "Cancel"
+  },
+  "toast_platform_added": "Platform added to publish queue",
+  "toast_platform_add_failed": "Failed to add platform: {{message}}",
+  "toast_update_failed": "Failed to update publication: {{message}}",
+  "toast_marked_published": "Marked as published",
+  "toast_mark_published_failed": "Failed to mark published: {{message}}",
+  "template": {
+    "use": "Templates",
+    "pick": "Apply a template",
+    "apply": "Apply",
+    "delete": "Delete template",
+    "empty": "No templates saved yet",
+    "empty_hint": "Fill in the form and save it as a template",
+    "save_current": "Save as template",
+    "save_title": "Save as Template",
+    "name_placeholder": "Template name…",
+    "save": "Save",
+    "panel_hint": "Save templates from the Configure form",
+    "apply_hint": "Open Configure on any platform to apply a template"
   }
 }

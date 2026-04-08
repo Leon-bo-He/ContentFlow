@@ -45,5 +45,10 @@
     "x": "X (Twitter)",
     "youtube": "YouTube",
     "instagram": "Instagram"
-  }
+  },
+  "name_required": "워크스페이스 이름을 입력하세요",
+  "icon_custom_placeholder": "커스텀 아이콘 (텍스트, 이모지)",
+  "color_custom": "커스텀 색상",
+  "about_label": "소개",
+  "about_placeholder": "워크스페이스를 한 문장으로 설명하세요…"
 }

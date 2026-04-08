@@ -45,5 +45,10 @@
     "x": "X (Twitter)",
     "youtube": "YouTube",
     "instagram": "Instagram"
-  }
+  },
+  "name_required": "請輸入工作空間名稱",
+  "icon_custom_placeholder": "自訂圖示（文字、Emoji）",
+  "color_custom": "自訂顏色",
+  "about_label": "簡介",
+  "about_placeholder": "用一兩句話描述這個工作空間…"
 }

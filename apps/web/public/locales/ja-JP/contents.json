@@ -1,6 +1,7 @@
 {
   "title": "コンテンツボード",
-  "create": "コンテンツを作成",
+  "stage_updated": "ステージを「{{stage}}」に更新しました",
+  "new_content": "コンテンツを作成",
   "stages": {
     "planned": "企画確定",
     "planning": "コンテンツ設計",
@@ -8,34 +9,11 @@
     "ready": "配信待ち",
     "publishing": "配信管理",
     "published": "配信済み",
-    "reviewed": "振り返り完了"
+    "reviewed": "振り返り完了",
+    "archived": "アーカイブ済み"
   },
   "brief": {
     "title": "コンテンツ企画書",
-    "audience": "ターゲット",
-    "goals": "目標",
-    "hooks": "フック分析",
-    "titles": "タイトル候補",
-    "outline": "コンテンツ構成",
-    "references": "参考事例",
-    "back_to_board": "ボードに戻る",
-    "sections": {
-      "format": "コンテンツ形式 / Content Format",
-      "audience": "ターゲット / Target Audience",
-      "goals": "目標 / Content Goals",
-      "hooks": "フック / Hook Analysis",
-      "titles": "タイトル候補 / Title Candidates",
-      "outline": "構成 / Content Outline",
-      "references": "参考事例 / Competitive References"
-    },
-    "format": {
-      "duration_label": "尺",
-      "duration_unit": "秒",
-      "aspect_ratio_label": "アスペクト比",
-      "aspect_ratio_placeholder": "アスペクト比を選択",
-      "notes_label": "形式メモ",
-      "notes_placeholder": "フォーマット、スタイル、制作要件に関するメモ…"
-    },
     "audience": {
       "age_range_label": "年齢層",
       "age_range_placeholder": "例：18〜25",
@@ -101,12 +79,40 @@
       "comments_label": "コメント数",
       "takeaway_label": "学んだこと",
       "add_reference_confirm": "追加"
+    },
+    "back_to_board": "ボードに戻る",
+    "sections": {
+      "format": "コンテンツ形式",
+      "audience": "ターゲット",
+      "goals": "目標",
+      "hooks": "フック分析",
+      "titles": "タイトル候補",
+      "outline": "コンテンツ構成",
+      "references": "参考事例"
+    },
+    "saving": "保存中…",
+    "saved": "保存しました",
+    "not_found": "コンテンツが見つかりません",
+    "format": {
+      "duration_label": "尺",
+      "duration_unit": "秒",
+      "aspect_ratio_label": "アスペクト比",
+      "aspect_ratio_placeholder": "アスペクト比を選択",
+      "notes_label": "形式メモ",
+      "notes_placeholder": "フォーマット、スタイル、制作要件に関するメモ…"
     }
+  },
+  "column": {
+    "empty": "コンテンツなし",
+    "drop_here": "ここにドロップ",
+    "workspace_not_found": "ワークスペースが見つかりません",
+    "auto_archive_hint": "7日後に自動アーカイブ"
   },
   "card": {
     "scheduled": "予定 {{date}}",
     "tags_more": "+{{count}} 件",
-    "no_date": "日程未設定"
+    "no_date": "日程未設定",
+    "more": "+{{count}} 件"
   },
   "drawer": {
     "title_label": "タイトル",
@@ -121,7 +127,18 @@
     "add_tag": "タグを追加",
     "open_brief": "企画書を開く ✍️",
     "tab_details": "詳細",
-    "tab_publish": "配信"
+    "tab_publish": "配信",
+    "tab_timeline": "タイムライン",
+    "archive": "アーカイブ",
+    "unarchive": "アーカイブ解除",
+    "add_custom_platform": "プラットフォーム追加",
+    "custom_platform_name": "プラットフォーム名",
+    "no_custom_platforms": "カスタムプラットフォームなし",
+    "manage_platforms": "プラットフォーム管理",
+    "delete": "コンテンツを削除",
+    "delete_confirm_title": "完全に削除しますか？",
+    "delete_confirm_body": "このコンテンツは完全に削除され、復元できません。",
+    "delete_confirm_button": "完全に削除"
   },
   "create": {
     "title": "コンテンツを作成",
@@ -142,12 +159,28 @@
   },
   "platforms": {
     "douyin": "TikTok",
-    "xiaohongshu": "Xiaohongshu",
+    "xiaohongshu": "RedNote",
     "weixin": "WeChat公式アカウント",
     "weixin_video": "WeChatビデオ",
     "bilibili": "Bilibili",
     "x": "X (Twitter)",
     "youtube": "YouTube",
-    "instagram": "Instagram"
+    "instagram": "Instagram",
+    "tiktok": "TikTok",
+    "custom": "カスタム"
+  },
+  "update_error": "コンテンツの更新に失敗しました：{{message}}",
+  "create_error": "コンテンツの作成に失敗しました：{{message}}",
+  "delete_error": "コンテンツの削除に失敗しました：{{message}}",
+  "toast_created": "コンテンツを作成しました",
+  "toast_deleted": "コンテンツを削除しました",
+  "archive": {
+    "archived_at": "アーカイブ日",
+    "published_at": "配信日",
+    "col_title": "タイトル",
+    "col_type": "タイプ",
+    "col_platforms": "プラットフォーム",
+    "col_published": "配信日",
+    "col_archived": "アーカイブ日"
   }
 }

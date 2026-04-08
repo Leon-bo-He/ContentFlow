@@ -10,8 +10,8 @@ const WorkspaceBoard = lazy(() => import('../pages/WorkspaceBoard.js'));
 const Calendar = lazy(() => import('../pages/Calendar.js'));
 const Publications = lazy(() => import('../pages/Publications.js'));
 const Analytics = lazy(() => import('../pages/Analytics.js'));
-const Settings = lazy(() => import('../pages/Settings.js'));
 const ContentBrief = lazy(() => import('../pages/ContentBrief.js'));
+const WorkspaceArchive = lazy(() => import('../pages/WorkspaceArchive.js'));
 const NotFound = lazy(() => import('../pages/NotFound.js'));
 const LoginPage = lazy(() => import('../pages/auth/LoginPage.js'));
 const RegisterPage = lazy(() => import('../pages/auth/RegisterPage.js'));
@@ -54,8 +54,8 @@ export const router: ReturnType<typeof createBrowserRouter> = createBrowserRoute
           { path: 'workspaces/:workspaceId/calendar', element: wrap(Calendar) },
           { path: 'workspaces/:workspaceId/analytics', element: wrap(Analytics) },
           { path: 'workspaces/:workspaceId/contents/:contentId/brief', element: wrap(ContentBrief) },
+          { path: 'workspaces/:workspaceId/archive', element: wrap(WorkspaceArchive) },
           { path: 'publications', element: wrap(Publications) },
-          { path: 'settings', element: wrap(Settings) },
           { path: '*', element: wrap(NotFound) },
         ],
       },

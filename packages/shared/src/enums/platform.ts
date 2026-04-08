@@ -7,17 +7,21 @@ export const Platform = {
   X: 'x',
   YOUTUBE: 'youtube',
   INSTAGRAM: 'instagram',
+  TIKTOK: 'tiktok',
+  CUSTOM: 'custom',
 } as const;
 
 export type Platform = (typeof Platform)[keyof typeof Platform];
 
 export const PLATFORM_LABELS: Record<Platform, string> = {
   douyin: 'Douyin',
-  xiaohongshu: 'Xiaohongshu',
+  xiaohongshu: 'Red Note',
   weixin: 'WeChat OA',
   weixin_video: 'WeChat Video',
   bilibili: 'Bilibili',
   x: 'X (Twitter)',
   youtube: 'YouTube',
   instagram: 'Instagram',
+  tiktok: 'TikTok',
+  custom: 'Custom',
 };

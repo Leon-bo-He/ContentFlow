@@ -104,6 +104,7 @@ export function IdeaCaptureModal({ open, onClose }: IdeaCaptureModalProps) {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {t('fields.title')}
+                <span className="text-red-500 ml-0.5">*</span>
               </label>
               <input
                 ref={titleRef}
@@ -210,8 +211,7 @@ export function IdeaCaptureModal({ open, onClose }: IdeaCaptureModalProps) {
               onClick={onClose}
               className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
             >
-              {/* Cancel */}
-              Cancel
+              {t('action.cancel')}
             </button>
             <button
               type="submit"

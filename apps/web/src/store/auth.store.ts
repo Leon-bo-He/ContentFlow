@@ -36,6 +36,9 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'contentflow-auth',
+      onRehydrateStorage: () => (state) => {
+        if (state?.accessToken) setAccessToken(state.accessToken);
+      },
       storage: {
         getItem: (name) => {
           const val = sessionStorage.getItem(name);

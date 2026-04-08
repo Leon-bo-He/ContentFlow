@@ -1,5 +1,5 @@
 {
-  "name": "content-creator",
+  "name": "ContentFlow",
   "private": true,
   "scripts": {
     "dev": "pnpm --parallel --filter=api --filter=web dev",

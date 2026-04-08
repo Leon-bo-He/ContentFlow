@@ -11,6 +11,8 @@ import {
   useDeleteReference,
   usePlanTemplates,
   useCreatePlanTemplate,
+  useRenamePlanTemplate,
+  useDeletePlanTemplate,
 } from '../api/content-plans.js';
 import { FormatSection } from '../components/brief/FormatSection.js';
 import { AudienceSection } from '../components/brief/AudienceSection.js';
@@ -48,6 +50,7 @@ function Accordion({ title, defaultOpen = false, children }: AccordionProps) {
 // ── SaveIndicator ─────────────────────────────────────────────────────────────
 
 function SaveIndicator({ saving }: { saving: boolean }) {
+  const { t } = useTranslation('contents');
   const [showCheck, setShowCheck] = useState(false);
   const prevSaving = useRef(false);
 
@@ -62,10 +65,10 @@ function SaveIndicator({ saving }: { saving: boolean }) {
   }, [saving]);
 
   if (saving) {
-    return <span className="text-xs text-gray-400">Saving…</span>;
+    return <span className="text-xs text-gray-400">{t('brief.saving')}</span>;
   }
   if (showCheck) {
-    return <span className="text-xs text-green-500">✓ Saved</span>;
+    return <span className="text-xs text-green-500">✓ {t('brief.saved')}</span>;
   }
   return null;
 }
@@ -92,6 +95,8 @@ export default function ContentBrief() {
 
   const { data: templates = [] } = usePlanTemplates(workspaceId);
   const createTemplate = useCreatePlanTemplate(workspaceId);
+  const renameTemplate = useRenamePlanTemplate(workspaceId);
+  const deleteTemplate = useDeletePlanTemplate(workspaceId);
 
   // Local plan state — initialised from server data
   const [localPlan, setLocalPlan] = useState<Partial<ContentPlan>>({});
@@ -145,10 +150,18 @@ export default function ContentBrief() {
     createTemplate.mutate(input);
   }
 
+  function handleRenameTemplate(templateId: string, name: string) {
+    renameTemplate.mutate({ templateId, name });
+  }
+
+  function handleDeleteTemplate(templateId: string) {
+    deleteTemplate.mutate(templateId);
+  }
+
   if (!content) {
     return (
       <div className="p-8 text-center text-gray-400">
-        {contentId ? 'Content not found.' : 'Loading…'}
+        {contentId ? t('brief.not_found') : t('status.loading', { ns: 'common' })}
       </div>
     );
   }
@@ -204,6 +217,8 @@ export default function ContentBrief() {
             templates={templates}
             onChange={handleChange}
             onSaveTemplate={handleSaveTemplate}
+            onRenameTemplate={handleRenameTemplate}
+            onDeleteTemplate={handleDeleteTemplate}
           />
         </Accordion>
 

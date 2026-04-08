@@ -23,7 +23,7 @@ export async function apiFetch<T>(
   options: RequestInit = {}
 ): Promise<T> {
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
+    ...(options.body !== undefined ? { 'Content-Type': 'application/json' } : {}),
     ...(options.headers as Record<string, string>),
   };
 
@@ -61,5 +61,6 @@ export async function apiFetch<T>(
     throw new ApiError(res.status, (body as { error: string }).error ?? res.statusText);
   }
 
+  if (res.status === 204) return undefined as unknown as T;
   return res.json() as Promise<T>;
 }

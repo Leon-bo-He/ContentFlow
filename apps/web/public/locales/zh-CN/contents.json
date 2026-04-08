@@ -1,6 +1,7 @@
 {
   "title": "内容看板",
-  "create": "新建内容",
+  "stage_updated": "阶段已更新为「{{stage}}」",
+  "new_content": "新建内容",
   "stages": {
     "planned": "选题确认",
     "planning": "内容策划",
@@ -8,34 +9,11 @@
     "ready": "待发布",
     "publishing": "发布管理",
     "published": "已发布",
-    "reviewed": "复盘完成"
+    "reviewed": "复盘完成",
+    "archived": "已归档"
   },
   "brief": {
     "title": "内容策划",
-    "audience": "目标受众",
-    "goals": "内容目标",
-    "hooks": "爆点提炼",
-    "titles": "标题候选",
-    "outline": "内容大纲",
-    "references": "竞品参考",
-    "back_to_board": "返回看板",
-    "sections": {
-      "format": "内容类型 / Content Format",
-      "audience": "目标受众 / Target Audience",
-      "goals": "内容目标 / Content Goals",
-      "hooks": "爆点提炼 / Hook Analysis",
-      "titles": "标题候选 / Title Candidates",
-      "outline": "内容大纲 / Content Outline",
-      "references": "竞品参考 / Competitive References"
-    },
-    "format": {
-      "duration_label": "时长",
-      "duration_unit": "秒",
-      "aspect_ratio_label": "画面比例",
-      "aspect_ratio_placeholder": "选择画面比例",
-      "notes_label": "格式备注",
-      "notes_placeholder": "关于格式、风格或制作要求的任何说明…"
-    },
     "audience": {
       "age_range_label": "年龄范围",
       "age_range_placeholder": "例如 18-25",
@@ -101,12 +79,40 @@
       "comments_label": "评论数",
       "takeaway_label": "核心收获",
       "add_reference_confirm": "添加"
+    },
+    "back_to_board": "返回看板",
+    "sections": {
+      "format": "内容类型",
+      "audience": "目标受众",
+      "goals": "内容目标",
+      "hooks": "爆点提炼",
+      "titles": "标题候选",
+      "outline": "内容大纲",
+      "references": "竞品参考"
+    },
+    "saving": "保存中…",
+    "saved": "已保存",
+    "not_found": "未找到内容",
+    "format": {
+      "duration_label": "时长",
+      "duration_unit": "秒",
+      "aspect_ratio_label": "画面比例",
+      "aspect_ratio_placeholder": "选择画面比例",
+      "notes_label": "格式备注",
+      "notes_placeholder": "关于格式、风格或制作要求的任何说明…"
     }
+  },
+  "column": {
+    "empty": "暂无内容",
+    "drop_here": "放置到此处",
+    "workspace_not_found": "未找到工作空间",
+    "auto_archive_hint": "7天后自动归档"
   },
   "card": {
     "scheduled": "预定 {{date}}",
     "tags_more": "+{{count}} 更多",
-    "no_date": "未设置日期"
+    "no_date": "未设置日期",
+    "more": "+{{count}} 更多"
   },
   "drawer": {
     "title_label": "标题",
@@ -121,7 +127,18 @@
     "add_tag": "添加标签",
     "open_brief": "打开策划书 ✍️",
     "tab_details": "详情",
-    "tab_publish": "发布"
+    "tab_publish": "发布",
+    "tab_timeline": "时间线",
+    "archive": "归档",
+    "unarchive": "取消归档",
+    "add_custom_platform": "添加平台",
+    "custom_platform_name": "平台名称",
+    "no_custom_platforms": "暂无自定义平台",
+    "manage_platforms": "管理平台",
+    "delete": "删除内容",
+    "delete_confirm_title": "永久删除？",
+    "delete_confirm_body": "此内容将被永久删除，无法恢复。",
+    "delete_confirm_button": "永久删除"
   },
   "create": {
     "title": "新建内容",
@@ -148,6 +165,22 @@
     "bilibili": "哔哩哔哩",
     "x": "X (Twitter)",
     "youtube": "YouTube",
-    "instagram": "Instagram"
+    "instagram": "Instagram",
+    "tiktok": "TikTok",
+    "custom": "自定义"
+  },
+  "update_error": "更新内容失败：{{message}}",
+  "create_error": "创建内容失败：{{message}}",
+  "delete_error": "删除内容失败：{{message}}",
+  "toast_created": "内容已创建",
+  "toast_deleted": "内容已删除",
+  "archive": {
+    "archived_at": "归档于",
+    "published_at": "发布于",
+    "col_title": "标题",
+    "col_type": "类型",
+    "col_platforms": "平台",
+    "col_published": "发布时间",
+    "col_archived": "归档时间"
   }
 }

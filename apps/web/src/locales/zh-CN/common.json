@@ -1,0 +1,151 @@
+{
+  "nav": {
+    "dashboard": "总览",
+    "ideas": "灵感库",
+    "board": "内容看板",
+    "calendar": "排期日历",
+    "publications": "发布管理",
+    "analytics": "数据分析",
+    "settings": "设置",
+    "workspaces": "工作空间",
+    "archive": "归档内容"
+  },
+  "action": {
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "create": "新建",
+    "confirm": "确认",
+    "add": "添加",
+    "language": "语言",
+    "try_again": "重试",
+    "back_home": "返回首页",
+    "enable": "开启",
+    "dismiss": "关闭",
+    "remove": "移除"
+  },
+  "status": {
+    "loading": "加载中…",
+    "error": "发生错误",
+    "empty": "暂无数据",
+    "saved": "已保存"
+  },
+  "workspace": {
+    "switcher_label": "切换工作空间",
+    "create": "创建工作空间",
+    "no_workspace": "暂无工作空间"
+  },
+  "calendar": {
+    "month_view": "月视图",
+    "week_view": "周视图",
+    "list_view": "列表",
+    "prev": "上月",
+    "next": "下月",
+    "today": "今天",
+    "no_content": "暂无内容",
+    "goal_banner": "本周：已排期 {{scheduled}} / 目标 {{goal}} 条",
+    "on_track": "进度正常",
+    "behind": "进度落后",
+    "add_content": "添加内容",
+    "goal_week": "本周",
+    "goal_month": "本月",
+    "goal_year": "今年",
+    "goal_of": "{{actual}} / {{goal}}"
+  },
+  "auth": {
+    "sign_in": "登录",
+    "sign_up": "注册",
+    "sign_out": "退出登录",
+    "email": "邮箱",
+    "password": "密码",
+    "name": "用户名",
+    "confirm_password": "确认密码",
+    "welcome_back": "欢迎回来",
+    "create_account": "创建账号",
+    "no_account": "还没有账号？",
+    "have_account": "已有账号？",
+    "invalid_credentials": "邮箱或密码错误",
+    "email_taken": "该邮箱已被注册",
+    "password_mismatch": "两次密码不一致",
+    "password_too_short": "密码至少需要 8 位字符"
+  },
+  "settings": {
+    "sections": {
+      "general": "通用",
+      "notifications": "通知",
+      "workspaces": "工作空间",
+      "platforms": "平台管理",
+      "account": "账号"
+    },
+    "platforms": {
+      "builtin_title": "内置平台",
+      "custom_title": "自定义平台",
+      "upload_icon_hint": "上传 SVG 图标",
+      "upload_icon_sub": "（点击方框上传）",
+      "remove_icon": "移除图标",
+      "add_custom": "添加自定义平台"
+    },
+    "general": {
+      "language": "语言",
+      "timezone": "时区",
+      "appearance": "外观",
+      "theme_system": "跟随系统",
+      "theme_light": "浅色",
+      "theme_dark": "深色"
+    },
+    "notifications": {
+      "publish_reminders": "发布提醒",
+      "publish_reminders_desc": "在排期发布前收到通知",
+      "lead_time": "提前提醒",
+      "lead_time_unit": "分钟前",
+      "blocked": "通知已被浏览器拦截，请在浏览器设置中开启"
+    },
+    "account": {
+      "name": "用户名",
+      "email": "邮箱",
+      "password": "密码",
+      "change_password": "修改密码",
+      "delete_account": "删除账号…",
+      "delete_warning": "此操作将永久删除您的账号及所有相关数据，无法撤销。",
+      "confirm_password_label": "请输入密码以确认",
+      "current_password": "当前密码",
+      "new_password": "新密码",
+      "confirm_new_password": "确认新密码",
+      "update_password": "更新密码",
+      "passwords_mismatch": "两次密码不一致",
+      "password_too_short": "密码至少需要 8 位字符",
+      "delete_my_account": "删除我的账号",
+      "profile": "个人资料",
+      "security": "安全",
+      "password_desc": "设置强密码以保护您的账号",
+      "danger_zone": "危险操作",
+      "sign_out_desc": "退出当前设备上的账号",
+      "delete_desc": "永久删除账号及所有数据"
+    }
+  },
+  "error": {
+    "something_went_wrong": "出现了错误",
+    "unexpected": "发生了意外错误",
+    "page_not_found": "页面未找到",
+    "page_not_found_desc": "该页面不存在或已被移动",
+    "failed_to_save": "保存失败",
+    "failed": "操作失败"
+  },
+  "offline": {
+    "back_online": "已恢复联网，正在同步 {{count}} 条待处理变更",
+    "all_synced": "所有变更已同步",
+    "banner": "您已离线 — 恢复联网后将自动同步"
+  },
+  "notifications": {
+    "banner_text": "开启发布提醒，在排期发布前 15 分钟收到通知"
+  },
+  "aria": {
+    "hide_password": "隐藏密码",
+    "show_password": "显示密码",
+    "expand_sidebar": "展开侧边栏",
+    "collapse_sidebar": "收起侧边栏",
+    "close": "关闭",
+    "dismiss": "关闭"
+  }
+}

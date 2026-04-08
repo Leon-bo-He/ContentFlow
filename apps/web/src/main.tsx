@@ -6,6 +6,8 @@ import { queryClient } from './api/query-client.js';
 import { router } from './router/index.js';
 import { FullPageSpinner } from './components/ui/FullPageSpinner.js';
 import { AuthProvider } from './components/auth/AuthProvider.js';
+// Import as side-effect: all locale JSON is eagerly bundled so i18n initialises
+// synchronously — no need to await the Promise before mounting React.
 import './i18n/index.js';
 import './index.css';
 

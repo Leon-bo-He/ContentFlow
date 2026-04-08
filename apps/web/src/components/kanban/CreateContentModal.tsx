@@ -1,23 +1,14 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Platform, ContentType } from '@contentflow/shared';
+import type { ContentType } from '@contentflow/shared';
 import { useCreateContent } from '../../api/contents.js';
+import { PlatformIcon } from '../ui/PlatformIcon.js';
+import { useUiStore } from '../../store/ui.store.js';
 
-const PLATFORM_EMOJI: Record<string, string> = {
-  douyin: '🎵',
-  xiaohongshu: '📕',
-  weixin: '📰',
-  weixin_video: '📱',
-  bilibili: '🎬',
-  x: '🐦',
-  youtube: '▶️',
-  instagram: '📷',
-};
-
-const ALL_PLATFORMS: Platform[] = [
+const BUILT_IN_PLATFORMS = [
   'douyin', 'xiaohongshu', 'weixin', 'weixin_video',
-  'bilibili', 'x', 'youtube', 'instagram',
-];
+  'bilibili', 'x', 'youtube', 'instagram', 'tiktok',
+] as const;
 
 const ALL_CONTENT_TYPES: ContentType[] = [
   'video_short', 'video_long', 'image_text', 'article', 'podcast', 'live',
@@ -31,13 +22,14 @@ interface CreateContentModalProps {
 export function CreateContentModal({ workspaceId, onClose }: CreateContentModalProps) {
   const { t } = useTranslation('contents');
   const createContent = useCreateContent();
+  const { customPlatforms, openSettings, disabledBuiltinPlatforms } = useUiStore();
 
   const [title, setTitle] = useState('');
   const [contentType, setContentType] = useState<ContentType>('video_short');
-  const [platforms, setPlatforms] = useState<Platform[]>([]);
+  const [platforms, setPlatforms] = useState<string[]>([]);
   const [error, setError] = useState('');
 
-  function togglePlatform(p: Platform) {
+  function togglePlatform(p: string) {
     setPlatforms((prev) =>
       prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p]
     );
@@ -104,7 +96,7 @@ export function CreateContentModal({ workspaceId, onClose }: CreateContentModalP
               {t('create.platforms_label')}
             </label>
             <div className="flex flex-wrap gap-2">
-              {ALL_PLATFORMS.map((p) => {
+              {BUILT_IN_PLATFORMS.filter((p) => !disabledBuiltinPlatforms.includes(p)).map((p) => {
                 const active = platforms.includes(p);
                 return (
                   <button
@@ -117,11 +109,36 @@ export function CreateContentModal({ workspaceId, onClose }: CreateContentModalP
                         : 'border-gray-200 text-gray-500 hover:border-gray-300'
                     }`}
                   >
-                    <span>{PLATFORM_EMOJI[p]}</span>
+                    <PlatformIcon platform={p} className="w-5 h-5" />
                     <span>{t(`platforms.${p}`)}</span>
                   </button>
                 );
               })}
+              {customPlatforms.map((cp) => {
+                const active = platforms.includes(cp.id);
+                return (
+                  <button
+                    key={cp.id}
+                    type="button"
+                    onClick={() => togglePlatform(cp.id)}
+                    className={`flex items-center gap-1 text-xs px-2 py-1 rounded-full border transition-colors ${
+                      active
+                        ? 'border-indigo-400 bg-indigo-50 text-indigo-700'
+                        : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                    }`}
+                  >
+                    <PlatformIcon platform={cp.id} className="w-5 h-5" />
+                    <span>{cp.name}</span>
+                  </button>
+                );
+              })}
+              <button
+                type="button"
+                onClick={() => openSettings('platforms')}
+                className="flex items-center gap-1 text-xs px-2 py-1 rounded-full border border-dashed border-gray-300 text-gray-400 hover:border-indigo-400 hover:text-indigo-500 transition-colors"
+              >
+                + {t('drawer.manage_platforms')}
+              </button>
             </div>
           </div>
 

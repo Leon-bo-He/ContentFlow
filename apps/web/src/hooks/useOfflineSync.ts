@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useOfflineQueue } from '../store/offline-queue.store.js';
 import { apiFetch } from '../api/client.js';
 import { toast } from '../store/toast.store.js';
+import i18n from '../i18n/index.js';
 import { useOnlineStatus } from './useOnlineStatus.js';
 
 export function useOfflineSync() {
@@ -17,7 +18,7 @@ export function useOfflineSync() {
     if (queue.length === 0) return;
 
     const pending = [...queue];
-    toast.info(`Back online — syncing ${pending.length} pending change${pending.length !== 1 ? 's' : ''}`);
+    toast.info(i18n.t('offline.back_online', { ns: 'common', count: pending.length }));
 
     void (async () => {
       let successCount = 0;
@@ -33,7 +34,7 @@ export function useOfflineSync() {
         }
       }
       if (successCount > 0) {
-        toast.success('All changes synced');
+        toast.success(i18n.t('offline.all_synced', { ns: 'common' }));
       }
     })();
   }, [isOnline, queue, dequeue]);

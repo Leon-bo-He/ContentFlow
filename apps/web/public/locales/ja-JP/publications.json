@@ -17,21 +17,25 @@
     "skipped": "スキップ"
   },
   "platforms": {
-    "douyin": "TikTok",
-    "xiaohongshu": "Xiaohongshu",
+    "douyin": "Douyin",
+    "xiaohongshu": "RedNote",
     "weixin": "WeChat公式アカウント",
     "weixin_video": "WeChatビデオ",
     "bilibili": "Bilibili",
     "x": "X (Twitter)",
     "youtube": "YouTube",
-    "instagram": "Instagram"
+    "instagram": "Instagram",
+    "tiktok": "TikTok",
+    "custom": "カスタム"
   },
   "action": {
     "configure": "設定",
     "mark_published": "配信済みにする",
     "remove": "削除",
     "view": "表示",
-    "retry": "再試行"
+    "retry": "再試行",
+    "restore": "元に戻す",
+    "cancel": "取り消す"
   },
   "queue_page": {
     "title": "配信キュー",
@@ -42,6 +46,8 @@
     "tomorrow": "明日",
     "empty": "予定された配信はありません",
     "all_statuses": "すべてのステータス",
+    "queued_and_ready": "配信予定",
+    "refresh": "更新",
     "btn_mark_published": "配信済みにする",
     "btn_view": "表示",
     "btn_retry": "再試行"
@@ -59,15 +65,38 @@
     "visibility_friends": "友達のみ",
     "allow_comments": "コメントを許可",
     "save": "保存",
-    "cancel": "キャンセル"
+    "cancel": "キャンセル",
+    "title": "設定"
   },
   "add": {
     "title": "プラットフォームを追加",
     "select_platform": "プラットフォームを選択",
     "all_added": "すべてのプラットフォームが追加済みです",
+    "manage_settings": "設定でプラットフォームを管理",
+    "add_custom": "カスタムプラットフォームを追加",
     "set_schedule": "配信時間を設定",
     "submit": "追加",
     "cancel": "キャンセル"
+  },
+  "bundle": {
+    "button": "バンドル",
+    "title": "プラットフォームバンドル",
+    "empty": "保存済みバンドルなし",
+    "empty_hint": "バンドルを作成して、複数プラットフォームを時間設定込みで一括追加",
+    "new": "新しいバンドル",
+    "save_current": "現在のプラットフォームをバンドルとして保存",
+    "save": "バンドルを保存",
+    "cancel": "キャンセル",
+    "name_placeholder": "例：週次ソーシャルパック",
+    "delete": "削除",
+    "apply": "適用",
+    "apply_title": "バンドルを適用",
+    "apply_date": "基準日",
+    "apply_confirm": "適用する",
+    "applying": "適用中…",
+    "no_time": "時間なし",
+    "time_label": "配信時間",
+    "skipped": "追加済み、スキップ"
   },
   "mark": {
     "title": "配信済みにする",
@@ -78,5 +107,24 @@
     "published_at": "配信日時",
     "submit": "確認",
     "cancel": "キャンセル"
+  },
+  "toast_platform_added": "プラットフォームを配信キューに追加しました",
+  "toast_platform_add_failed": "プラットフォームの追加に失敗しました：{{message}}",
+  "toast_update_failed": "配信設定の更新に失敗しました：{{message}}",
+  "toast_marked_published": "配信済みとしてマークしました",
+  "toast_mark_published_failed": "配信済みのマークに失敗しました：{{message}}",
+  "template": {
+    "use": "テンプレート",
+    "pick": "テンプレートを適用",
+    "apply": "適用",
+    "delete": "テンプレートを削除",
+    "empty": "保存済みテンプレートなし",
+    "empty_hint": "フォームを入力してテンプレートとして保存",
+    "save_current": "テンプレートとして保存",
+    "save_title": "テンプレートとして保存",
+    "name_placeholder": "テンプレート名…",
+    "save": "保存",
+    "panel_hint": "「設定」フォームからテンプレートを保存できます",
+    "apply_hint": "テンプレートを適用するには、各プラットフォームの「設定」を開いてください"
   }
 }

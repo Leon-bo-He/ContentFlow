@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useToastStore, type Toast } from '../../store/toast.store.js';
 
 const TYPE_STYLES: Record<Toast['type'], string> = {
@@ -19,6 +20,7 @@ const AUTO_DISMISS_MS = 4000;
 
 function ToastItem({ toast }: { toast: Toast }) {
   const remove = useToastStore((s) => s.removeToast);
+  const { t } = useTranslation('common');
 
   useEffect(() => {
     const timer = setTimeout(() => remove(toast.id), AUTO_DISMISS_MS);
@@ -36,7 +38,7 @@ function ToastItem({ toast }: { toast: Toast }) {
       <button
         onClick={() => remove(toast.id)}
         className="flex-shrink-0 opacity-70 hover:opacity-100 ml-1 leading-none"
-        aria-label="Dismiss"
+        aria-label={t('aria.dismiss')}
       >
         ✕
       </button>

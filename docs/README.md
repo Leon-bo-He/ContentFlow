@@ -63,7 +63,7 @@ ContentFlow is a multilingual content scheduling, distribution, and analytics pl
 ```bash
 # 1. Clone the repository
 git clone <repo-url>
-cd content_creator
+cd ContentFlow
 
 # 2. Start infrastructure (Postgres + Redis)
 docker compose up -d
@@ -105,7 +105,7 @@ GOOGLE_CLIENT_SECRET=
 ## Project Structure
 
 ```
-content_creator/
+ContentFlow/
 ├── apps/
 │   ├── web/              # React PWA client
 │   │   ├── src/

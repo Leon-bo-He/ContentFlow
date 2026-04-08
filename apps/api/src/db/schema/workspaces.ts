@@ -7,6 +7,7 @@ export const workspaces = pgTable('workspaces', {
   name: text('name').notNull(),
   icon: text('icon').notNull(),
   color: text('color').notNull(),
+  about: text('about'),
   platform: text('platform').notNull(),
   contentType: text('content_type').notNull(),
   defaultLocale: text('default_locale').notNull().default('zh-CN'),

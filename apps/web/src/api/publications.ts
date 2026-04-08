@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiFetch, ApiError } from './client.js';
 import { toast } from '../store/toast.store.js';
+import i18n from '../i18n/index.js';
 import type { Publication } from '@contentflow/shared';
 
 export interface QueueItem {
@@ -35,10 +36,10 @@ export function useCreatePublication(contentId: string) {
       }),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['publications', contentId] });
-      toast.success('Platform added to publish queue');
+      toast.success(i18n.t('toast_platform_added', { ns: 'publications' }));
     },
     onError: (err) => {
-      toast.error(`Failed to add platform: ${err.message}`);
+      toast.error(i18n.t('toast_platform_add_failed', { ns: 'publications', message: err.message }));
     },
   });
 }
@@ -57,7 +58,7 @@ export function useUpdatePublication() {
       void qc.invalidateQueries({ queryKey: ['publishQueue'] });
     },
     onError: (err) => {
-      toast.error(`Failed to update publication: ${err.message}`);
+      toast.error(i18n.t('toast_update_failed', { ns: 'publications', message: err.message }));
     },
   });
 }
@@ -78,10 +79,10 @@ export function useMarkPublished() {
     onSuccess: (_data, vars) => {
       void qc.invalidateQueries({ queryKey: ['publications', vars.contentId] });
       void qc.invalidateQueries({ queryKey: ['publishQueue'] });
-      toast.success('Marked as published');
+      toast.success(i18n.t('toast_marked_published', { ns: 'publications' }));
     },
     onError: (err) => {
-      toast.error(`Failed to mark published: ${err.message}`);
+      toast.error(i18n.t('toast_mark_published_failed', { ns: 'publications', message: err.message }));
     },
   });
 }
@@ -98,6 +99,22 @@ export function usePublishQueue(filters?: PublishQueueFilters) {
     queryKey: ['publishQueue', filters],
     queryFn: () => apiFetch<QueueItem[]>(`/api/publications/queue${qs ? `?${qs}` : ''}`),
     refetchOnWindowFocus: true,
+  });
+}
+
+// DELETE /api/publications/:id
+export function useDeletePublication() {
+  const qc = useQueryClient();
+  return useMutation<void, ApiError, { id: string; contentId: string }>({
+    mutationFn: ({ id }) =>
+      apiFetch<void>(`/api/publications/${id}`, { method: 'DELETE' }),
+    onSuccess: (_data, vars) => {
+      void qc.invalidateQueries({ queryKey: ['publications', vars.contentId] });
+      void qc.invalidateQueries({ queryKey: ['publishQueue'] });
+    },
+    onError: (err) => {
+      toast.error(i18n.t('toast_update_failed', { ns: 'publications', message: err.message }));
+    },
   });
 }
 

@@ -1,0 +1,151 @@
+{
+  "nav": {
+    "dashboard": "總覽",
+    "ideas": "靈感庫",
+    "board": "內容看板",
+    "calendar": "排期日曆",
+    "publications": "發佈管理",
+    "analytics": "數據分析",
+    "settings": "設定",
+    "workspaces": "工作空間",
+    "archive": "封存內容"
+  },
+  "action": {
+    "save": "儲存",
+    "cancel": "取消",
+    "delete": "刪除",
+    "edit": "編輯",
+    "create": "新建",
+    "confirm": "確認",
+    "add": "新增",
+    "language": "語言",
+    "try_again": "重試",
+    "back_home": "返回首頁",
+    "enable": "開啟",
+    "dismiss": "關閉",
+    "remove": "移除"
+  },
+  "status": {
+    "loading": "載入中…",
+    "error": "發生錯誤",
+    "empty": "暫無資料",
+    "saved": "已儲存"
+  },
+  "workspace": {
+    "switcher_label": "切換工作空間",
+    "create": "建立工作空間",
+    "no_workspace": "尚無工作空間"
+  },
+  "calendar": {
+    "month_view": "月檢視",
+    "week_view": "週檢視",
+    "list_view": "清單",
+    "prev": "上個月",
+    "next": "下個月",
+    "today": "今天",
+    "no_content": "暫無內容",
+    "goal_banner": "本週：已排期 {{scheduled}} / 目標 {{goal}} 篇",
+    "on_track": "進度正常",
+    "behind": "進度落後",
+    "add_content": "新增內容",
+    "goal_week": "本週",
+    "goal_month": "本月",
+    "goal_year": "今年",
+    "goal_of": "{{actual}} / {{goal}}"
+  },
+  "auth": {
+    "sign_in": "登入",
+    "sign_up": "註冊",
+    "sign_out": "登出",
+    "email": "電子郵件",
+    "password": "密碼",
+    "name": "用戶名",
+    "confirm_password": "確認密碼",
+    "welcome_back": "歡迎回來",
+    "create_account": "建立帳號",
+    "no_account": "還沒有帳號？",
+    "have_account": "已有帳號？",
+    "invalid_credentials": "電子郵件或密碼錯誤",
+    "email_taken": "此電子郵件已被註冊",
+    "password_mismatch": "兩次密碼不一致",
+    "password_too_short": "密碼至少需要 8 個字元"
+  },
+  "settings": {
+    "sections": {
+      "general": "一般",
+      "notifications": "通知",
+      "workspaces": "工作空間",
+      "platforms": "平台管理",
+      "account": "帳號"
+    },
+    "platforms": {
+      "builtin_title": "內建平台",
+      "custom_title": "自定義平台",
+      "upload_icon_hint": "上傳 SVG 圖示",
+      "upload_icon_sub": "（點擊方框上傳）",
+      "remove_icon": "移除圖示",
+      "add_custom": "新增自訂平台"
+    },
+    "general": {
+      "language": "語言",
+      "timezone": "時區",
+      "appearance": "外觀",
+      "theme_system": "跟隨系統",
+      "theme_light": "淺色",
+      "theme_dark": "深色"
+    },
+    "notifications": {
+      "publish_reminders": "發布提醒",
+      "publish_reminders_desc": "在排期發布前收到通知",
+      "lead_time": "提前提醒",
+      "lead_time_unit": "分鐘前",
+      "blocked": "通知已被瀏覽器攔截，請在瀏覽器設定中開啟"
+    },
+    "account": {
+      "name": "用戶名",
+      "email": "電子郵件",
+      "password": "密碼",
+      "change_password": "修改密碼",
+      "delete_account": "刪除帳號…",
+      "delete_warning": "此操作將永久刪除您的帳號及所有相關資料，無法復原。",
+      "confirm_password_label": "請輸入密碼以確認",
+      "current_password": "目前密碼",
+      "new_password": "新密碼",
+      "confirm_new_password": "確認新密碼",
+      "update_password": "更新密碼",
+      "passwords_mismatch": "兩次密碼不一致",
+      "password_too_short": "密碼至少需要 8 個字元",
+      "delete_my_account": "刪除我的帳號",
+      "profile": "個人資料",
+      "security": "安全",
+      "password_desc": "設定強密碼以保護您的帳號",
+      "danger_zone": "危險操作",
+      "sign_out_desc": "登出此裝置上的帳號",
+      "delete_desc": "永久刪除帳號及所有資料"
+    }
+  },
+  "error": {
+    "something_went_wrong": "發生了錯誤",
+    "unexpected": "發生了意外錯誤",
+    "page_not_found": "找不到頁面",
+    "page_not_found_desc": "此頁面不存在或已被移動",
+    "failed_to_save": "儲存失敗",
+    "failed": "操作失敗"
+  },
+  "offline": {
+    "back_online": "已恢復連線，正在同步 {{count}} 筆待處理變更",
+    "all_synced": "所有變更已同步",
+    "banner": "您已離線 — 恢復連線後將自動同步"
+  },
+  "notifications": {
+    "banner_text": "開啟發佈提醒，在排定發佈前 15 分鐘收到通知"
+  },
+  "aria": {
+    "hide_password": "隱藏密碼",
+    "show_password": "顯示密碼",
+    "expand_sidebar": "展開側邊欄",
+    "collapse_sidebar": "收合側邊欄",
+    "close": "關閉",
+    "dismiss": "關閉"
+  }
+}
