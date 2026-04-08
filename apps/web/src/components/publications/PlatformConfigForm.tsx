@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Publication } from '@contentflow/shared';
 import { useUpdatePublication } from '../../api/publications.js';
+import { DateTimePicker } from '../ui/DateTimePicker.js';
+import { useUiStore, type PublicationTemplate } from '../../store/ui.store.js';
 
 interface PlatformConfigFormProps {
   publication: Publication;
@@ -16,9 +18,143 @@ function toDatetimeLocal(val: Date | string | null | undefined): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
+// ─── Template Picker Popover ──────────────────────────────────────────────────
+
+function TemplatePicker({
+  onApply,
+  onClose,
+}: {
+  onApply: (tpl: PublicationTemplate) => void;
+  onClose: () => void;
+}) {
+  const { t } = useTranslation('publications');
+  const { publicationTemplates, removePublicationTemplate } = useUiStore();
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+
+  const confirmTarget = deleteConfirmId ? publicationTemplates.find((t) => t.id === deleteConfirmId) : null;
+
+  if (publicationTemplates.length === 0) {
+    return (
+      <div className="absolute right-0 top-full mt-1 z-20 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-4">
+        <p className="text-xs text-gray-400 text-center">{t('template.empty')}</p>
+        <p className="text-xs text-gray-400 text-center mt-1">{t('template.empty_hint')}</p>
+        <button onClick={onClose} className="mt-3 w-full text-xs text-gray-500 hover:text-gray-700">
+          {t('config.cancel')}
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="absolute right-0 top-full mt-1 z-20 w-64 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+        <div className="px-3 py-2 bg-gray-50 border-b border-gray-100">
+          <p className="text-xs font-medium text-gray-600">{t('template.pick')}</p>
+        </div>
+        <ul className="max-h-48 overflow-y-auto">
+          {publicationTemplates.map((tpl) => (
+            <li key={tpl.id} className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 border-b border-gray-50 last:border-0">
+              <div className="flex-1 min-w-0 mr-2">
+                <p className="text-sm font-medium text-gray-800 truncate">{tpl.name}</p>
+                {tpl.platformCopy && (
+                  <p className="text-xs text-gray-400 truncate">{tpl.platformCopy}</p>
+                )}
+              </div>
+              <div className="flex items-center gap-1 flex-shrink-0">
+                <button
+                  onClick={() => { onApply(tpl); onClose(); }}
+                  className="text-xs px-2 py-0.5 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+                >
+                  {t('template.apply')}
+                </button>
+                <button
+                  onClick={() => setDeleteConfirmId(tpl.id)}
+                  className="text-xs text-gray-300 hover:text-red-500 transition-colors"
+                  title={t('template.delete')}
+                >
+                  ×
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {confirmTarget && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl p-5 w-72">
+            <p className="text-sm font-semibold text-gray-900 mb-1">{t('template.delete_confirm_title')}</p>
+            <p className="text-xs text-gray-500 mb-4">
+              {t('template.delete_confirm_desc', { name: confirmTarget.name })}
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setDeleteConfirmId(null)}
+                className="text-xs text-gray-500 px-3 py-1.5 rounded hover:bg-gray-100"
+              >
+                {t('config.cancel')}
+              </button>
+              <button
+                onClick={() => { removePublicationTemplate(confirmTarget.id); setDeleteConfirmId(null); }}
+                className="text-xs bg-red-600 text-white px-3 py-1.5 rounded hover:bg-red-700"
+              >
+                {t('template.delete')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+// ─── Save Template Modal ──────────────────────────────────────────────────────
+
+function SaveTemplateModal({
+  onSave,
+  onClose,
+}: {
+  onSave: (name: string) => void;
+  onClose: () => void;
+}) {
+  const { t } = useTranslation('publications');
+  const [name, setName] = useState('');
+
+  return (
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-xs p-5">
+        <h3 className="text-sm font-semibold text-gray-900 mb-3">{t('template.save_title')}</h3>
+        <input
+          autoFocus
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter' && name.trim()) onSave(name.trim()); if (e.key === 'Escape') onClose(); }}
+          placeholder={t('template.name_placeholder')}
+          className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-200 mb-4"
+        />
+        <div className="flex justify-end gap-2">
+          <button onClick={onClose} className="text-xs text-gray-500 hover:text-gray-700 px-3 py-1.5">
+            {t('config.cancel')}
+          </button>
+          <button
+            onClick={() => { if (name.trim()) onSave(name.trim()); }}
+            disabled={!name.trim()}
+            className="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded hover:bg-indigo-700 disabled:opacity-40"
+          >
+            {t('template.save')}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Form ────────────────────────────────────────────────────────────────
+
 export function PlatformConfigForm({ publication, onClose }: PlatformConfigFormProps) {
   const { t } = useTranslation('publications');
   const updatePublication = useUpdatePublication();
+  const { publicationTemplates, savePublicationTemplate } = useUiStore();
 
   const [platformTitle, setPlatformTitle] = useState(publication.platformTitle ?? '');
   const [platformCopy, setPlatformCopy] = useState(publication.platformCopy ?? '');
@@ -32,11 +168,33 @@ export function PlatformConfigForm({ publication, onClose }: PlatformConfigFormP
     publication.platformSettings?.allowComments ?? true,
   );
 
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [saveModalOpen, setSaveModalOpen] = useState(false);
+  const pickerRef = useRef<HTMLDivElement>(null);
+
+  function applyTemplate(tpl: PublicationTemplate) {
+    if (tpl.platformTitle !== undefined) setPlatformTitle(tpl.platformTitle ?? '');
+    if (tpl.platformCopy !== undefined) setPlatformCopy(tpl.platformCopy ?? '');
+    if (tpl.platformTags !== undefined) setTags(tpl.platformTags ?? []);
+    if (tpl.visibility !== undefined) setVisibility(tpl.visibility);
+    if (tpl.allowComments !== undefined) setAllowComments(tpl.allowComments);
+  }
+
+  function handleSaveTemplate(name: string) {
+    savePublicationTemplate({
+      name,
+      platformTitle: platformTitle || undefined,
+      platformCopy: platformCopy || undefined,
+      platformTags: tags.length ? tags : undefined,
+      visibility,
+      allowComments,
+    });
+    setSaveModalOpen(false);
+  }
+
   function addTag() {
     const tag = tagInput.trim().replace(/^#/, '');
-    if (tag && !tags.includes(tag)) {
-      setTags([...tags, tag]);
-    }
+    if (tag && !tags.includes(tag)) setTags([...tags, tag]);
     setTagInput('');
   }
 
@@ -61,6 +219,39 @@ export function PlatformConfigForm({ publication, onClose }: PlatformConfigFormP
 
   return (
     <div className="mt-2 bg-gray-50 rounded-lg border border-gray-200 p-4 space-y-3">
+      {/* Template bar */}
+      <div className="flex items-center justify-between pb-2 border-b border-gray-200">
+        <span className="text-xs font-medium text-gray-500">{t('config.title')}</span>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setSaveModalOpen(true)}
+            className="text-xs text-gray-400 hover:text-indigo-600 transition-colors"
+          >
+            {t('template.save_current')}
+          </button>
+          <div className="relative" ref={pickerRef}>
+            <button
+              type="button"
+              onClick={() => setPickerOpen((o) => !o)}
+              className={`text-xs px-2 py-1 rounded border transition-colors ${
+                publicationTemplates.length > 0
+                  ? 'border-indigo-300 text-indigo-600 hover:bg-indigo-50'
+                  : 'border-gray-200 text-gray-400 hover:border-gray-300'
+              }`}
+            >
+              {t('template.use')} {publicationTemplates.length > 0 && `(${publicationTemplates.length})`}
+            </button>
+            {pickerOpen && (
+              <TemplatePicker
+                onApply={applyTemplate}
+                onClose={() => setPickerOpen(false)}
+              />
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* Platform title */}
       <div>
         <label className="block text-xs font-medium text-gray-600 mb-1">
@@ -99,13 +290,7 @@ export function PlatformConfigForm({ publication, onClose }: PlatformConfigFormP
               className="flex items-center gap-0.5 text-xs bg-indigo-50 text-indigo-600 rounded-full px-2 py-0.5"
             >
               #{tag}
-              <button
-                type="button"
-                onClick={() => removeTag(tag)}
-                className="text-indigo-400 hover:text-indigo-700 ml-0.5"
-              >
-                ×
-              </button>
+              <button type="button" onClick={() => removeTag(tag)} className="text-indigo-400 hover:text-indigo-700 ml-0.5">×</button>
             </span>
           ))}
         </div>
@@ -113,20 +298,11 @@ export function PlatformConfigForm({ publication, onClose }: PlatformConfigFormP
           <input
             value={tagInput}
             onChange={(e) => setTagInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                addTag();
-              }
-            }}
+            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } }}
             placeholder={t('config.hashtag_placeholder')}
             className="flex-1 text-xs border border-gray-200 rounded px-2 py-1 outline-none focus:ring-1 focus:ring-indigo-300"
           />
-          <button
-            type="button"
-            onClick={addTag}
-            className="text-xs bg-indigo-500 text-white px-2 py-1 rounded hover:bg-indigo-600"
-          >
+          <button type="button" onClick={addTag} className="text-xs bg-indigo-500 text-white px-2 py-1 rounded hover:bg-indigo-600">
             +
           </button>
         </div>
@@ -137,11 +313,9 @@ export function PlatformConfigForm({ publication, onClose }: PlatformConfigFormP
         <label className="block text-xs font-medium text-gray-600 mb-1">
           {t('config.scheduled_at')}
         </label>
-        <input
-          type="datetime-local"
-          value={scheduledAt}
-          onChange={(e) => setScheduledAt(e.target.value)}
-          className="w-full text-sm border border-gray-200 rounded px-2 py-1.5 outline-none focus:ring-2 focus:ring-indigo-200"
+        <DateTimePicker
+          value={scheduledAt ? new Date(scheduledAt).toISOString() : ''}
+          onChange={(iso) => setScheduledAt(iso ? iso : '')}
         />
       </div>
 
@@ -177,11 +351,7 @@ export function PlatformConfigForm({ publication, onClose }: PlatformConfigFormP
 
       {/* Actions */}
       <div className="flex justify-end gap-2 pt-1">
-        <button
-          type="button"
-          onClick={onClose}
-          className="text-xs text-gray-500 hover:text-gray-700 px-3 py-1.5"
-        >
+        <button type="button" onClick={onClose} className="text-xs text-gray-500 hover:text-gray-700 px-3 py-1.5">
           {t('config.cancel')}
         </button>
         <button
@@ -193,6 +363,13 @@ export function PlatformConfigForm({ publication, onClose }: PlatformConfigFormP
           {updatePublication.isPending ? '...' : t('config.save')}
         </button>
       </div>
+
+      {saveModalOpen && (
+        <SaveTemplateModal
+          onSave={handleSaveTemplate}
+          onClose={() => setSaveModalOpen(false)}
+        />
+      )}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from 'fastify';
-import { eq, and, inArray, gte, lte } from 'drizzle-orm';
+import { eq, and, inArray, gte, lte, isNull } from 'drizzle-orm';
 import { db } from '../db/client.js';
 import { publications } from '../db/schema/publications.js';
 import { contents } from '../db/schema/contents.js';
@@ -249,9 +249,10 @@ export const publicationsRoutes: FastifyPluginAsync = async (app) => {
     if (body.status !== undefined) updateData.status = body.status;
 
     // Auto-advance: draft → queued if scheduledAt + platform are now present
+    // Skip if the caller is explicitly setting status to draft (e.g. cancel action)
     const nextScheduledAt = body.scheduledAt !== undefined ? body.scheduledAt : current.scheduledAt;
     const nextStatus = body.status ?? current.status;
-    if (nextStatus === 'draft' && nextScheduledAt && current.platform) {
+    if (nextStatus === 'draft' && body.status !== 'draft' && nextScheduledAt && current.platform) {
       updateData.status = 'queued';
     }
 
@@ -262,6 +263,21 @@ export const publicationsRoutes: FastifyPluginAsync = async (app) => {
       .returning();
 
     return reply.send(updated);
+  });
+
+  // DELETE /api/publications/:id
+  app.delete('/api/publications/:id', { onRequest: [app.authenticate] }, async (req, reply) => {
+    const user = req.user as { sub: string };
+    const { id } = req.params as { id: string };
+
+    const ownership = await verifyPublicationOwnership(id, user.sub);
+    if (!ownership) {
+      return reply.code(403).send({ error: 'Forbidden' });
+    }
+
+    await db.delete(publications).where(eq(publications.id, id));
+
+    return reply.code(204).send();
   });
 
   // POST /api/publications/:id/mark-published
@@ -305,6 +321,12 @@ export const publicationsRoutes: FastifyPluginAsync = async (app) => {
       })
       .where(eq(publications.id, id))
       .returning();
+
+    // Also stamp publishedAt on the parent content (if not already set)
+    await db
+      .update(contents)
+      .set({ publishedAt, updatedAt: new Date() })
+      .where(and(eq(contents.id, current.contentId), isNull(contents.publishedAt)));
 
     return reply.send(updated);
   });

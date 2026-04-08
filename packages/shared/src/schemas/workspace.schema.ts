@@ -18,9 +18,11 @@ export const createWorkspaceSchema = z.object({
   name: z.string().min(1).max(100),
   icon: z.string().min(1).max(10),
   color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
-  platform: z.enum(platformValues),
-  contentType: z.enum(contentTypeValues),
-  defaultLocale: z.string().default('zh-CN'),
+  about: z.string().max(500).optional(),
+  // Legacy fields — kept for DB compatibility, defaulted automatically
+  platform: z.enum(platformValues).default('douyin'),
+  contentType: z.enum(contentTypeValues).default('video_short'),
+  defaultLocale: z.string().default('en-US'),
   timezone: z.string().default('Asia/Shanghai'),
   publishGoal: publishGoalSchema.optional(),
 });
@@ -28,6 +30,7 @@ export const createWorkspaceSchema = z.object({
 export const updateWorkspaceSchema = z.object({
   name: z.string().min(1).max(100).optional(),
   icon: z.string().min(1).max(10).optional(),
+  about: z.string().max(500).optional(),
   publishGoal: publishGoalSchema.optional(),
   defaultLocale: z.string().optional(),
   timezone: z.string().optional(),

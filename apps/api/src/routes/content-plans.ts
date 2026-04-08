@@ -196,4 +196,52 @@ export const contentPlansRoutes: FastifyPluginAsync = async (app) => {
 
     return reply.send(templates);
   });
+
+  // PATCH /api/workspaces/:id/plan-templates/:templateId — rename
+  app.patch('/api/workspaces/:id/plan-templates/:templateId', { onRequest: [app.authenticate] }, async (req, reply) => {
+    const user = req.user as { sub: string };
+    const { id, templateId } = req.params as { id: string; templateId: string };
+
+    const [ws] = await db
+      .select({ id: workspaces.id })
+      .from(workspaces)
+      .where(and(eq(workspaces.id, id), eq(workspaces.userId, user.sub)));
+
+    if (!ws) return reply.code(403).send({ error: 'Forbidden' });
+
+    const body = req.body as { name: string };
+    if (!body.name?.trim()) return reply.code(400).send({ error: 'Name is required' });
+
+    const [updated] = await db
+      .update(planTemplates)
+      .set({ name: body.name.trim() })
+      .where(and(eq(planTemplates.id, templateId), eq(planTemplates.workspaceId, id)))
+      .returning();
+
+    if (!updated) return reply.code(404).send({ error: 'Template not found' });
+
+    return reply.send(updated);
+  });
+
+  // DELETE /api/workspaces/:id/plan-templates/:templateId
+  app.delete('/api/workspaces/:id/plan-templates/:templateId', { onRequest: [app.authenticate] }, async (req, reply) => {
+    const user = req.user as { sub: string };
+    const { id, templateId } = req.params as { id: string; templateId: string };
+
+    const [ws] = await db
+      .select({ id: workspaces.id })
+      .from(workspaces)
+      .where(and(eq(workspaces.id, id), eq(workspaces.userId, user.sub)));
+
+    if (!ws) return reply.code(403).send({ error: 'Forbidden' });
+
+    const [deleted] = await db
+      .delete(planTemplates)
+      .where(and(eq(planTemplates.id, templateId), eq(planTemplates.workspaceId, id)))
+      .returning({ id: planTemplates.id });
+
+    if (!deleted) return reply.code(404).send({ error: 'Template not found' });
+
+    return reply.code(204).send();
+  });
 };

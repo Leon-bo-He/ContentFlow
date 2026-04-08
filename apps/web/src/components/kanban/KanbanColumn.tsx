@@ -8,9 +8,10 @@ interface KanbanColumnProps {
   contents: Content[];
   onCardClick: (content: Content) => void;
   onDrop: (contentId: string, newStage: Stage) => void;
+  onDoubleClick?: (() => void) | undefined;
 }
 
-export function KanbanColumn({ stage, contents, onCardClick, onDrop }: KanbanColumnProps) {
+export function KanbanColumn({ stage, contents, onCardClick, onDrop, onDoubleClick }: KanbanColumnProps) {
   const { t } = useTranslation('contents');
   const [isDragOver, setIsDragOver] = useState(false);
 
@@ -41,12 +42,18 @@ export function KanbanColumn({ stage, contents, onCardClick, onDrop }: KanbanCol
     }
   }
 
+  const isArchived = stage === 'archived';
+
   return (
-    <div className="flex-shrink-0 w-64 flex flex-col">
+    <div className={`flex-shrink-0 w-64 flex flex-col h-full${isArchived ? ' opacity-60' : ''}`}>
       {/* Column header */}
       <div className="flex items-center justify-between px-3 py-2 mb-2">
-        <h3 className="text-sm font-semibold text-gray-700">
+        <h3 className={`text-sm font-semibold ${isArchived ? 'text-gray-400' : 'text-gray-700'}`}>
+          {isArchived && <span className="mr-1">🗄</span>}
           {t(`stages.${stage}`)}
+          {stage === 'reviewed' && (
+            <span className="ml-1.5 text-[10px] font-normal text-amber-500">{t('column.auto_archive_hint')}</span>
+          )}
         </h3>
         <span className="text-xs text-gray-400 bg-gray-100 rounded-full px-2 py-0.5">
           {contents.length}
@@ -58,7 +65,8 @@ export function KanbanColumn({ stage, contents, onCardClick, onDrop }: KanbanCol
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        className={`flex-1 min-h-32 rounded-lg p-2 space-y-2 transition-colors ${
+        onDoubleClick={onDoubleClick}
+        className={`flex-1 min-h-32 overflow-y-auto rounded-lg p-2 space-y-2 transition-colors ${
           isDragOver
             ? 'bg-indigo-50 border-2 border-dashed border-indigo-300'
             : 'bg-gray-50 border-2 border-transparent'
@@ -74,7 +82,7 @@ export function KanbanColumn({ stage, contents, onCardClick, onDrop }: KanbanCol
         ))}
         {contents.length === 0 && (
           <div className="flex items-center justify-center h-16 text-xs text-gray-400">
-            {isDragOver ? '放置到此处' : '暂无内容'}
+            {isDragOver ? t('column.drop_here') : t('column.empty')}
           </div>
         )}
       </div>

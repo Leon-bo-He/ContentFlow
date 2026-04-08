@@ -7,7 +7,8 @@
     "publications": "發佈管理",
     "analytics": "數據分析",
     "settings": "設定",
-    "workspaces": "工作空間"
+    "workspaces": "工作空間",
+    "archive": "封存內容"
   },
   "action": {
     "save": "儲存",
@@ -17,7 +18,12 @@
     "create": "新建",
     "confirm": "確認",
     "add": "新增",
-    "language": "語言"
+    "language": "語言",
+    "try_again": "重試",
+    "back_home": "返回首頁",
+    "enable": "開啟",
+    "dismiss": "關閉",
+    "remove": "移除"
   },
   "status": {
     "loading": "載入中…",
@@ -65,7 +71,16 @@
       "general": "一般",
       "notifications": "通知",
       "workspaces": "工作空間",
+      "platforms": "平台管理",
       "account": "帳號"
+    },
+    "platforms": {
+      "builtin_title": "內建平台",
+      "custom_title": "自定義平台",
+      "upload_icon_hint": "上傳 SVG 圖示",
+      "upload_icon_sub": "（點擊方框上傳）",
+      "remove_icon": "移除圖示",
+      "add_custom": "新增自訂平台"
     },
     "general": {
       "language": "語言",
@@ -96,7 +111,36 @@
       "update_password": "更新密碼",
       "passwords_mismatch": "兩次密碼不一致",
       "password_too_short": "密碼至少需要 8 個字元",
-      "delete_my_account": "刪除我的帳號"
+      "delete_my_account": "刪除我的帳號",
+      "profile": "個人資料",
+      "security": "安全",
+      "password_desc": "設定強密碼以保護您的帳號",
+      "danger_zone": "危險操作",
+      "delete_desc": "永久刪除帳號及所有資料"
     }
+  },
+  "error": {
+    "something_went_wrong": "發生了錯誤",
+    "unexpected": "發生了意外錯誤",
+    "page_not_found": "找不到頁面",
+    "page_not_found_desc": "此頁面不存在或已被移動",
+    "failed_to_save": "儲存失敗",
+    "failed": "操作失敗"
+  },
+  "offline": {
+    "back_online": "已恢復連線，正在同步 {{count}} 筆待處理變更",
+    "all_synced": "所有變更已同步",
+    "banner": "您已離線 — 恢復連線後將自動同步"
+  },
+  "notifications": {
+    "banner_text": "開啟發佈提醒，在排定發佈前 15 分鐘收到通知"
+  },
+  "aria": {
+    "hide_password": "隱藏密碼",
+    "show_password": "顯示密碼",
+    "expand_sidebar": "展開側邊欄",
+    "collapse_sidebar": "收合側邊欄",
+    "close": "關閉",
+    "dismiss": "關閉"
   }
 }

@@ -1,6 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { apiFetch, ApiError, QUEUED_OFFLINE } from './client.js';
 import { toast } from '../store/toast.store.js';
+import i18n from '../i18n/index.js';
 import type { Idea } from '@contentflow/shared';
 
 export interface IdeaFilters {
@@ -37,6 +38,7 @@ export function useIdeas(filters: IdeaFilters = {}) {
   return useQuery<Idea[], ApiError>({
     queryKey: ['ideas', filters],
     queryFn: () => apiFetch<Idea[]>(buildQuery(filters)),
+    placeholderData: keepPreviousData,
     retry: (failureCount, error) => {
       if (error instanceof ApiError && error.status === 401) return false;
       return failureCount < 3;
@@ -55,11 +57,11 @@ export function useCreateIdea() {
     onSuccess: (data) => {
       void qc.invalidateQueries({ queryKey: ['ideas'] });
       if ((data as unknown) !== QUEUED_OFFLINE) {
-        toast.success('Idea created');
+        toast.success(i18n.t('toast_created', { ns: 'ideas' }));
       }
     },
     onError: (err) => {
-      toast.error(`Failed to create idea: ${err.message}`);
+      toast.error(i18n.t('toast_create_failed', { ns: 'ideas', message: err.message }));
     },
   });
 }
@@ -81,7 +83,7 @@ export function useUpdateIdea() {
       return { prev };
     },
     onSuccess: () => {
-      toast.success('Idea saved');
+      toast.success(i18n.t('toast_saved', { ns: 'ideas' }));
     },
     onError: (err, _vars, ctx) => {
       const context = ctx as { prev?: [unknown, Idea[] | undefined][] } | undefined;
@@ -90,7 +92,7 @@ export function useUpdateIdea() {
           qc.setQueryData(queryKey as Parameters<typeof qc.setQueryData>[0], data);
         }
       }
-      toast.error(`Failed to update idea: ${err.message}`);
+      toast.error(i18n.t('toast_update_failed', { ns: 'ideas', message: err.message }));
     },
     onSettled: () => {
       void qc.invalidateQueries({ queryKey: ['ideas'] });

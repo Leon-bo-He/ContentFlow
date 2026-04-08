@@ -10,6 +10,7 @@ interface ToastState {
   toasts: Toast[];
   addToast: (toast: Omit<Toast, 'id'>) => void;
   removeToast: (id: string) => void;
+  clearToasts: () => void;
 }
 
 export const useToastStore = create<ToastState>()((set) => ({
@@ -19,6 +20,7 @@ export const useToastStore = create<ToastState>()((set) => ({
     set((s) => ({ toasts: [...s.toasts, { ...toast, id }] }));
   },
   removeToast: (id) => set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) })),
+  clearToasts: () => set({ toasts: [] }),
 }));
 
 function addToast(type: Toast['type'], message: string) {
@@ -30,4 +32,5 @@ export const toast = {
   error: (msg: string) => addToast('error', msg),
   info: (msg: string) => addToast('info', msg),
   warning: (msg: string) => addToast('warning', msg),
+  clear: () => useToastStore.getState().clearToasts(),
 };

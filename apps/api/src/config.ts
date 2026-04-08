@@ -7,7 +7,7 @@ const envSchema = z.object({
   REDIS_URL: z.string(),
   JWT_SECRET: z.string().min(32),
   JWT_ACCESS_TTL: z.coerce.number().default(900),
-  JWT_REFRESH_TTL: z.coerce.number().default(604800),
+  JWT_REFRESH_TTL: z.coerce.number().default(2592000),
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
   WECHAT_APP_ID: z.string().optional(),
   WECHAT_APP_SECRET: z.string().optional(),

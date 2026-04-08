@@ -7,7 +7,8 @@
     "publications": "발행 관리",
     "analytics": "분석",
     "settings": "설정",
-    "workspaces": "워크스페이스"
+    "workspaces": "워크스페이스",
+    "archive": "보관된 콘텐츠"
   },
   "action": {
     "save": "저장",
@@ -17,7 +18,12 @@
     "create": "만들기",
     "confirm": "확인",
     "add": "추가",
-    "language": "언어"
+    "language": "언어",
+    "try_again": "다시 시도",
+    "back_home": "홈으로 돌아가기",
+    "enable": "활성화",
+    "dismiss": "닫기",
+    "remove": "제거"
   },
   "status": {
     "loading": "불러오는 중…",
@@ -65,7 +71,16 @@
       "general": "일반",
       "notifications": "알림",
       "workspaces": "워크스페이스",
+      "platforms": "플랫폼",
       "account": "계정"
+    },
+    "platforms": {
+      "builtin_title": "기본 플랫폼",
+      "custom_title": "사용자 정의 플랫폼",
+      "upload_icon_hint": "SVG 아이콘 업로드",
+      "upload_icon_sub": "(박스 클릭)",
+      "remove_icon": "아이콘 제거",
+      "add_custom": "사용자 정의 플랫폼 추가"
     },
     "general": {
       "language": "언어",
@@ -96,7 +111,36 @@
       "update_password": "비밀번호 업데이트",
       "passwords_mismatch": "새 비밀번호가 일치하지 않습니다",
       "password_too_short": "비밀번호는 8자 이상이어야 합니다",
-      "delete_my_account": "내 계정 삭제"
+      "delete_my_account": "내 계정 삭제",
+      "profile": "프로필",
+      "security": "보안",
+      "password_desc": "계정을 보호하는 강력한 비밀번호 설정",
+      "danger_zone": "위험 구역",
+      "delete_desc": "계정 및 모든 데이터를 영구적으로 삭제"
     }
+  },
+  "error": {
+    "something_went_wrong": "오류가 발생했습니다",
+    "unexpected": "예기치 않은 오류가 발생했습니다",
+    "page_not_found": "페이지를 찾을 수 없습니다",
+    "page_not_found_desc": "이 페이지는 존재하지 않거나 이동되었습니다",
+    "failed_to_save": "저장 실패",
+    "failed": "오류가 발생했습니다"
+  },
+  "offline": {
+    "back_online": "온라인 복귀 — {{count}}개 변경 사항 동기화 중",
+    "all_synced": "모든 변경 사항이 동기화되었습니다",
+    "banner": "오프라인 상태입니다 — 연결이 복구되면 자동으로 동기화됩니다"
+  },
+  "notifications": {
+    "banner_text": "발행 알림을 활성화하여 예약 발행 15분 전에 알림을 받으세요"
+  },
+  "aria": {
+    "hide_password": "비밀번호 숨기기",
+    "show_password": "비밀번호 표시",
+    "expand_sidebar": "사이드바 펼치기",
+    "collapse_sidebar": "사이드바 접기",
+    "close": "닫기",
+    "dismiss": "닫기"
   }
 }

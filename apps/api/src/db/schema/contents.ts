@@ -18,6 +18,7 @@ export const contents = pgTable('contents', {
   notes: text('notes'),
   reviewNotes: text('review_notes'),
   attachments: jsonb('attachments').notNull().default([]),
+  stageHistory: jsonb('stage_history').notNull().default([]),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });

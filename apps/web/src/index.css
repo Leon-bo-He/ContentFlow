@@ -26,20 +26,20 @@
 .dark {
   color-scheme: dark;
 
-  --color-surface:        #1f1f1f;
-  --color-surface-raised: #191919;
+  --color-surface:        #202020;
+  --color-surface-raised: #2f2f2f;
 
   --cf-bg:      #191919;
-  --cf-surface: #1f1f1f;
+  --cf-surface: #202020;
 
-  --cf-text:       rgba(255, 255, 255, 0.81);
-  --cf-text-sub:   rgba(255, 255, 255, 0.45);
-  --cf-text-muted: rgba(255, 255, 255, 0.28);
+  --cf-text:       rgba(255, 255, 255, 0.9);
+  --cf-text-sub:   rgba(255, 255, 255, 0.71);
+  --cf-text-muted: rgba(255, 255, 255, 0.45);
 
-  --cf-border: rgba(255, 255, 255, 0.07);
+  --cf-border: rgba(255, 255, 255, 0.13);
 
-  --cf-hover:  rgba(255, 255, 255, 0.055);
-  --cf-active: rgba(255, 255, 255, 0.09);
+  --cf-hover:  rgba(255, 255, 255, 0.07);
+  --cf-active: rgba(255, 255, 255, 0.11);
 }
 
 /* ── Base styles ───────────────────────────────────────────────────────────── */
@@ -70,8 +70,8 @@ body {
 /* Using .dark .class (specificity 0,2,0) beats Tailwind .class (0,1,0).      */
 /* This makes every component dark without adding dark: to each one.           */
 
-.dark body,
-.dark .bg-white          { background-color: var(--cf-bg); }
+.dark body               { background-color: var(--cf-bg); }
+.dark .bg-white          { background-color: var(--color-surface-raised); }
 .dark .bg-gray-50        { background-color: var(--cf-surface); }
 .dark .bg-gray-100       { background-color: rgba(255,255,255,0.06); }
 .dark .bg-gray-200       { background-color: rgba(255,255,255,0.10); }

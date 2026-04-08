@@ -24,14 +24,18 @@
     "bilibili": "Bilibili",
     "x": "X (Twitter)",
     "youtube": "YouTube",
-    "instagram": "Instagram"
+    "instagram": "Instagram",
+    "tiktok": "TikTok",
+    "custom": "커스텀"
   },
   "action": {
     "configure": "설정",
     "mark_published": "발행됨으로 표시",
     "remove": "삭제",
     "view": "보기",
-    "retry": "재시도"
+    "retry": "재시도",
+    "restore": "복원",
+    "cancel": "취소"
   },
   "queue_page": {
     "title": "발행 큐",
@@ -42,6 +46,8 @@
     "tomorrow": "내일",
     "empty": "예약된 발행 없음",
     "all_statuses": "전체 상태",
+    "queued_and_ready": "발행 예정",
+    "refresh": "새로고침",
     "btn_mark_published": "발행됨으로 표시",
     "btn_view": "보기",
     "btn_retry": "재시도"
@@ -59,15 +65,38 @@
     "visibility_friends": "친구만",
     "allow_comments": "댓글 허용",
     "save": "저장",
-    "cancel": "취소"
+    "cancel": "취소",
+    "title": "설정"
   },
   "add": {
     "title": "플랫폼 추가",
     "select_platform": "플랫폼 선택",
     "all_added": "모든 플랫폼이 추가됨",
+    "manage_settings": "설정에서 플랫폼 관리",
+    "add_custom": "커스텀 플랫폼 추가",
     "set_schedule": "발행 시간 설정",
     "submit": "추가",
     "cancel": "취소"
+  },
+  "bundle": {
+    "button": "번들",
+    "title": "플랫폼 번들",
+    "empty": "저장된 번들 없음",
+    "empty_hint": "번들을 만들어 여러 플랫폼을 시간 설정과 함께 한 번에 추가하세요",
+    "new": "새 번들",
+    "save_current": "현재 플랫폼을 번들로 저장",
+    "save": "번들 저장",
+    "cancel": "취소",
+    "name_placeholder": "예: 주간 소셜 팩",
+    "delete": "삭제",
+    "apply": "적용",
+    "apply_title": "번들 적용",
+    "apply_date": "기준 날짜",
+    "apply_confirm": "적용",
+    "applying": "적용 중…",
+    "no_time": "시간 없음",
+    "time_label": "발행 시간",
+    "skipped": "이미 추가됨, 건너뜀"
   },
   "mark": {
     "title": "발행됨으로 표시",
@@ -78,5 +107,24 @@
     "published_at": "발행 일시",
     "submit": "확인",
     "cancel": "취소"
+  },
+  "toast_platform_added": "플랫폼이 발행 대기열에 추가되었습니다",
+  "toast_platform_add_failed": "플랫폼 추가 실패: {{message}}",
+  "toast_update_failed": "발행 설정 업데이트 실패: {{message}}",
+  "toast_marked_published": "발행 완료로 표시되었습니다",
+  "toast_mark_published_failed": "발행 완료 표시 실패: {{message}}",
+  "template": {
+    "use": "템플릿",
+    "pick": "템플릿 적용",
+    "apply": "적용",
+    "delete": "템플릿 삭제",
+    "empty": "저장된 템플릿 없음",
+    "empty_hint": "양식을 작성한 후 템플릿으로 저장하세요",
+    "save_current": "템플릿으로 저장",
+    "save_title": "템플릿으로 저장",
+    "name_placeholder": "템플릿 이름…",
+    "save": "저장",
+    "panel_hint": "Configure 양식에서 템플릿을 저장하세요",
+    "apply_hint": "템플릿을 적용하려면 플랫폼의 Configure를 여세요"
   }
 }

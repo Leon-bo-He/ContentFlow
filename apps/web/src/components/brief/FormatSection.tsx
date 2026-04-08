@@ -8,9 +8,9 @@ interface FormatSectionProps {
 }
 
 const ASPECT_RATIOS = [
-  { value: '9:16', label: '9:16 竖屏' },
-  { value: '16:9', label: '16:9 横屏' },
-  { value: '1:1', label: '1:1 方形' },
+  { value: '9:16', label: '9:16' },
+  { value: '16:9', label: '16:9' },
+  { value: '1:1', label: '1:1' },
   { value: '4:3', label: '4:3' },
 ];
 

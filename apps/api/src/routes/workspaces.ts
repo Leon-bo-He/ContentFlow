@@ -19,6 +19,7 @@ export const workspacesRoutes: FastifyPluginAsync = async (app) => {
         name: body.name,
         icon: body.icon,
         color: body.color,
+        about: body.about ?? null,
         platform: body.platform,
         contentType: body.contentType,
         defaultLocale: body.defaultLocale,
@@ -53,6 +54,7 @@ export const workspacesRoutes: FastifyPluginAsync = async (app) => {
     const updateData: Partial<typeof workspaces.$inferInsert> = {};
     if (body.name !== undefined) updateData.name = body.name;
     if (body.icon !== undefined) updateData.icon = body.icon;
+    if (body.about !== undefined) updateData.about = body.about ?? null;
     if (body.publishGoal !== undefined) updateData.publishGoal = body.publishGoal ?? null;
     if (body.defaultLocale !== undefined) updateData.defaultLocale = body.defaultLocale;
     if (body.timezone !== undefined) updateData.timezone = body.timezone;

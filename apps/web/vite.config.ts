@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      devOptions: { enabled: true },
+      devOptions: { enabled: false },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         runtimeCaching: [
@@ -20,11 +20,6 @@ export default defineConfig({
               networkTimeoutSeconds: 10,
               cacheableResponse: { statuses: [0, 200] },
             },
-          },
-          {
-            urlPattern: /\/locales\//,
-            handler: 'CacheFirst',
-            options: { cacheName: 'locale-cache' },
           },
         ],
       },

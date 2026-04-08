@@ -21,18 +21,6 @@ interface MetricsFormState {
   followersGained: string;
 }
 
-const PLATFORM_EMOJI: Record<string, string> = {
-  douyin: '🎵',
-  xiaohongshu: '📕',
-  weixin: '📰',
-  weixin_video: '📱',
-  bilibili: '🎬',
-  x: '🐦',
-  youtube: '▶️',
-  instagram: '📸',
-  tiktok: '🎶',
-};
-
 function PublicationSelector({
   workspaceId,
   value,
@@ -42,6 +30,7 @@ function PublicationSelector({
   value: string;
   onChange: (pubId: string) => void;
 }) {
+  const { t } = useTranslation('analytics');
   const [selectedContentId, setSelectedContentId] = useState('');
   const { data: contents = [] } = useContents(workspaceId);
   const publishedContents = contents.filter((c: Content) => c.stage === 'published');
@@ -53,7 +42,7 @@ function PublicationSelector({
     <div className="space-y-3">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Content
+          {t('record.content_label')}
         </label>
         <select
           className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500"
@@ -63,7 +52,7 @@ function PublicationSelector({
             onChange('');
           }}
         >
-          <option value="">— select content —</option>
+          <option value="">{t('record.content_placeholder')}</option>
           {publishedContents.map((c: Content) => (
             <option key={c.id} value={c.id}>
               {c.title}
@@ -74,23 +63,23 @@ function PublicationSelector({
       {selectedContentId && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Publication
+            {t('record.publication_label')}
           </label>
           <select
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-indigo-500 focus:border-indigo-500"
             value={value}
             onChange={(e) => onChange(e.target.value)}
           >
-            <option value="">— select publication —</option>
+            <option value="">{t('record.publication_placeholder')}</option>
             {publishedPubs.map((p: Publication) => (
               <option key={p.id} value={p.id}>
-                {(PLATFORM_EMOJI[p.platform] ?? '📄') + ' ' + p.platform}
+                {p.platform}
                 {p.platformTitle ? ` — ${p.platformTitle}` : ''}
               </option>
             ))}
           </select>
           {publishedPubs.length === 0 && (
-            <p className="text-xs text-gray-400 mt-1">No published publications for this content.</p>
+            <p className="text-xs text-gray-400 mt-1">{t('record.no_publications')}</p>
           )}
         </div>
       )}
@@ -166,7 +155,7 @@ export function RecordMetricsModal({ workspaceId, onClose }: RecordMetricsModalP
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
-            aria-label="Close"
+            aria-label={t('record.cancel')}
           >
             ✕
           </button>
@@ -199,7 +188,7 @@ export function RecordMetricsModal({ workspaceId, onClose }: RecordMetricsModalP
 
           {createMetrics.isError && (
             <p className="text-sm text-red-600">
-              {createMetrics.error?.message ?? 'Failed to record metrics'}
+              {t('record.error', { message: createMetrics.error?.message ?? '' })}
             </p>
           )}
 

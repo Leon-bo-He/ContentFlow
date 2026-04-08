@@ -75,7 +75,13 @@ export const authRoutes: FastifyPluginAsync = async (app) => {
         { sub: payload.sub, jti: newJti },
         { expiresIn: config.JWT_ACCESS_TTL }
       );
-      return reply.send({ accessToken });
+      const newRefreshToken = app.jwt.sign(
+        { sub: payload.sub, type: 'refresh', jti: newJti },
+        { expiresIn: config.JWT_REFRESH_TTL }
+      );
+      return reply
+        .setCookie('refreshToken', newRefreshToken, { ...COOKIE_OPTS, maxAge: config.JWT_REFRESH_TTL })
+        .send({ accessToken });
     } catch {
       return reply.code(401).send({ error: 'Invalid refresh token' });
     }

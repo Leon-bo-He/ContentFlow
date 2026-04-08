@@ -32,6 +32,7 @@ export function Sidebar() {
 
   const { data: workspaces = [] } = useWorkspaces();
 
+  const openSettings = useUiStore((s) => s.openSettings);
   const [popoutOpen, setPopoutOpen] = useState(false);
   const popoutRef = useRef<HTMLDivElement>(null);
 
@@ -47,8 +48,12 @@ export function Sidebar() {
   }, [popoutOpen]);
 
   function handleWorkspaceSelect(id: string) {
-    setActiveWorkspace(id);
-    void navigate(`/workspaces/${id}/board`);
+    if (id === activeWorkspaceId) {
+      setActiveWorkspace(null);
+    } else {
+      setActiveWorkspace(id);
+      void navigate(`/workspaces/${id}/board`);
+    }
   }
 
   function handleSignOut() {
@@ -68,7 +73,7 @@ export function Sidebar() {
 
   function handleSettings() {
     setPopoutOpen(false);
-    void navigate('/settings');
+    openSettings('account');
   }
 
   const userInitial = user?.name ? (user.name[0]?.toUpperCase() ?? 'U') : 'U';
@@ -79,7 +84,7 @@ export function Sidebar() {
         <button
           onClick={toggle}
           className="w-8 h-8 flex items-center justify-center rounded-[4px] text-[var(--cf-text-muted)] hover:bg-[var(--cf-hover)] transition-colors text-sm"
-          aria-label="Expand sidebar"
+          aria-label={t('aria.expand_sidebar')}
         >
           →
         </button>
@@ -137,7 +142,7 @@ export function Sidebar() {
         <button
           onClick={toggle}
           className="w-6 h-6 flex items-center justify-center rounded-[4px] text-[var(--cf-text-muted)] hover:bg-[var(--cf-hover)] transition-colors text-sm"
-          aria-label="Collapse sidebar"
+          aria-label={t('aria.collapse_sidebar')}
         >
           ←
         </button>
@@ -188,6 +193,7 @@ export function Sidebar() {
                         { to: `/workspaces/${ws.id}/board`,     label: 'nav.board' },
                         { to: `/workspaces/${ws.id}/calendar`,  label: 'nav.calendar' },
                         { to: `/workspaces/${ws.id}/analytics`, label: 'nav.analytics' },
+                        { to: `/workspaces/${ws.id}/archive`,   label: 'nav.archive' },
                       ].map((sub) => (
                         <NavLink
                           key={sub.to}
@@ -249,7 +255,7 @@ export function Sidebar() {
                 onClick={handleSettings}
                 className="w-full flex items-center gap-2 px-3 py-[6px] text-[13px] text-[var(--cf-text-sub)] hover:bg-[var(--cf-hover)] transition-colors"
               >
-                Settings
+                {t('nav.settings')}
               </button>
               <div className="border-t border-[var(--cf-border)] mt-1 pt-1">
                 <button
@@ -264,6 +270,7 @@ export function Sidebar() {
           </div>
         )}
       </div>
+
     </div>
   );
 }

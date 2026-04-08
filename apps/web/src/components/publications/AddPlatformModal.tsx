@@ -1,22 +1,13 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Platform } from '@contentflow/shared';
 import { useCreatePublication } from '../../api/publications.js';
+import { DateTimePicker } from '../ui/DateTimePicker.js';
+import { PlatformIcon } from '../ui/PlatformIcon.js';
+import { useUiStore } from '../../store/ui.store.js';
 
-const PLATFORM_EMOJI: Record<string, string> = {
-  douyin: '🎵',
-  xiaohongshu: '📕',
-  weixin: '📰',
-  weixin_video: '📱',
-  bilibili: '🎬',
-  x: '🐦',
-  youtube: '▶️',
-  instagram: '📷',
-};
-
-const ALL_PLATFORMS: Platform[] = [
+const BUILTIN_PLATFORMS = [
   'douyin', 'xiaohongshu', 'weixin', 'weixin_video',
-  'bilibili', 'x', 'youtube', 'instagram',
+  'bilibili', 'x', 'youtube', 'instagram', 'tiktok',
 ];
 
 function toDatetimeLocal(d: Date): string {
@@ -26,20 +17,27 @@ function toDatetimeLocal(d: Date): string {
 
 interface AddPlatformModalProps {
   contentId: string;
-  existingPlatforms: Platform[];
+  existingPlatforms: string[];
   onClose: () => void;
 }
 
 export function AddPlatformModal({ contentId, existingPlatforms, onClose }: AddPlatformModalProps) {
   const { t } = useTranslation('publications');
+  const { t: tc } = useTranslation('contents');
   const createPublication = useCreatePublication(contentId);
+  const { customPlatforms, disabledBuiltinPlatforms, openSettings } = useUiStore();
 
-  const [selectedPlatform, setSelectedPlatform] = useState<Platform | null>(null);
+  const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
   const [scheduledAt, setScheduledAt] = useState(toDatetimeLocal(new Date()));
   const [useSchedule, setUseSchedule] = useState(false);
   const [error, setError] = useState('');
 
-  const availablePlatforms = ALL_PLATFORMS.filter((p) => !existingPlatforms.includes(p));
+  const enabledBuiltins = BUILTIN_PLATFORMS.filter((p) => !disabledBuiltinPlatforms.includes(p));
+  const allPlatforms: { id: string; label: string }[] = [
+    ...enabledBuiltins.map((id) => ({ id, label: tc(`platforms.${id}`) })),
+    ...customPlatforms.map((cp) => ({ id: cp.id, label: cp.name })),
+  ];
+  const availablePlatforms = allPlatforms.filter((p) => !existingPlatforms.includes(p.id));
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -48,7 +46,7 @@ export function AddPlatformModal({ contentId, existingPlatforms, onClose }: AddP
       return;
     }
     await createPublication.mutateAsync({
-      platform: selectedPlatform,
+      platform: selectedPlatform as Parameters<typeof createPublication.mutateAsync>[0]['platform'],
       scheduledAt: useSchedule && scheduledAt ? new Date(scheduledAt).toISOString() : undefined,
     });
     onClose();
@@ -69,24 +67,41 @@ export function AddPlatformModal({ contentId, existingPlatforms, onClose }: AddP
               {t('add.select_platform')}
             </label>
             {availablePlatforms.length === 0 ? (
-              <p className="text-sm text-gray-400">{t('add.all_added')}</p>
+              <div className="text-center py-4">
+                <p className="text-sm text-gray-400 mb-2">{t('add.all_added')}</p>
+                <button
+                  type="button"
+                  onClick={() => openSettings('platforms')}
+                  className="text-xs text-indigo-600 hover:text-indigo-700 underline"
+                >
+                  {t('add.manage_settings')}
+                </button>
+              </div>
             ) : (
               <div className="grid grid-cols-4 gap-2">
                 {availablePlatforms.map((p) => (
                   <button
-                    key={p}
+                    key={p.id}
                     type="button"
-                    onClick={() => { setSelectedPlatform(p); setError(''); }}
+                    onClick={() => { setSelectedPlatform(p.id); setError(''); }}
                     className={`flex flex-col items-center gap-1 p-3 rounded-lg border text-xs transition-colors ${
-                      selectedPlatform === p
+                      selectedPlatform === p.id
                         ? 'border-indigo-400 bg-indigo-50 text-indigo-700'
                         : 'border-gray-200 text-gray-600 hover:border-gray-300'
                     }`}
                   >
-                    <span className="text-xl">{PLATFORM_EMOJI[p]}</span>
-                    <span className="leading-tight text-center">{t(`platforms.${p}`)}</span>
+                    <PlatformIcon platform={p.id} className="w-6 h-6" />
+                    <span className="leading-tight text-center">{p.label}</span>
                   </button>
                 ))}
+                <button
+                  type="button"
+                  onClick={() => openSettings('platforms')}
+                  className="flex flex-col items-center gap-1 p-3 rounded-lg border border-dashed border-gray-200 text-xs text-gray-400 hover:border-indigo-300 hover:text-indigo-500 transition-colors"
+                >
+                  <span className="text-lg">+</span>
+                  <span className="leading-tight text-center">{t('add.add_custom')}</span>
+                </button>
               </div>
             )}
             {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
@@ -104,12 +119,12 @@ export function AddPlatformModal({ contentId, existingPlatforms, onClose }: AddP
               {t('add.set_schedule')}
             </label>
             {useSchedule && (
-              <input
-                type="datetime-local"
-                value={scheduledAt}
-                onChange={(e) => setScheduledAt(e.target.value)}
-                className="mt-2 w-full text-sm border border-gray-200 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-200"
-              />
+              <div className="mt-2">
+                <DateTimePicker
+                  value={scheduledAt ? new Date(scheduledAt).toISOString() : ''}
+                  onChange={(iso) => setScheduledAt(iso ?? '')}
+                />
+              </div>
             )}
           </div>
 

@@ -1,10 +1,5 @@
 import { z } from 'zod';
 
-const platformValues = [
-  'douyin', 'xiaohongshu', 'weixin', 'weixin_video',
-  'bilibili', 'x', 'youtube', 'instagram',
-] as const;
-
 const platformSettingsSchema = z.object({
   visibility: z.enum(['public', 'private', 'friends']).optional(),
   allowComments: z.boolean().optional(),
@@ -13,7 +8,7 @@ const platformSettingsSchema = z.object({
 }).passthrough();
 
 export const createPublicationSchema = z.object({
-  platform: z.enum(platformValues),
+  platform: z.string().min(1),
   platformTitle: z.string().optional(),
   platformCopy: z.string().optional(),
   platformTags: z.array(z.string()).default([]),

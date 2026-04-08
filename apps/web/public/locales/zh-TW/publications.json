@@ -24,14 +24,18 @@
     "bilibili": "嗶哩嗶哩",
     "x": "X (Twitter)",
     "youtube": "YouTube",
-    "instagram": "Instagram"
+    "instagram": "Instagram",
+    "tiktok": "TikTok",
+    "custom": "自訂"
   },
   "action": {
     "configure": "設定",
     "mark_published": "標記已發佈",
     "remove": "移除",
     "view": "查看",
-    "retry": "重試"
+    "retry": "重試",
+    "restore": "恢復",
+    "cancel": "撤銷"
   },
   "queue_page": {
     "title": "發佈佇列",
@@ -42,6 +46,8 @@
     "tomorrow": "明天",
     "empty": "尚無待發佈內容",
     "all_statuses": "全部狀態",
+    "queued_and_ready": "待發佈",
+    "refresh": "重新整理",
     "btn_mark_published": "標記發佈",
     "btn_view": "查看",
     "btn_retry": "重試"
@@ -59,15 +65,38 @@
     "visibility_friends": "僅好友",
     "allow_comments": "允許留言",
     "save": "儲存",
-    "cancel": "取消"
+    "cancel": "取消",
+    "title": "設定"
   },
   "add": {
     "title": "新增發佈平台",
     "select_platform": "選擇平台",
     "all_added": "已新增全部平台",
+    "manage_settings": "在設定中管理平台",
+    "add_custom": "新增自訂平台",
     "set_schedule": "設定發佈時間",
     "submit": "新增",
     "cancel": "取消"
+  },
+  "bundle": {
+    "button": "套裝",
+    "title": "平台套裝",
+    "empty": "尚無已儲存的套裝",
+    "empty_hint": "建立套裝，一鍵新增多個平台並設定發佈時間",
+    "new": "新建套裝",
+    "save_current": "將目前平台儲存為套裝",
+    "save": "儲存套裝",
+    "cancel": "取消",
+    "name_placeholder": "例如：每週社群媒體套裝",
+    "delete": "刪除",
+    "apply": "套用",
+    "apply_title": "套用套裝",
+    "apply_date": "基準日期",
+    "apply_confirm": "確認套用",
+    "applying": "套用中…",
+    "no_time": "不設時間",
+    "time_label": "發佈時間",
+    "skipped": "已存在，已略過"
   },
   "mark": {
     "title": "標記已發佈",
@@ -78,5 +107,24 @@
     "published_at": "發佈時間",
     "submit": "確認",
     "cancel": "取消"
+  },
+  "toast_platform_added": "平台已加入發佈佇列",
+  "toast_platform_add_failed": "新增平台失敗：{{message}}",
+  "toast_update_failed": "更新發佈計畫失敗：{{message}}",
+  "toast_marked_published": "已標記為已發佈",
+  "toast_mark_published_failed": "標記已發佈失敗：{{message}}",
+  "template": {
+    "use": "範本",
+    "pick": "套用範本",
+    "apply": "套用",
+    "delete": "刪除範本",
+    "empty": "尚無已儲存的範本",
+    "empty_hint": "填寫表單後儲存為範本",
+    "save_current": "儲存為範本",
+    "save_title": "儲存為範本",
+    "name_placeholder": "範本名稱…",
+    "save": "儲存",
+    "panel_hint": "在「配置」表單中儲存範本",
+    "apply_hint": "點擊任意平台的「配置」按鈕來套用範本"
   }
 }

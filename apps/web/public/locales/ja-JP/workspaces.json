@@ -45,5 +45,10 @@
     "x": "X (Twitter)",
     "youtube": "YouTube",
     "instagram": "Instagram"
-  }
+  },
+  "name_required": "ワークスペース名を入力してください",
+  "icon_custom_placeholder": "カスタムアイコン（テキスト・絵文字）",
+  "color_custom": "カスタムカラー",
+  "about_label": "概要",
+  "about_placeholder": "このワークスペースを一言で説明してください…"
 }

@@ -1,16 +1,6 @@
 import type { Content } from '@contentflow/shared';
 import { useTranslation } from 'react-i18next';
-
-const PLATFORM_EMOJI: Record<string, string> = {
-  douyin: '🎵',
-  xiaohongshu: '📕',
-  weixin: '📰',
-  weixin_video: '📱',
-  bilibili: '🎬',
-  x: '🐦',
-  youtube: '▶️',
-  instagram: '📷',
-};
+import { PlatformIcon } from '../ui/PlatformIcon.js';
 
 function formatDate(date: Date | string | null): string {
   if (!date) return '';
@@ -35,6 +25,7 @@ export function KanbanCard({ content, onClick, onDragStart }: KanbanCardProps) {
       draggable
       onDragStart={(e) => onDragStart(e, content.id)}
       onClick={() => onClick(content)}
+      onDoubleClick={(e) => e.stopPropagation()}
       className="bg-white rounded-lg border border-gray-200 p-3 shadow-sm cursor-pointer hover:border-indigo-300 hover:shadow-md transition-all select-none"
     >
       {/* Title */}
@@ -49,9 +40,7 @@ export function KanbanCard({ content, onClick, onDragStart }: KanbanCardProps) {
       {content.targetPlatforms.length > 0 && (
         <div className="flex gap-1 mb-2">
           {content.targetPlatforms.map((p) => (
-            <span key={p} title={p} className="text-sm">
-              {PLATFORM_EMOJI[p] ?? '🌐'}
-            </span>
+            <PlatformIcon key={p} platform={p} className="w-4 h-4" />
           ))}
         </div>
       )}

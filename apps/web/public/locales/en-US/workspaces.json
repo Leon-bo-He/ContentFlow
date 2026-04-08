@@ -38,12 +38,17 @@
   },
   "platforms": {
     "douyin": "Douyin",
-    "xiaohongshu": "Xiaohongshu",
+    "xiaohongshu": "RedNote",
     "weixin": "WeChat OA",
     "weixin_video": "WeChat Video",
     "bilibili": "Bilibili",
     "x": "X (Twitter)",
     "youtube": "YouTube",
     "instagram": "Instagram"
-  }
+  },
+  "name_required": "Workspace name is required",
+  "icon_custom_placeholder": "Custom icon (text, emoji)",
+  "color_custom": "Custom color",
+  "about_label": "About",
+  "about_placeholder": "Describe this workspace in a sentence…"
 }

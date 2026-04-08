@@ -1,9 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
-import { useRefreshToken, useMe } from '../../api/auth.js';
+import { useMe } from '../../api/auth.js';
 import { useAuthStore } from '../../store/auth.store.js';
-import { setAccessToken } from '../../api/client.js';
+import { apiFetch, setAccessToken } from '../../api/client.js';
 import { FullPageSpinner } from '../ui/FullPageSpinner.js';
 import { useTheme } from '../../hooks/useTheme.js';
+
+/** Decode a JWT and check whether its exp claim is in the future. */
+function isTokenValid(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]!));
+    return typeof payload.exp === 'number' && payload.exp * 1000 > Date.now();
+  } catch {
+    return false;
+  }
+}
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -19,7 +29,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // refreshedToken is the token obtained from the refresh call (may differ from stored)
   const [refreshedToken, setRefreshedToken] = useState<string | null>(null);
 
-  const refreshMutation = useRefreshToken();
   // useMe is enabled only once we have a token from refresh
   const meQuery = useMe(refreshedToken);
 
@@ -29,30 +38,41 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (initialized.current) return;
     initialized.current = true;
 
-    // Restore stored token into the in-memory variable so apiFetch can use it
-    // while we attempt to refresh
+    // Restore stored token into memory so API calls work immediately
     if (storedToken) {
       setAccessToken(storedToken);
     }
 
-    // Fallback: if API is unreachable, stop spinning after 5s
+    // If the stored token is still valid, skip the refresh round-trip.
+    // useMe will verify the user and restore the session.
+    if (storedToken && isTokenValid(storedToken)) {
+      setRefreshedToken(storedToken);
+      return;
+    }
+
+    // Token missing or expired — use the httpOnly refresh cookie to get a new one.
+    // Abort after 3 s so a slow/cold server doesn't block the login page.
+    const controller = new AbortController();
     const timeout = setTimeout(() => {
+      controller.abort();
       clearAuth();
       setIsLoading(false);
-    }, 5000);
+    }, 3000);
 
-    refreshMutation.mutate(undefined, {
-      onSuccess: (data) => {
+    apiFetch<{ accessToken: string }>('/api/auth/refresh', {
+      method: 'POST',
+      signal: controller.signal,
+    })
+      .then((data) => {
         clearTimeout(timeout);
         setAccessToken(data.accessToken);
         setRefreshedToken(data.accessToken);
-      },
-      onError: () => {
+      })
+      .catch(() => {
         clearTimeout(timeout);
         clearAuth();
         setIsLoading(false);
-      },
-    });
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

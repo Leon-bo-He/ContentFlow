@@ -7,7 +7,8 @@
     "publications": "配信管理",
     "analytics": "分析",
     "settings": "設定",
-    "workspaces": "ワークスペース"
+    "workspaces": "ワークスペース",
+    "archive": "アーカイブ"
   },
   "action": {
     "save": "保存",
@@ -17,7 +18,12 @@
     "create": "作成",
     "confirm": "確認",
     "add": "追加",
-    "language": "言語"
+    "language": "言語",
+    "try_again": "再試行",
+    "back_home": "ホームに戻る",
+    "enable": "有効にする",
+    "dismiss": "閉じる",
+    "remove": "削除"
   },
   "status": {
     "loading": "読み込み中…",
@@ -65,7 +71,16 @@
       "general": "一般",
       "notifications": "通知",
       "workspaces": "ワークスペース",
+      "platforms": "プラットフォーム",
       "account": "アカウント"
+    },
+    "platforms": {
+      "builtin_title": "組み込みプラットフォーム",
+      "custom_title": "カスタムプラットフォーム",
+      "upload_icon_hint": "SVGアイコンをアップロード",
+      "upload_icon_sub": "（ボックスをクリック）",
+      "remove_icon": "アイコンを削除",
+      "add_custom": "カスタムプラットフォームを追加"
     },
     "general": {
       "language": "言語",
@@ -96,7 +111,36 @@
       "update_password": "パスワードを更新",
       "passwords_mismatch": "新しいパスワードが一致しません",
       "password_too_short": "パスワードは8文字以上にしてください",
-      "delete_my_account": "アカウントを削除する"
+      "delete_my_account": "アカウントを削除する",
+      "profile": "プロフィール",
+      "security": "セキュリティ",
+      "password_desc": "アカウントを守る強力なパスワードを設定",
+      "danger_zone": "危険な操作",
+      "delete_desc": "アカウントとすべてのデータを完全に削除"
     }
+  },
+  "error": {
+    "something_went_wrong": "エラーが発生しました",
+    "unexpected": "予期しないエラーが発生しました",
+    "page_not_found": "ページが見つかりません",
+    "page_not_found_desc": "このページは存在しないか、移動しました",
+    "failed_to_save": "保存に失敗しました",
+    "failed": "エラーが発生しました"
+  },
+  "offline": {
+    "back_online": "オンラインに戻りました — {{count}} 件の変更を同期中",
+    "all_synced": "すべての変更を同期しました",
+    "banner": "オフラインです — 接続が回復したら自動的に同期されます"
+  },
+  "notifications": {
+    "banner_text": "公開リマインダーを有効にして、予定公開の 15 分前に通知を受け取りましょう"
+  },
+  "aria": {
+    "hide_password": "パスワードを非表示",
+    "show_password": "パスワードを表示",
+    "expand_sidebar": "サイドバーを展開",
+    "collapse_sidebar": "サイドバーを折りたたむ",
+    "close": "閉じる",
+    "dismiss": "閉じる"
   }
 }

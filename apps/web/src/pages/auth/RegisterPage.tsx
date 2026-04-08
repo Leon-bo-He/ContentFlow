@@ -3,13 +3,19 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useRegister } from '../../api/auth.js';
 import { useAuthStore } from '../../store/auth.store.js';
+import { useUiStore } from '../../store/ui.store.js';
 import { toast } from '../../store/toast.store.js';
 import { ApiError } from '../../api/client.js';
+import LanguageSwitcher from '../../components/auth/LanguageSwitcher.js';
+
+type Theme = 'system' | 'light' | 'dark';
+const THEME_ICONS: Record<Theme, string> = { system: '💻', light: '☀️', dark: '🌙' };
 
 export default function RegisterPage() {
   const { t } = useTranslation('common');
   const navigate = useNavigate();
   const setAuth = useAuthStore((s) => s.setAuth);
+  const { theme, setTheme } = useUiStore();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -60,15 +66,20 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">
           <span className="text-3xl font-bold text-indigo-600">ContentFlow</span>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-          <h1 className="text-xl font-semibold text-gray-900 mb-6">{t('auth.create_account')}</h1>
+        <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
+          {/* Language — top right */}
+          <div className="absolute top-4 right-4">
+            <LanguageSwitcher />
+          </div>
+
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">{t('auth.create_account')}</h1>
 
           <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
             {/* Name */}
@@ -119,7 +130,7 @@ export default function RegisterPage() {
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
                   className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-gray-600"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showPassword ? t('aria.hide_password') : t('aria.show_password')}
                 >
                   {showPassword ? '🙈' : '👁'}
                 </button>
@@ -159,13 +170,33 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          <p className="mt-5 text-center text-sm text-gray-500">
+          <p className="mt-5 text-center text-sm text-gray-500 dark:text-gray-400">
             {t('auth.have_account')}{' '}
             <Link to="/login" className="text-indigo-600 hover:text-indigo-700 font-medium">
               {t('auth.sign_in')}
             </Link>
           </p>
+
+          {/* Theme — bottom center */}
+          <div className="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-center gap-1">
+            {(['system', 'light', 'dark'] as Theme[]).map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setTheme(m)}
+                title={t(`settings.general.theme_${m}`)}
+                className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm transition-colors ${
+                  theme === m
+                    ? 'bg-gray-100 dark:bg-gray-600 text-gray-800 dark:text-gray-100'
+                    : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'
+                }`}
+              >
+                {THEME_ICONS[m]}
+              </button>
+            ))}
+          </div>
         </div>
+
       </div>
     </div>
   );

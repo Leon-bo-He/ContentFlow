@@ -1,6 +1,7 @@
 {
   "title": "Content Board",
-  "create": "New Content",
+  "stage_updated": "Stage updated to {{stage}}",
+  "new_content": "New Content",
   "stages": {
     "planned": "Planned",
     "planning": "Planning",
@@ -8,34 +9,11 @@
     "ready": "Ready",
     "publishing": "Publishing",
     "published": "Published",
-    "reviewed": "Reviewed"
+    "reviewed": "Reviewed",
+    "archived": "Archived"
   },
   "brief": {
     "title": "Content Brief",
-    "audience": "Target Audience",
-    "goals": "Content Goals",
-    "hooks": "Key Hooks",
-    "titles": "Title Candidates",
-    "outline": "Content Outline",
-    "references": "References",
-    "back_to_board": "Back to Board",
-    "sections": {
-      "format": "内容类型 / Content Format",
-      "audience": "目标受众 / Target Audience",
-      "goals": "内容目标 / Content Goals",
-      "hooks": "爆点提炼 / Hook Analysis",
-      "titles": "标题候选 / Title Candidates",
-      "outline": "内容大纲 / Content Outline",
-      "references": "竞品参考 / Competitive References"
-    },
-    "format": {
-      "duration_label": "Duration",
-      "duration_unit": "seconds",
-      "aspect_ratio_label": "Aspect Ratio",
-      "aspect_ratio_placeholder": "Select aspect ratio",
-      "notes_label": "Format Notes",
-      "notes_placeholder": "Any notes about format, style, or production requirements…"
-    },
     "audience": {
       "age_range_label": "Age Range",
       "age_range_placeholder": "e.g. 18-25",
@@ -101,12 +79,40 @@
       "comments_label": "Comments",
       "takeaway_label": "Key Takeaway",
       "add_reference_confirm": "Add"
+    },
+    "back_to_board": "Back to Board",
+    "sections": {
+      "format": "Content Format",
+      "audience": "Target Audience",
+      "goals": "Content Goals",
+      "hooks": "Hook Analysis",
+      "titles": "Title Candidates",
+      "outline": "Content Outline",
+      "references": "Competitive References"
+    },
+    "saving": "Saving…",
+    "saved": "Saved",
+    "not_found": "Content not found",
+    "format": {
+      "duration_label": "Duration",
+      "duration_unit": "seconds",
+      "aspect_ratio_label": "Aspect Ratio",
+      "aspect_ratio_placeholder": "Select aspect ratio",
+      "notes_label": "Format Notes",
+      "notes_placeholder": "Any notes about format, style, or production requirements…"
     }
+  },
+  "column": {
+    "empty": "No content",
+    "drop_here": "Drop here",
+    "workspace_not_found": "Workspace not found",
+    "auto_archive_hint": "Auto-archived after 7 days"
   },
   "card": {
     "scheduled": "Scheduled {{date}}",
     "tags_more": "+{{count}} more",
-    "no_date": "No date set"
+    "no_date": "No date set",
+    "more": "+{{count}} more"
   },
   "drawer": {
     "title_label": "Title",
@@ -121,7 +127,18 @@
     "add_tag": "Add tag",
     "open_brief": "Open Brief ✍️",
     "tab_details": "Details",
-    "tab_publish": "Publish"
+    "tab_publish": "Publish",
+    "tab_timeline": "Timeline",
+    "archive": "Archive",
+    "unarchive": "Unarchive",
+    "add_custom_platform": "Add platform",
+    "custom_platform_name": "Platform name",
+    "no_custom_platforms": "No custom platforms yet",
+    "manage_platforms": "Manage platforms",
+    "delete": "Delete Content",
+    "delete_confirm_title": "Delete permanently?",
+    "delete_confirm_body": "This content will be permanently deleted and cannot be recovered.",
+    "delete_confirm_button": "Delete permanently"
   },
   "create": {
     "title": "New Content",
@@ -142,12 +159,28 @@
   },
   "platforms": {
     "douyin": "Douyin",
-    "xiaohongshu": "Xiaohongshu",
+    "xiaohongshu": "RedNote",
     "weixin": "WeChat OA",
     "weixin_video": "WeChat Video",
     "bilibili": "Bilibili",
     "x": "X (Twitter)",
     "youtube": "YouTube",
-    "instagram": "Instagram"
+    "instagram": "Instagram",
+    "tiktok": "TikTok",
+    "custom": "Custom"
+  },
+  "update_error": "Failed to update content: {{message}}",
+  "create_error": "Failed to create content: {{message}}",
+  "delete_error": "Failed to delete content: {{message}}",
+  "toast_created": "Content created",
+  "toast_deleted": "Content deleted",
+  "archive": {
+    "archived_at": "Archived",
+    "published_at": "Published",
+    "col_title": "Title",
+    "col_type": "Type",
+    "col_platforms": "Platforms",
+    "col_published": "Published",
+    "col_archived": "Archived"
   }
 }

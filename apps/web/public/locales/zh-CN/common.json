@@ -7,7 +7,8 @@
     "publications": "发布管理",
     "analytics": "数据分析",
     "settings": "设置",
-    "workspaces": "工作空间"
+    "workspaces": "工作空间",
+    "archive": "归档内容"
   },
   "action": {
     "save": "保存",
@@ -17,7 +18,12 @@
     "create": "新建",
     "confirm": "确认",
     "add": "添加",
-    "language": "语言"
+    "language": "语言",
+    "try_again": "重试",
+    "back_home": "返回首页",
+    "enable": "开启",
+    "dismiss": "关闭",
+    "remove": "移除"
   },
   "status": {
     "loading": "加载中…",
@@ -65,7 +71,16 @@
       "general": "通用",
       "notifications": "通知",
       "workspaces": "工作空间",
+      "platforms": "平台管理",
       "account": "账号"
+    },
+    "platforms": {
+      "builtin_title": "内置平台",
+      "custom_title": "自定义平台",
+      "upload_icon_hint": "上传 SVG 图标",
+      "upload_icon_sub": "（点击方框上传）",
+      "remove_icon": "移除图标",
+      "add_custom": "添加自定义平台"
     },
     "general": {
       "language": "语言",
@@ -96,7 +111,36 @@
       "update_password": "更新密码",
       "passwords_mismatch": "两次密码不一致",
       "password_too_short": "密码至少需要 8 位字符",
-      "delete_my_account": "删除我的账号"
+      "delete_my_account": "删除我的账号",
+      "profile": "个人资料",
+      "security": "安全",
+      "password_desc": "设置强密码以保护您的账号",
+      "danger_zone": "危险操作",
+      "delete_desc": "永久删除账号及所有数据"
     }
+  },
+  "error": {
+    "something_went_wrong": "出现了错误",
+    "unexpected": "发生了意外错误",
+    "page_not_found": "页面未找到",
+    "page_not_found_desc": "该页面不存在或已被移动",
+    "failed_to_save": "保存失败",
+    "failed": "操作失败"
+  },
+  "offline": {
+    "back_online": "已恢复联网，正在同步 {{count}} 条待处理变更",
+    "all_synced": "所有变更已同步",
+    "banner": "您已离线 — 恢复联网后将自动同步"
+  },
+  "notifications": {
+    "banner_text": "开启发布提醒，在排期发布前 15 分钟收到通知"
+  },
+  "aria": {
+    "hide_password": "隐藏密码",
+    "show_password": "显示密码",
+    "expand_sidebar": "展开侧边栏",
+    "collapse_sidebar": "收起侧边栏",
+    "close": "关闭",
+    "dismiss": "关闭"
   }
 }

@@ -236,7 +236,7 @@ export default function Analytics() {
   const weekGoal = publishGoal?.period === 'week' ? publishGoal.count : null;
 
   if (!workspaceId) {
-    return <div className="p-6 text-gray-500">Workspace not found.</div>;
+    return <div className="p-6 text-gray-500">{t('workspace_not_found')}</div>;
   }
 
   if (isLoading) {
@@ -268,7 +268,7 @@ export default function Analytics() {
           )}
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              {workspace?.name ?? 'Analytics'} — {t('title')}
+              {workspace?.name ?? t('title')} — {t('title')}
             </h1>
             <p className="text-sm text-gray-500">{t('dashboard.subtitle')}</p>
           </div>

@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export default function NotFound() {
+  const { t } = useTranslation('common');
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8 text-center bg-surface">
       <svg
@@ -22,15 +24,15 @@ export default function NotFound() {
         </text>
       </svg>
 
-      <h1 className="text-3xl font-bold text-gray-900 mb-2">Page not found</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('error.page_not_found')}</h1>
       <p className="text-gray-500 text-sm mb-8 max-w-xs">
-        The page you're looking for doesn't exist or has been moved.
+        {t('error.page_not_found_desc')}
       </p>
       <Link
         to="/"
         className="px-6 py-2.5 bg-indigo-600 text-white font-medium text-sm rounded-lg hover:bg-indigo-700 transition-colors"
       >
-        Back to Home
+        {t('action.back_home')}
       </Link>
     </div>
   );

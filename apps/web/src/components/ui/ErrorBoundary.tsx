@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   children: ReactNode;
@@ -8,6 +9,25 @@ interface Props {
 interface State {
   hasError: boolean;
   error: Error | null;
+}
+
+function ErrorFallback({ error, onReset }: { error: Error | null; onReset: () => void }) {
+  const { t } = useTranslation('common');
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[50vh] p-8 text-center">
+      <div className="text-5xl mb-4">⚠️</div>
+      <h2 className="text-xl font-semibold text-gray-900 mb-2">{t('error.something_went_wrong')}</h2>
+      <p className="text-sm text-gray-500 mb-6 max-w-sm">
+        {error?.message ?? t('error.unexpected')}
+      </p>
+      <button
+        onClick={onReset}
+        className="px-5 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+      >
+        {t('action.try_again')}
+      </button>
+    </div>
+  );
 }
 
 export class ErrorBoundary extends Component<Props, State> {
@@ -28,21 +48,7 @@ export class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       if (this.props.fallback) return this.props.fallback;
-      return (
-        <div className="flex flex-col items-center justify-center min-h-[50vh] p-8 text-center">
-          <div className="text-5xl mb-4">⚠️</div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Something went wrong</h2>
-          <p className="text-sm text-gray-500 mb-6 max-w-sm">
-            {this.state.error?.message ?? 'An unexpected error occurred.'}
-          </p>
-          <button
-            onClick={this.reset}
-            className="px-5 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
-          >
-            Try again
-          </button>
-        </div>
-      );
+      return <ErrorFallback error={this.state.error} onReset={this.reset} />;
     }
     return this.props.children;
   }

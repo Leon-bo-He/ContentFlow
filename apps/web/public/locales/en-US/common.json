@@ -7,7 +7,8 @@
     "publications": "Publications",
     "analytics": "Analytics",
     "settings": "Settings",
-    "workspaces": "Workspaces"
+    "workspaces": "Workspaces",
+    "archive": "Archive"
   },
   "action": {
     "save": "Save",
@@ -17,7 +18,12 @@
     "create": "Create",
     "confirm": "Confirm",
     "add": "Add",
-    "language": "Language"
+    "language": "Language",
+    "try_again": "Try again",
+    "back_home": "Back to Home",
+    "enable": "Enable",
+    "dismiss": "Dismiss",
+    "remove": "Remove"
   },
   "status": {
     "loading": "Loading…",
@@ -65,7 +71,16 @@
       "general": "General",
       "notifications": "Notifications",
       "workspaces": "Workspaces",
+      "platforms": "Platforms",
       "account": "Account"
+    },
+    "platforms": {
+      "builtin_title": "Built-in Platforms",
+      "custom_title": "Custom Platforms",
+      "upload_icon_hint": "Upload SVG icon",
+      "upload_icon_sub": "(click the box)",
+      "remove_icon": "Remove icon",
+      "add_custom": "Add Custom Platform"
     },
     "general": {
       "language": "Language",
@@ -96,7 +111,36 @@
       "update_password": "Update password",
       "passwords_mismatch": "New passwords do not match",
       "password_too_short": "Password must be at least 8 characters",
-      "delete_my_account": "Delete my account"
+      "delete_my_account": "Delete my account",
+      "profile": "Profile",
+      "security": "Security",
+      "password_desc": "Set a strong password to protect your account",
+      "danger_zone": "Danger Zone",
+      "delete_desc": "Permanently delete your account and all data"
     }
+  },
+  "error": {
+    "something_went_wrong": "Something went wrong",
+    "unexpected": "An unexpected error occurred.",
+    "page_not_found": "Page not found",
+    "page_not_found_desc": "The page you're looking for doesn't exist or has been moved.",
+    "failed_to_save": "Failed to save",
+    "failed": "An error occurred"
+  },
+  "offline": {
+    "back_online": "Back online — syncing {{count}} pending change(s)",
+    "all_synced": "All changes synced",
+    "banner": "You're offline — changes will sync when reconnected"
+  },
+  "notifications": {
+    "banner_text": "Enable publish reminders to get notified 15 min before scheduled posts."
+  },
+  "aria": {
+    "hide_password": "Hide password",
+    "show_password": "Show password",
+    "expand_sidebar": "Expand sidebar",
+    "collapse_sidebar": "Collapse sidebar",
+    "close": "Close",
+    "dismiss": "Dismiss"
   }
 }

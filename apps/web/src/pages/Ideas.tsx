@@ -14,7 +14,7 @@ export default function Ideas() {
   const [filters, setFilters] = useState<IdeaFilters>({});
   const [modalOpen, setModalOpen] = useState(false);
 
-  const { data: ideas, isLoading, error } = useIdeas(filters);
+  const { data: ideas, isLoading, isFetching, error } = useIdeas(filters);
   const { data: workspaces } = useWorkspaces();
 
   // Build a workspace lookup map
@@ -62,7 +62,7 @@ export default function Ideas() {
         <IdeaFiltersBar filters={filters} onChange={setFilters} />
       </div>
 
-      {/* Loading state */}
+      {/* Initial loading state — skeletons only when there's no data at all yet */}
       {isLoading && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {Array.from({ length: 6 }).map((_, i) => (
@@ -91,9 +91,12 @@ export default function Ideas() {
         </div>
       )}
 
-      {/* Ideas grid */}
+      {/* Ideas grid — kept visible while re-fetching with a subtle opacity fade */}
       {!isLoading && ideas && ideas.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 transition-opacity duration-150"
+          style={{ opacity: isFetching ? 0.5 : 1 }}
+        >
           {ideas.map((idea) => (
             <IdeaCard
               key={idea.id}

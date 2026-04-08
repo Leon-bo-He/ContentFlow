@@ -25,7 +25,7 @@ ContentFlow is a multilingual social media content scheduling, distribution, and
 ## Directory Layout (target)
 
 ```
-content_creator/
+ContentFlow/
 ├── apps/
 │   ├── web/          # React PWA client
 │   └── api/          # Fastify server

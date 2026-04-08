@@ -6,6 +6,7 @@ export const Stage = {
   PUBLISHING: 'publishing',
   PUBLISHED: 'published',
   REVIEWED: 'reviewed',
+  ARCHIVED: 'archived',
 } as const;
 
 export type Stage = (typeof Stage)[keyof typeof Stage];

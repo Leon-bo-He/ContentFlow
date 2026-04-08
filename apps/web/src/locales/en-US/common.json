@@ -1,0 +1,151 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "ideas": "Ideas",
+    "board": "Content Board",
+    "calendar": "Calendar",
+    "publications": "Publications",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "workspaces": "Workspaces",
+    "archive": "Archive"
+  },
+  "action": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "confirm": "Confirm",
+    "add": "Add",
+    "language": "Language",
+    "try_again": "Try again",
+    "back_home": "Back to Home",
+    "enable": "Enable",
+    "dismiss": "Dismiss",
+    "remove": "Remove"
+  },
+  "status": {
+    "loading": "Loading…",
+    "error": "An error occurred",
+    "empty": "No data",
+    "saved": "Saved"
+  },
+  "workspace": {
+    "switcher_label": "Switch workspace",
+    "create": "Create workspace",
+    "no_workspace": "No workspaces yet"
+  },
+  "calendar": {
+    "month_view": "Month",
+    "week_view": "Week",
+    "list_view": "List",
+    "prev": "Previous",
+    "next": "Next",
+    "today": "Today",
+    "no_content": "No content",
+    "goal_banner": "This week: {{scheduled}} of {{goal}} posts scheduled",
+    "on_track": "On track",
+    "behind": "Behind",
+    "add_content": "Add content",
+    "goal_week": "This week",
+    "goal_month": "This month",
+    "goal_year": "This year",
+    "goal_of": "{{actual}} / {{goal}}"
+  },
+  "auth": {
+    "sign_in": "Sign In",
+    "sign_up": "Sign Up",
+    "sign_out": "Sign Out",
+    "email": "Email",
+    "password": "Password",
+    "name": "Username",
+    "confirm_password": "Confirm Password",
+    "welcome_back": "Welcome back",
+    "create_account": "Create your account",
+    "no_account": "Don't have an account?",
+    "have_account": "Already have an account?",
+    "invalid_credentials": "Invalid email or password",
+    "email_taken": "This email is already registered",
+    "password_mismatch": "Passwords do not match",
+    "password_too_short": "Password must be at least 8 characters"
+  },
+  "settings": {
+    "sections": {
+      "general": "General",
+      "notifications": "Notifications",
+      "workspaces": "Workspaces",
+      "platforms": "Platforms",
+      "account": "Account"
+    },
+    "platforms": {
+      "builtin_title": "Built-in Platforms",
+      "custom_title": "Custom Platforms",
+      "upload_icon_hint": "Upload SVG icon",
+      "upload_icon_sub": "(click the box)",
+      "remove_icon": "Remove icon",
+      "add_custom": "Add Custom Platform"
+    },
+    "general": {
+      "language": "Language",
+      "timezone": "Timezone",
+      "appearance": "Appearance",
+      "theme_system": "System",
+      "theme_light": "Light",
+      "theme_dark": "Dark"
+    },
+    "notifications": {
+      "publish_reminders": "Publish reminders",
+      "publish_reminders_desc": "Get notified before a scheduled publication",
+      "lead_time": "Reminder lead time",
+      "lead_time_unit": "min before",
+      "blocked": "Notifications are blocked. Enable them in your browser settings."
+    },
+    "account": {
+      "name": "Username",
+      "email": "Email",
+      "password": "Password",
+      "change_password": "Change password",
+      "delete_account": "Delete account…",
+      "delete_warning": "This will permanently delete your account and all associated data. This action cannot be undone.",
+      "confirm_password_label": "Confirm your password",
+      "current_password": "Current password",
+      "new_password": "New password",
+      "confirm_new_password": "Confirm new password",
+      "update_password": "Update password",
+      "passwords_mismatch": "New passwords do not match",
+      "password_too_short": "Password must be at least 8 characters",
+      "delete_my_account": "Delete my account",
+      "profile": "Profile",
+      "security": "Security",
+      "password_desc": "Set a strong password to protect your account",
+      "danger_zone": "Danger Zone",
+      "sign_out_desc": "Sign out of your account on this device",
+      "delete_desc": "Permanently delete your account and all data"
+    }
+  },
+  "error": {
+    "something_went_wrong": "Something went wrong",
+    "unexpected": "An unexpected error occurred.",
+    "page_not_found": "Page not found",
+    "page_not_found_desc": "The page you're looking for doesn't exist or has been moved.",
+    "failed_to_save": "Failed to save",
+    "failed": "An error occurred"
+  },
+  "offline": {
+    "back_online": "Back online — syncing {{count}} pending change(s)",
+    "all_synced": "All changes synced",
+    "banner": "You're offline — changes will sync when reconnected"
+  },
+  "notifications": {
+    "banner_text": "Enable publish reminders to get notified 15 min before scheduled posts."
+  },
+  "aria": {
+    "hide_password": "Hide password",
+    "show_password": "Show password",
+    "expand_sidebar": "Expand sidebar",
+    "collapse_sidebar": "Collapse sidebar",
+    "close": "Close",
+    "dismiss": "Dismiss"
+  }
+}
