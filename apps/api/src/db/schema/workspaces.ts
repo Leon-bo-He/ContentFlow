@@ -9,7 +9,6 @@ export const workspaces = pgTable('workspaces', {
   color: text('color').notNull(),
   about: text('about'),
   publishGoal: jsonb('publish_goal'),
-  timezone: text('timezone').notNull().default('Asia/Shanghai'),
   stageConfig: jsonb('stage_config').notNull().default([]),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
