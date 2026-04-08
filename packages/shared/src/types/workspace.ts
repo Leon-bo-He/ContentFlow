@@ -17,17 +17,16 @@ export interface Workspace {
   color: string;
   about: string | null;
   publishGoal: PublishGoal | null;
-  timezone: string;
   stageConfig: KanbanStageConfig[];
   createdAt: Date;
 }
 
 export type CreateWorkspaceInput = Pick<
   Workspace,
-  'name' | 'icon' | 'color' | 'timezone'
+  'name' | 'icon' | 'color'
 > & { about?: string; publishGoal?: PublishGoal };
 
 // color intentionally excluded — immutable after creation
 export type UpdateWorkspaceInput = Partial<
-  Pick<Workspace, 'name' | 'icon' | 'about' | 'publishGoal' | 'timezone' | 'stageConfig'>
+  Pick<Workspace, 'name' | 'icon' | 'about' | 'publishGoal' | 'stageConfig'>
 >;
