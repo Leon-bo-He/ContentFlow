@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ContentPlan, OutlineItem } from '@contentflow/shared';
+import type { ContentPlan, OutlineItem } from '@orbit/shared';
 
 interface OutlineSectionProps {
   plan: Partial<ContentPlan>;

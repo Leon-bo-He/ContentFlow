@@ -1,5 +1,5 @@
 {
-  "name": "ContentFlow",
+  "name": "Orbit",
   "private": true,
   "scripts": {
     "dev": "pnpm --parallel --filter=api --filter=web dev",

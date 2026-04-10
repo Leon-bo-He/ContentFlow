@@ -26,6 +26,6 @@ export const useOfflineQueue = create<OfflineQueueState>()(
         })),
       dequeue: (id) => set((s) => ({ queue: s.queue.filter((m) => m.id !== id) })),
     }),
-    { name: 'contentflow-offline-queue' }
+    { name: 'orbit-offline-queue' }
   )
 );

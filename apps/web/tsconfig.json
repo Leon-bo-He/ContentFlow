@@ -9,7 +9,7 @@
     "outDir": "dist",
     "paths": {
       "@/*": ["./src/*"],
-      "@contentflow/shared": ["../../packages/shared/src/index.ts"]
+      "@orbit/shared": ["../../packages/shared/src/index.ts"]
     }
   },
   "include": ["src", "vite.config.ts"]

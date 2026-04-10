@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import type { ContentPlan, AudienceProfile, PlanTemplate, CreatePlanTemplateInput } from '@contentflow/shared';
+import type { ContentPlan, AudienceProfile, PlanTemplate, CreatePlanTemplateInput } from '@orbit/shared';
 
 interface AudienceSectionProps {
   plan: Partial<ContentPlan>;

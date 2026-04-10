@@ -9,6 +9,7 @@ import i18n from '../../i18n/index.js';
 import { toast } from '../../store/toast.store.js';
 import { ApiError, apiFetch } from '../../api/client.js';
 import LanguageSwitcher from '../../components/auth/LanguageSwitcher.js';
+import OrbitLogo from '../../components/ui/OrbitLogo.js';
 
 type Theme = 'system' | 'light' | 'dark';
 const THEME_ICONS: Record<Theme, string> = { system: '💻', light: '☀️', dark: '🌙' };
@@ -60,6 +61,8 @@ export default function LoginPage() {
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
         setErrorMsg(t('auth.invalid_credentials'));
+      } else if (err instanceof ApiError && err.status >= 500) {
+        setErrorMsg(t('auth.server_error'));
       } else {
         setErrorMsg(t('status.error'));
       }
@@ -70,8 +73,8 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
 <div className="w-full max-w-sm">
         {/* Logo */}
-        <div className="text-center mb-8">
-          <span className="text-3xl font-bold text-indigo-600">ContentFlow</span>
+        <div className="flex justify-center mb-8">
+          <OrbitLogo variant="full" className="h-20 w-auto text-slate-900 dark:text-white" />
         </div>
 
         <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
@@ -124,9 +127,7 @@ export default function LoginPage() {
             </div>
 
             {/* Error */}
-            {errorMsg && (
-              <p className="text-sm text-red-600">{errorMsg}</p>
-            )}
+            <p className="text-sm text-red-600 min-h-[1.25rem]">{errorMsg}</p>
 
             {/* Submit */}
             <button

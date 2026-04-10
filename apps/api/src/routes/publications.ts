@@ -9,8 +9,8 @@ import {
   updatePublicationSchema,
   markPublishedSchema,
   batchUpdatePublicationsSchema,
-} from '@contentflow/shared';
-import type { PublishLogEntry } from '@contentflow/shared';
+} from '@orbit/shared';
+import type { PublishLogEntry } from '@orbit/shared';
 
 /** Helper: verify that a content's workspace belongs to the current user */
 async function verifyContentOwnership(

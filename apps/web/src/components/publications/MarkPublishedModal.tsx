@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Publication } from '@contentflow/shared';
+import type { Publication } from '@orbit/shared';
 import { useMarkPublished } from '../../api/publications.js';
 import { DateTimePicker } from '../ui/DateTimePicker.js';
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Content, Stage } from '@contentflow/shared';
+import type { Content, Stage } from '@orbit/shared';
 import { KanbanCard } from './KanbanCard.js';
 import { useTranslation } from 'react-i18next';
 

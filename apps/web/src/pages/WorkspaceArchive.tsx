@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import type { Content } from '@contentflow/shared';
+import type { Content } from '@orbit/shared';
 import { useWorkspaces } from '../api/workspaces.js';
 import { useContents } from '../api/contents.js';
 import { apiFetch } from '../api/client.js';
@@ -79,14 +79,14 @@ function ManageArchivedModal({
         const result = await apiFetch<{ contents: unknown[]; ideas: unknown[] }>(`/api/contents/archived/export?${params.toString()}`);
         const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob); const a = document.createElement('a');
-        a.href = url; a.download = `contentflow-archived-${dateStr}.json`; a.click();
+        a.href = url; a.download = `orbit-archived-${dateStr}.json`; a.click();
         URL.revokeObjectURL(url);
         toast.success(t('settings.general.archived_export_success', { count: result.contents.length }));
       } else {
         const rows = await apiFetch<unknown[]>(`/api/contents/archived/export?${params.toString()}`);
         const blob = new Blob([JSON.stringify(rows, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob); const a = document.createElement('a');
-        a.href = url; a.download = `contentflow-archived-${dateStr}.json`; a.click();
+        a.href = url; a.download = `orbit-archived-${dateStr}.json`; a.click();
         URL.revokeObjectURL(url);
         toast.success(t('settings.general.archived_export_success', { count: rows.length }));
       }

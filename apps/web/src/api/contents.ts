@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tansta
 import { apiFetch, ApiError, QUEUED_OFFLINE } from './client.js';
 import { toast } from '../store/toast.store.js';
 import i18n from '../i18n/index.js';
-import type { Content, Idea } from '@contentflow/shared';
+import type { Content, Idea } from '@orbit/shared';
 
 export interface ContentFilters {
   stage?: string;

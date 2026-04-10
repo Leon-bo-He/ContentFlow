@@ -1,6 +1,6 @@
 {
   "name": "web",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@contentflow/shared": "workspace:*",
+    "@orbit/shared": "workspace:*",
     "@tanstack/react-query": "^5.28.0",
     "dexie": "^3.2.7",
     "i18next": "^23.10.0",

@@ -11,7 +11,7 @@ import { IdeaCaptureModal } from '../components/ideas/IdeaCaptureModal.js';
 import { Skeleton } from '../components/ui/Skeleton.js';
 import { CalendarPicker } from '../components/ui/CalendarPicker.js';
 import { toast } from '../store/toast.store.js';
-import type { Workspace } from '@contentflow/shared';
+import type { Workspace } from '@orbit/shared';
 
 function buildDateRange(tf: string, from: string, to: string): { from?: string; to?: string } {
   const now = new Date();
@@ -62,7 +62,7 @@ function ManageArchivedIdeasModal({ onClose }: { onClose: () => void }) {
       const rows = await apiFetch<unknown[]>(`/api/ideas/archived/export?${params.toString()}`);
       const blob = new Blob([JSON.stringify(rows, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob); const a = document.createElement('a');
-      a.href = url; a.download = `contentflow-archived-ideas-${new Date().toISOString().slice(0, 10)}.json`; a.click();
+      a.href = url; a.download = `orbit-archived-ideas-${new Date().toISOString().slice(0, 10)}.json`; a.click();
       URL.revokeObjectURL(url);
       toast.success(t('settings.general.archived_ideas_export_success', { count: rows.length }));
     } catch (err) {

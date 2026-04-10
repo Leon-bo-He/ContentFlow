@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import type { ContentPlan, ContentType } from '@contentflow/shared';
+import type { ContentPlan, ContentType } from '@orbit/shared';
 
 interface FormatSectionProps {
   contentType: ContentType;

@@ -5,6 +5,6 @@ export default defineConfig({
   out: './src/db/migrations',
   dialect: 'postgresql',
   dbCredentials: {
-    url: process.env['DATABASE_URL'] ?? 'postgres://contentflow:secret@localhost:5432/contentflow',
+    url: process.env['DATABASE_URL'] ?? 'postgres://orbit:secret@localhost:5432/orbit',
   },
 });

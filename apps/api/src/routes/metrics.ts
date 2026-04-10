@@ -5,7 +5,7 @@ import { metrics } from '../db/schema/metrics.js';
 import { publications } from '../db/schema/publications.js';
 import { contents } from '../db/schema/contents.js';
 import { workspaces } from '../db/schema/workspaces.js';
-import { createMetricsSchema } from '@contentflow/shared';
+import { createMetricsSchema } from '@orbit/shared';
 import {
   calcEngagementRate,
   buildTopContents,

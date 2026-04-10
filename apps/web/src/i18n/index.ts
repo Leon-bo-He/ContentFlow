@@ -7,7 +7,7 @@ export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 /** Read the persisted locale from localStorage before i18next initialises. */
 function getStoredLocale(): SupportedLocale {
   try {
-    const raw = localStorage.getItem('contentflow-ui');
+    const raw = localStorage.getItem('orbit-ui');
     if (raw) {
       const locale = (JSON.parse(raw) as { state?: { locale?: string } }).state?.locale;
       if (locale && (SUPPORTED_LOCALES as readonly string[]).includes(locale)) {

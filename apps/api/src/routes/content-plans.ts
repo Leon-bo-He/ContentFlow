@@ -6,7 +6,7 @@ import { workspaces } from '../db/schema/workspaces.js';
 import { contentPlans } from '../db/schema/content-plans.js';
 import { contentReferences } from '../db/schema/content-references.js';
 import { planTemplates } from '../db/schema/plan-templates.js';
-import type { UpsertContentPlanInput, CreateContentReferenceInput, CreatePlanTemplateInput } from '@contentflow/shared';
+import type { UpsertContentPlanInput, CreateContentReferenceInput, CreatePlanTemplateInput } from '@orbit/shared';
 
 async function verifyContentOwnership(contentId: string, userId: string) {
   const [content] = await db

@@ -6,6 +6,7 @@ import { useWorkspaces } from '../../api/workspaces.js';
 import { useAuthStore } from '../../store/auth.store.js';
 import { useLogout } from '../../api/auth.js';
 import { toast } from '../../store/toast.store.js';
+import OrbitLogo from '../ui/OrbitLogo.js';
 
 const topNavItems = [
   { path: '/',            label: 'nav.dashboard',   icon: '⊞' },
@@ -141,9 +142,7 @@ export function Sidebar() {
     >
       {/* Header: app name + collapse */}
       <div className="flex items-center justify-between px-3 h-[44px] flex-shrink-0">
-        <span className="text-sm font-semibold text-[var(--cf-text)] tracking-tight">
-          ContentFlow
-        </span>
+        <OrbitLogo variant="icon" className="h-7 w-7" />
         <button
           onClick={toggle}
           className="w-6 h-6 flex items-center justify-center rounded-[4px] text-[var(--cf-text-muted)] hover:bg-[var(--cf-hover)] transition-colors text-sm"

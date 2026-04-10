@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import type { Workspace } from '@contentflow/shared';
+import type { Workspace } from '@orbit/shared';
 import { useWorkspaces, useUpdateWorkspace } from '../api/workspaces.js';
 import { useCustomPlatforms, useCreateCustomPlatform, useDeleteCustomPlatform } from '../api/custom-platforms.js';
 import type { CustomPlatform } from '../api/custom-platforms.js';
@@ -295,7 +295,7 @@ function DataPanel() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `contentflow-export-${new Date().toISOString().slice(0, 10)}.json`;
+      a.download = `orbit-export-${new Date().toISOString().slice(0, 10)}.json`;
       a.click();
       URL.revokeObjectURL(url);
     } finally {
@@ -332,11 +332,11 @@ function DataPanel() {
       const dateStr = new Date().toISOString().slice(0, 10);
       if (includeIdeas) {
         const result = await apiFetch<{ contents: unknown[]; ideas: unknown[] }>(`/api/contents/archived/export?${params.toString()}`);
-        downloadJson(result, `contentflow-archived-${dateStr}.json`);
+        downloadJson(result, `orbit-archived-${dateStr}.json`);
         toast.success(t('settings.general.archived_export_success', { count: result.contents.length }));
       } else {
         const rows = await apiFetch<unknown[]>(`/api/contents/archived/export?${params.toString()}`);
-        downloadJson(rows, `contentflow-archived-${dateStr}.json`);
+        downloadJson(rows, `orbit-archived-${dateStr}.json`);
         toast.success(t('settings.general.archived_export_success', { count: rows.length }));
       }
     } catch (err) {
@@ -372,7 +372,7 @@ function DataPanel() {
     try {
       const params = buildArchivedParams(archivedIdeasWorkspaceId, archivedIdeasTimeframe, customIdeasFromDate, customIdeasToDate);
       const rows = await apiFetch<unknown[]>(`/api/ideas/archived/export?${params.toString()}`);
-      downloadJson(rows, `contentflow-archived-ideas-${new Date().toISOString().slice(0, 10)}.json`);
+      downloadJson(rows, `orbit-archived-ideas-${new Date().toISOString().slice(0, 10)}.json`);
       toast.success(t('settings.general.archived_ideas_export_success', { count: rows.length }));
     } catch (err) {
       toast.error(t('settings.general.archived_ideas_export_error', { message: err instanceof Error ? err.message : String(err) }));

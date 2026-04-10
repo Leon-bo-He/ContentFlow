@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePushNotifications } from '../../hooks/usePushNotifications.js';
 
-const DISMISSED_KEY = 'contentflow-notif-banner-dismissed';
+const DISMISSED_KEY = 'orbit-notif-banner-dismissed';
 
 export function NotificationPermissionBanner() {
   const { t } = useTranslation('common');

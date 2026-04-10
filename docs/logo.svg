@@ -1,0 +1,35 @@
+<svg viewBox="0 0 520 160" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="orbit1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF3366" />
+      <stop offset="100%" stop-color="#FF9933" />
+    </linearGradient>
+    <linearGradient id="orbit2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3366FF" />
+      <stop offset="100%" stop-color="#33CCFF" />
+    </linearGradient>
+    <linearGradient id="orbit3" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#9933FF" />
+      <stop offset="100%" stop-color="#FF33CC" />
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <g transform="translate(20, 20)">
+    <ellipse cx="60" cy="60" rx="55" ry="22" fill="none" stroke="url(#orbit1)" stroke-width="6" stroke-linecap="round" transform="rotate(30 60 60)" opacity="0.85" />
+    <ellipse cx="60" cy="60" rx="55" ry="22" fill="none" stroke="url(#orbit2)" stroke-width="6" stroke-linecap="round" transform="rotate(-30 60 60)" opacity="0.85" />
+    <ellipse cx="60" cy="60" rx="55" ry="22" fill="none" stroke="url(#orbit3)" stroke-width="6" stroke-linecap="round" transform="rotate(90 60 60)" opacity="0.85" />
+    <circle cx="60" cy="60" r="16" fill="#0F172A" />
+    <circle cx="5" cy="60" r="7" fill="#FF9933" filter="url(#glow)" transform="rotate(30 60 60)" />
+    <circle cx="115" cy="60" r="7" fill="#33CCFF" filter="url(#glow)" transform="rotate(-30 60 60)" />
+    <circle cx="5" cy="60" r="7" fill="#FF33CC" filter="url(#glow)" transform="rotate(90 60 60)" />
+  </g>
+
+  <g transform="translate(160, 0)">
+    <text x="0" y="98" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="82" letter-spacing="-0.04em" fill="#0F172A">orbit</text>
+    <text x="5" y="128" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="14" letter-spacing="0.25em" fill="#64748B">CONTENT OPS PLATFORM</text>
+  </g>
+</svg>

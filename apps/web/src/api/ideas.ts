@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tansta
 import { apiFetch, ApiError, QUEUED_OFFLINE } from './client.js';
 import { toast } from '../store/toast.store.js';
 import i18n from '../i18n/index.js';
-import type { Idea } from '@contentflow/shared';
+import type { Idea } from '@orbit/shared';
 
 export interface IdeaFilters {
   workspace?: string;

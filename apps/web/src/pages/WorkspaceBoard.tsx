@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { STAGE_ORDER } from '@contentflow/shared';
-import type { Content, Stage } from '@contentflow/shared';
+import { STAGE_ORDER } from '@orbit/shared';
+import type { Content, Stage } from '@orbit/shared';
 import { useWorkspaces } from '../api/workspaces.js';
 import { useContents, useUpdateContent } from '../api/contents.js';
 import { KanbanColumn } from '../components/kanban/KanbanColumn.js';

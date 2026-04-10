@@ -2,7 +2,7 @@ import type { FastifyPluginAsync } from 'fastify';
 import { eq, and } from 'drizzle-orm';
 import { db } from '../db/client.js';
 import { workspaces } from '../db/schema/workspaces.js';
-import { createWorkspaceSchema, updateWorkspaceSchema } from '@contentflow/shared';
+import { createWorkspaceSchema, updateWorkspaceSchema } from '@orbit/shared';
 
 const NI = { error: 'Not implemented' };
 

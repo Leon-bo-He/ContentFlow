@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import type { ContentPlan, HookAnalysis } from '@contentflow/shared';
+import type { ContentPlan, HookAnalysis } from '@orbit/shared';
 
 interface HooksSectionProps {
   plan: Partial<ContentPlan>;

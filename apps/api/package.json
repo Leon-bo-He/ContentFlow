@@ -1,6 +1,6 @@
 {
   "name": "api",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "scripts": {
     "dev": "node --env-file=.env --import tsx/esm --watch src/index.ts",
@@ -12,7 +12,7 @@
     "generate": "drizzle-kit generate"
   },
   "dependencies": {
-    "@contentflow/shared": "workspace:*",
+    "@orbit/shared": "workspace:*",
     "@fastify/cookie": "^9.3.0",
     "@fastify/rate-limit": "^9.0.0",
     "@fastify/cors": "^9.0.0",

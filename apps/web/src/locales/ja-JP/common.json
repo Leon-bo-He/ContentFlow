@@ -69,7 +69,8 @@
     "invalid_credentials": "メールアドレスまたはパスワードが間違っています",
     "email_taken": "このメールアドレスはすでに登録されています",
     "password_mismatch": "パスワードが一致しません",
-    "password_too_short": "パスワードは8文字以上にしてください"
+    "password_too_short": "パスワードは8文字以上にしてください",
+    "server_error": "サービスが利用できません。しばらくしてからお試しください。"
   },
   "settings": {
     "sections": {

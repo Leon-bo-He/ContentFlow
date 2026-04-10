@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { useContents } from '../../api/contents.js';
 import { usePublications } from '../../api/publications.js';
 import { useCreateMetrics } from '../../api/analytics.js';
-import type { Content } from '@contentflow/shared';
-import type { Publication } from '@contentflow/shared';
+import type { Content } from '@orbit/shared';
+import type { Publication } from '@orbit/shared';
 
 interface RecordMetricsModalProps {
   workspaceId: string;

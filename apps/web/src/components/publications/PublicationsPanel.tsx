@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Publication } from '@contentflow/shared';
+import type { Publication } from '@orbit/shared';
 import { usePublications, useUpdatePublication, useDeletePublication, useCreatePublication } from '../../api/publications.js';
 import { PlatformConfigForm } from './PlatformConfigForm.js';
 import { AddPlatformModal } from './AddPlatformModal.js';

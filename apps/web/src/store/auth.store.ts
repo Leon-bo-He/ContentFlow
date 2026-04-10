@@ -39,7 +39,7 @@ export const useAuthStore = create<AuthState>()(
       },
     }),
     {
-      name: 'contentflow-auth',
+      name: 'orbit-auth',
       onRehydrateStorage: () => (state) => {
         if (state?.accessToken) setAccessToken(state.accessToken);
       },

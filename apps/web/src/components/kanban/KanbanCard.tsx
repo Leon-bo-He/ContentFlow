@@ -1,4 +1,4 @@
-import type { Content } from '@contentflow/shared';
+import type { Content } from '@orbit/shared';
 import { useTranslation } from 'react-i18next';
 import { PlatformIcon } from '../ui/PlatformIcon.js';
 

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import type { ContentPlan, UpsertContentPlanInput } from '@contentflow/shared';
+import type { ContentPlan, UpsertContentPlanInput } from '@orbit/shared';
 import { useContents } from '../api/contents.js';
 import {
   useContentPlan,
@@ -21,7 +21,7 @@ import { HooksSection } from '../components/brief/HooksSection.js';
 import { TitlesSection } from '../components/brief/TitlesSection.js';
 import { OutlineSection } from '../components/brief/OutlineSection.js';
 import { ReferencesSection } from '../components/brief/ReferencesSection.js';
-import type { CreateContentReferenceInput, CreatePlanTemplateInput } from '@contentflow/shared';
+import type { CreateContentReferenceInput, CreatePlanTemplateInput } from '@orbit/shared';
 
 // ── Accordion ────────────────────────────────────────────────────────────────
 

@@ -1,4 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <rect width="32" height="32" rx="8" fill="#6366f1"/>
-  <text x="16" y="22" text-anchor="middle" font-size="16" font-family="sans-serif" fill="white" font-weight="bold">CF</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient id="f1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF3366" />
+      <stop offset="100%" stop-color="#FF9933" />
+    </linearGradient>
+    <linearGradient id="f2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3366FF" />
+      <stop offset="100%" stop-color="#33CCFF" />
+    </linearGradient>
+    <linearGradient id="f3" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#9933FF" />
+      <stop offset="100%" stop-color="#FF33CC" />
+    </linearGradient>
+  </defs>
+  <ellipse cx="16" cy="16" rx="12" ry="4.8" fill="none" stroke="url(#f1)" stroke-width="1.6" transform="rotate(30 16 16)" opacity="0.9"/>
+  <ellipse cx="16" cy="16" rx="12" ry="4.8" fill="none" stroke="url(#f2)" stroke-width="1.6" transform="rotate(-30 16 16)" opacity="0.9"/>
+  <ellipse cx="16" cy="16" rx="12" ry="4.8" fill="none" stroke="url(#f3)" stroke-width="1.6" transform="rotate(90 16 16)" opacity="0.9"/>
+  <circle cx="4" cy="16" r="1.8" fill="#FF9933" transform="rotate(30 16 16)"/>
+  <circle cx="28" cy="16" r="1.8" fill="#33CCFF" transform="rotate(-30 16 16)"/>
+  <circle cx="4" cy="16" r="1.8" fill="#FF33CC" transform="rotate(90 16 16)"/>
 </svg>

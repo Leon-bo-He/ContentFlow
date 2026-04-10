@@ -4,7 +4,7 @@ import { useUpdateIdea, useConvertIdea } from '../../api/ideas.js';
 import { useDeleteContent } from '../../api/contents.js';
 import { useWorkspaces } from '../../api/workspaces.js';
 import { toast } from '../../store/toast.store.js';
-import type { Idea } from '@contentflow/shared';
+import type { Idea } from '@orbit/shared';
 
 interface IdeaEditModalProps {
   idea: Idea;

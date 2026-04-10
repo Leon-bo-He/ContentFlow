@@ -69,7 +69,8 @@
     "invalid_credentials": "電子郵件或密碼錯誤",
     "email_taken": "此電子郵件已被註冊",
     "password_mismatch": "兩次密碼不一致",
-    "password_too_short": "密碼至少需要 8 個字元"
+    "password_too_short": "密碼至少需要 8 個字元",
+    "server_error": "服務暫時無法使用，請稍後再試。"
   },
   "settings": {
     "sections": {

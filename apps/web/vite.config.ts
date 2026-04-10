@@ -24,8 +24,8 @@ export default defineConfig({
         ],
       },
       manifest: {
-        name: 'ContentFlow',
-        short_name: 'ContentFlow',
+        name: 'Orbit',
+        short_name: 'Orbit',
         description: 'Multilingual social media content management',
         theme_color: '#6366f1',
         background_color: '#ffffff',
@@ -62,7 +62,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@contentflow/shared': path.resolve(__dirname, '../../packages/shared/src/index.ts'),
+      '@orbit/shared': path.resolve(__dirname, '../../packages/shared/src/index.ts'),
     },
   },
   server: {

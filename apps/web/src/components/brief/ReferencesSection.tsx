@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ContentReference, CreateContentReferenceInput } from '@contentflow/shared';
+import type { ContentReference, CreateContentReferenceInput } from '@orbit/shared';
 import { useUiStore } from '../../store/ui.store';
 import { useCustomPlatforms } from '../../api/custom-platforms';
 import { PlatformIcon } from '../ui/PlatformIcon';

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Idea } from '@contentflow/shared';
+import type { Idea } from '@orbit/shared';
 import { IdeaEditModal } from './IdeaEditModal.js';
 
 interface IdeaCardProps {

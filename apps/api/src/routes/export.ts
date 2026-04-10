@@ -125,7 +125,7 @@ export const exportRoutes: FastifyPluginAsync = async (app) => {
       ideas: allIdeas,
     };
 
-    const filename = `contentflow-export-${new Date().toISOString().slice(0, 10)}.json`;
+    const filename = `orbit-export-${new Date().toISOString().slice(0, 10)}.json`;
     reply.header('Content-Disposition', `attachment; filename="${filename}"`);
     reply.header('Content-Type', 'application/json');
     return reply.send(payload);

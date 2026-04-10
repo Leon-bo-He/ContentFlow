@@ -28,7 +28,13 @@ export const authRoutes: FastifyPluginAsync = async (app) => {
     onRequest: [],
   }, async (req, reply) => {
     const { email, password } = req.body;
-    const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    let user: typeof users.$inferSelect | undefined;
+    try {
+      [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    } catch (err) {
+      req.log.error(err, 'Database error during login');
+      return reply.code(503).send({ error: 'Service temporarily unavailable' });
+    }
     if (!user?.passwordHash) return reply.code(401).send({ error: 'Invalid credentials' });
 
     const valid = await bcrypt.compare(password, user.passwordHash);

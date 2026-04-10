@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import type { ContentPlan, ContentGoal, KpiTargets } from '@contentflow/shared';
+import type { ContentPlan, ContentGoal, KpiTargets } from '@orbit/shared';
 
 interface GoalsSectionProps {
   plan: Partial<ContentPlan>;

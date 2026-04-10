@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiFetch, ApiError } from './client.js';
-import type { Workspace } from '@contentflow/shared';
+import type { Workspace } from '@orbit/shared';
 
 export function useWorkspaces() {
   return useQuery<Workspace[], ApiError>({

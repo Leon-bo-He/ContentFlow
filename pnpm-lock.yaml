@@ -29,7 +29,7 @@ importers:
 
   apps/api:
     dependencies:
-      '@contentflow/shared':
+      '@orbit/shared':
         specifier: workspace:*
         version: link:../../packages/shared
       '@fastify/cookie':
@@ -93,7 +93,7 @@ importers:
 
   apps/web:
     dependencies:
-      '@contentflow/shared':
+      '@orbit/shared':
         specifier: workspace:*
         version: link:../../packages/shared
       '@tanstack/react-query':

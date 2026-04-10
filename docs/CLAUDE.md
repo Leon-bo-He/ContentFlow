@@ -1,8 +1,8 @@
-# ContentFlow — Claude Code Project Settings
+# Orbit — Claude Code Project Settings
 
 ## Project Overview
 
-ContentFlow is a multilingual social media content scheduling, distribution, and analytics platform for solo creators managing multiple vertical accounts (e.g. Douyin comedy, Xiaohongshu fashion, WeChat Official Account long-form).
+Orbit is a multilingual social media content scheduling, distribution, and analytics platform for solo creators managing multiple vertical accounts (e.g. Douyin comedy, Xiaohongshu fashion, WeChat Official Account long-form).
 
 **Phase 1 (MVP):** Manual-assist publishing, full content lifecycle, scheduling calendar, analytics dashboard.
 **Phase 2:** Multi-user collaboration, automated API publishing, AI-assisted titling/translation.
@@ -25,7 +25,7 @@ ContentFlow is a multilingual social media content scheduling, distribution, and
 ## Directory Layout (target)
 
 ```
-ContentFlow/
+Orbit/
 ├── apps/
 │   ├── web/          # React PWA client
 │   └── api/          # Fastify server

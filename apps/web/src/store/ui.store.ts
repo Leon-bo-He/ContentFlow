@@ -94,6 +94,6 @@ export const useUiStore = create<UiState>()(
       removePlatformBundle: (id) =>
         set((s) => ({ platformBundles: s.platformBundles.filter((b) => b.id !== id) })),
     }),
-    { name: 'contentflow-ui' }
+    { name: 'orbit-ui' }
   )
 );

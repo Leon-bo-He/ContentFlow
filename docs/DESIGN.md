@@ -1,4 +1,4 @@
-# ContentFlow — Design Document
+# Orbit — Design Document
 
 **Version:** 2.0 | **Last updated:** 2026-04-07
 
@@ -27,7 +27,7 @@
 
 ## 1. Product Positioning
 
-**One sentence:** ContentFlow doesn't replace your creative tools — it manages everything around creation: idea capture, scheduling, multi-platform distribution, and performance tracking.
+**One sentence:** Orbit doesn't replace your creative tools — it manages everything around creation: idea capture, scheduling, multi-platform distribution, and performance tracking.
 
 **Core scenario:** A creator running three vertical accounts simultaneously — Douyin (comedy), Xiaohongshu (fashion), WeChat Official Account (long-form opinion) — needs one place to plan content, manage publishing cadence, and track performance across all channels.
 
@@ -50,7 +50,7 @@
 ## 2. Information Architecture
 
 ```
-ContentFlow
+Orbit
 │
 ├── Global Dashboard        — cross-workspace overview
 ├── Global Publish Queue    — cross-workspace timeline

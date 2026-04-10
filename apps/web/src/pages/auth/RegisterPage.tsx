@@ -7,6 +7,7 @@ import { useUiStore } from '../../store/ui.store.js';
 import { toast } from '../../store/toast.store.js';
 import { ApiError } from '../../api/client.js';
 import LanguageSwitcher from '../../components/auth/LanguageSwitcher.js';
+import OrbitLogo from '../../components/ui/OrbitLogo.js';
 
 type Theme = 'system' | 'light' | 'dark';
 const THEME_ICONS: Record<Theme, string> = { system: '💻', light: '☀️', dark: '🌙' };
@@ -69,8 +70,8 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
       <div className="w-full max-w-sm">
         {/* Logo */}
-        <div className="text-center mb-8">
-          <span className="text-3xl font-bold text-indigo-600">ContentFlow</span>
+        <div className="flex justify-center mb-8">
+          <OrbitLogo variant="full" className="h-20 w-auto text-slate-900 dark:text-white" />
         </div>
 
         <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">

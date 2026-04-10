@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import type { Content, Workspace } from '@contentflow/shared';
+import type { Content, Workspace } from '@orbit/shared';
 import { apiFetch, ApiError } from '../api/client.js';
 import { useWorkspaces } from '../api/workspaces.js';
 import { useUpdateContent } from '../api/contents.js';

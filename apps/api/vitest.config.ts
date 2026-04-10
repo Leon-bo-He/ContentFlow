@@ -6,7 +6,7 @@ export default defineConfig({
     environment: 'node',
     env: {
       NODE_ENV: 'test',
-      DATABASE_URL: 'postgres://contentflow:secret@localhost:5433/contentflow_test',
+      DATABASE_URL: 'postgres://orbit:secret@localhost:5433/orbit_test',
       REDIS_URL: 'redis://localhost:6379',
       JWT_SECRET: 'test-secret-that-is-at-least-32-characters-long',
     },

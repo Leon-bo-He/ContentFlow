@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiFetch, ApiError } from './client.js';
 import { toast } from '../store/toast.store.js';
 import i18n from '../i18n/index.js';
-import type { Publication } from '@contentflow/shared';
+import type { Publication } from '@orbit/shared';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

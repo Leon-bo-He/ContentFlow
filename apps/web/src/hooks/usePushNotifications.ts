@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 
-const REMINDERS_KEY = 'contentflow-scheduled-reminders';
+const REMINDERS_KEY = 'orbit-scheduled-reminders';
 const REMINDER_ADVANCE_MS = 15 * 60 * 1000; // 15 minutes
 
 interface ScheduledPublication {
@@ -48,7 +48,7 @@ export function usePushNotifications() {
     }
 
     const timerId = window.setTimeout(() => {
-      new Notification('ContentFlow — Time to publish', {
+      new Notification('Orbit — Time to publish', {
         body: `Time to publish: ${pub.contentTitle ?? 'Content'} on ${pub.platform}`,
         icon: '/icon-192.png',
         tag: `reminder-${pub.id}`,

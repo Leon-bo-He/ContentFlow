@@ -3,7 +3,7 @@ import { eq, and, ilike, isNull, gte, lte } from 'drizzle-orm';
 import { db } from '../db/client.js';
 import { ideas } from '../db/schema/ideas.js';
 import { contents } from '../db/schema/contents.js';
-import { createIdeaSchema, updateIdeaSchema } from '@contentflow/shared';
+import { createIdeaSchema, updateIdeaSchema } from '@orbit/shared';
 
 export const ideasRoutes: FastifyPluginAsync = async (app) => {
   // POST /api/ideas

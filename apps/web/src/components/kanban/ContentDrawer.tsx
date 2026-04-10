@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { Content, Stage, Platform, ContentType, StageHistoryEntry } from '@contentflow/shared';
-import { STAGE_ORDER } from '@contentflow/shared';
+import type { Content, Stage, Platform, ContentType, StageHistoryEntry } from '@orbit/shared';
+import { STAGE_ORDER } from '@orbit/shared';
 import { useTranslation } from 'react-i18next';
 import { useUpdateContent, useDeleteContent } from '../../api/contents.js';
 import { useCustomPlatforms } from '../../api/custom-platforms.js';

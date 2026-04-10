@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Publication } from '@contentflow/shared';
+import type { Publication } from '@orbit/shared';
 import { usePublishQueue, useUpdatePublication, useMarkPublished } from '../api/publications.js';
 import { MarkPublishedModal } from '../components/publications/MarkPublishedModal.js';
 import { PlatformIcon } from '../components/ui/PlatformIcon.js';

@@ -4,7 +4,7 @@ import { db } from '../db/client.js';
 import { contents } from '../db/schema/contents.js';
 import { workspaces } from '../db/schema/workspaces.js';
 import { ideas } from '../db/schema/ideas.js';
-import { createContentSchema, updateContentSchema } from '@contentflow/shared';
+import { createContentSchema, updateContentSchema } from '@orbit/shared';
 import type { ContentRow } from '../db/schema/contents.js';
 
 export const contentsRoutes: FastifyPluginAsync = async (app) => {

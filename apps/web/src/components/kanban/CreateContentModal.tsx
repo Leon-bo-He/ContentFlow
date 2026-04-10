@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ContentType } from '@contentflow/shared';
+import type { ContentType } from '@orbit/shared';
 import { useCreateContent } from '../../api/contents.js';
 import { useCustomPlatforms } from '../../api/custom-platforms.js';
 import { PlatformIcon } from '../ui/PlatformIcon.js';

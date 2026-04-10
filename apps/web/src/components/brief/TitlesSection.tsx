@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import type { ContentPlan, TitleCandidate } from '@contentflow/shared';
+import type { ContentPlan, TitleCandidate } from '@orbit/shared';
 
 interface TitlesSectionProps {
   plan: Partial<ContentPlan>;

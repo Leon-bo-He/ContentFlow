@@ -7,7 +7,7 @@ import type {
   CreateContentReferenceInput,
   PlanTemplate,
   CreatePlanTemplateInput,
-} from '@contentflow/shared';
+} from '@orbit/shared';
 
 // ── Plan ────────────────────────────────────────────────────────────────────
 
