@@ -149,7 +149,7 @@ Orbit/
 - Only merge to `master` after the user says something like "looks good", "merge it", or "LGTM".
 - Minor single-line fixes may be committed directly to master only when the user asks for a quick fix in the same message.
 - Do not squash or rebase without being asked.
-- Do not include `Co-Authored-By` lines in commit messages.
+- Do not include `Co-Authored-By` lines or mention `Claude` in commit messages.
 - **After each major change, commit and push to the current branch automatically.** A "major change" is any edit that fixes a bug, adds a feature, or meaningfully refactors logic. Minor clarifying edits (typos, comment tweaks) do not require a commit.
 
 ---
