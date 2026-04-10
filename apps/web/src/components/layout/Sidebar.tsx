@@ -78,7 +78,7 @@ export function Sidebar() {
     openSettings('account');
   }
 
-  const userInitial = user?.name ? (user.name[0]?.toUpperCase() ?? 'U') : 'U';
+  const userInitial = user?.username ? (user.username[0]?.toUpperCase() ?? 'U') : 'U';
 
   if (collapsed) {
     return (
@@ -128,9 +128,11 @@ export function Sidebar() {
         <div className="flex-1" />
         <button
           onClick={() => setPopoutOpen((o) => !o)}
-          className="w-7 h-7 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-semibold mt-1"
+          className="w-7 h-7 rounded-full overflow-hidden bg-indigo-600 text-white flex items-center justify-center text-xs font-semibold mt-1 flex-shrink-0"
         >
-          {userInitial}
+          {user?.avatar
+            ? <img src={user.avatar} alt={user?.username ?? ''} className="w-full h-full object-cover" />
+            : userInitial}
         </button>
       </div>
     );
@@ -230,12 +232,14 @@ export function Sidebar() {
             popoutOpen ? 'bg-[var(--cf-hover)]' : ''
           }`}
         >
-          <div className="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[11px] font-semibold flex-shrink-0">
-            {userInitial}
+          <div className="w-6 h-6 rounded-full overflow-hidden bg-indigo-600 text-white flex items-center justify-center text-[11px] font-semibold flex-shrink-0">
+            {user?.avatar
+              ? <img src={user.avatar} alt={user?.username ?? ''} className="w-full h-full object-cover" />
+              : userInitial}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[13px] font-medium text-[var(--cf-text)] truncate leading-tight">
-              {user?.name ?? ''}
+              {user?.username ?? ''}
             </p>
           </div>
         </button>
@@ -253,7 +257,7 @@ export function Sidebar() {
           >
             <div className="py-1">
               <div className="px-3 py-2 border-b border-[var(--cf-border)] mb-1">
-                <p className="text-[12px] font-medium text-[var(--cf-text)] truncate">{user?.name}</p>
+                <p className="text-[12px] font-medium text-[var(--cf-text)] truncate">{user?.username}</p>
                 <p className="text-[11px] text-[var(--cf-text-muted)] truncate">{user?.email}</p>
               </div>
               <button

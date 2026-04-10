@@ -1,5 +1,5 @@
 /**
- * Demo seed — creates a realistic demo account with data across all features.
+ * Demo seed — creates a realistic demo account with ~15 months of data.
  *
  * Usage:
  *   pnpm seed:demo            # skip if demo user already exists
@@ -34,6 +34,212 @@ function sh(...stages: Array<[string, number]>) {
   }));
 }
 
+function snapshotAges(publishedDaysBack: number): number[] {
+  const ages = [2];
+  if (publishedDaysBack >= 14) ages.push(10);
+  if (publishedDaysBack >= 45) ages.push(30);
+  if (publishedDaysBack >= 100) ages.push(60);
+  if (publishedDaysBack >= 200) ages.push(120);
+  ages.push(publishedDaysBack - 2);
+  return ages.filter((a) => a > 0 && a < publishedDaysBack);
+}
+
+function platformMetrics(
+  platform: string,
+  ageDays: number,
+  virality: number,
+): { views: number; likes: number; comments: number; shares: number; saves: number; followersGained: number } {
+  const g = Math.min(ageDays / 45, 1);
+  const v = virality;
+  switch (platform) {
+    case 'douyin':
+    case 'tiktok': {
+      const b = Math.round(45000 * v * (0.25 + g * 0.75));
+      return { views: b, likes: Math.round(b * 0.11), comments: Math.round(b * 0.016), shares: Math.round(b * 0.024), saves: Math.round(b * 0.007), followersGained: Math.round(b * 0.003) };
+    }
+    case 'bilibili': {
+      const b = Math.round(12000 * v * (0.25 + g * 0.75));
+      return { views: b, likes: Math.round(b * 0.09), comments: Math.round(b * 0.03), shares: Math.round(b * 0.018), saves: Math.round(b * 0.06), followersGained: Math.round(b * 0.004) };
+    }
+    case 'xiaohongshu': {
+      const b = Math.round(22000 * v * (0.25 + g * 0.75));
+      return { views: b, likes: Math.round(b * 0.14), comments: Math.round(b * 0.022), shares: 0, saves: Math.round(b * 0.29), followersGained: Math.round(b * 0.004) };
+    }
+    case 'instagram': {
+      const b = Math.round(16000 * v * (0.25 + g * 0.75));
+      return { views: b, likes: Math.round(b * 0.16), comments: Math.round(b * 0.025), shares: 0, saves: Math.round(b * 0.22), followersGained: Math.round(b * 0.005) };
+    }
+    case 'weixin': {
+      const b = Math.round(14000 * v * (0.25 + g * 0.75));
+      return { views: b, likes: Math.round(b * 0.10), comments: Math.round(b * 0.028), shares: Math.round(b * 0.056), saves: 0, followersGained: Math.round(b * 0.006) };
+    }
+    case 'x': {
+      const b = Math.round(19000 * v * (0.25 + g * 0.75));
+      return { views: b, likes: Math.round(b * 0.08), comments: Math.round(b * 0.018), shares: Math.round(b * 0.046), saves: 0, followersGained: Math.round(b * 0.002) };
+    }
+    case 'youtube': {
+      const b = Math.round(18000 * v * (0.25 + g * 0.75));
+      return { views: b, likes: Math.round(b * 0.07), comments: Math.round(b * 0.022), shares: Math.round(b * 0.012), saves: Math.round(b * 0.015), followersGained: Math.round(b * 0.005) };
+    }
+    case 'weixin_video': {
+      const b = Math.round(11000 * v * (0.25 + g * 0.75));
+      return { views: b, likes: Math.round(b * 0.09), comments: Math.round(b * 0.025), shares: Math.round(b * 0.048), saves: 0, followersGained: Math.round(b * 0.004) };
+    }
+    default: {
+      const b = Math.round(5000 * v * (0.25 + g * 0.75));
+      return { views: b, likes: Math.round(b * 0.10), comments: Math.round(b * 0.02), shares: Math.round(b * 0.01), saves: Math.round(b * 0.05), followersGained: Math.round(b * 0.003) };
+    }
+  }
+}
+
+async function insertPublished(
+  contentId: string,
+  platforms: string[],
+  publishedDaysBack: number,
+  virality: number,
+  urlBase: string,
+  extra?: { [platform: string]: { title?: string; copy?: string; tags?: string[] } },
+) {
+  for (const platform of platforms) {
+    const ex = extra?.[platform] ?? {};
+    const [pub] = await db.insert(publications).values({
+      contentId, platform, status: 'published',
+      platformTitle: ex.title, platformCopy: ex.copy,
+      platformTags: ex.tags ?? [], platformSettings: {},
+      publishedAt: daysAgo(publishedDaysBack),
+      scheduledAt: daysAgo(publishedDaysBack + 1),
+      platformUrl: `${urlBase}-${platform.slice(0, 2)}`,
+      publishLog: [{ action: 'published', timestamp: daysAgo(publishedDaysBack).toISOString() }],
+    }).returning();
+
+    const ages = snapshotAges(publishedDaysBack);
+    await db.insert(metrics).values(
+      ages.map((age) => ({
+        publicationId: pub!.id,
+        ...platformMetrics(platform, age, virality),
+        recordedAt: daysAgo(publishedDaysBack - age),
+      })),
+    );
+  }
+}
+
+// Virality cycle: gives a natural mix of viral hits, average, and below-average
+const VIRALITY = [1.0, 1.4, 0.7, 2.8, 1.1, 1.9, 0.8, 1.3, 3.2, 0.6, 1.0, 1.6, 0.9, 2.1, 0.7];
+
+// ─── content banks ───────────────────────────────────────────────────────────
+
+interface ContentDef {
+  title: string;
+  tags: string[];
+  platforms: string[];
+  contentType: string;
+  notes?: string;
+  reviewNotes?: string;
+}
+
+// 3 items/month × 13 months = 39 items (months 14 → 2)
+const COMEDY_BANK: ContentDef[] = [
+  { title: 'Expectation vs Reality: Working From Home', tags: ['relatable', 'wfh', 'comedy'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube'], contentType: 'video_short', reviewNotes: 'Huge engagement. Surprise-ending format works.' },
+  { title: 'Types of Coworkers in Every Stand-up Meeting', tags: ['work', 'relatable', 'comedy'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube'], contentType: 'video_short' },
+  { title: 'When the Code Finally Works After 6 Hours', tags: ['dev-humor', 'relatable', 'coding'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube', 'instagram'], contentType: 'video_short' },
+  { title: "POV: You're the Rubber Duck in a Dev Session", tags: ['dev-humor', 'comedy'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube'], contentType: 'video_short' },
+  { title: 'Office Monday vs Friday Energy', tags: ['work', 'relatable', 'comedy'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube'], contentType: 'video_short' },
+  { title: 'The 5 Stages of Debugging Grief', tags: ['dev-humor', 'coding'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube', 'instagram'], contentType: 'video_short' },
+  { title: 'Git Commit Messages Throughout Your Career', tags: ['dev-humor', 'coding', 'relatable'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube'], contentType: 'video_short' },
+  { title: "When the PM Says 'It'll Only Take 5 Minutes'", tags: ['dev-humor', 'work', 'relatable'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube'], contentType: 'video_short' },
+  { title: 'Developer Zodiac Signs', tags: ['dev-humor', 'comedy', 'trending'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube', 'instagram'], contentType: 'video_short' },
+  { title: 'Zoom Call Bingo: Remote Work Edition', tags: ['wfh', 'work', 'relatable'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube'], contentType: 'video_short' },
+  { title: "When HR Sends a 'Quick Sync' Invite", tags: ['work', 'relatable', 'comedy'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube'], contentType: 'video_short' },
+  { title: "Every Dev's Reaction to a New JS Framework", tags: ['dev-humor', 'javascript', 'comedy'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube', 'instagram'], contentType: 'video_short' },
+  { title: 'Stack Overflow vs Reading the Docs', tags: ['dev-humor', 'relatable', 'coding'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube'], contentType: 'video_short' },
+  { title: 'Senior Dev vs Junior Dev: Same Bug', tags: ['dev-humor', 'coding', 'relatable'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube'], contentType: 'video_short' },
+  { title: 'The Different Faces of Code Review', tags: ['dev-humor', 'work', 'comedy'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube', 'instagram'], contentType: 'video_short' },
+  { title: 'What Clients Say vs What They Mean', tags: ['work', 'relatable', 'comedy'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube'], contentType: 'video_short' },
+  { title: 'When You Finally Push to Production', tags: ['dev-humor', 'coding', 'relatable'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube'], contentType: 'video_short' },
+  { title: 'Tech Bro vs Normal Person Translator', tags: ['comedy', 'trending', 'tech'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube', 'instagram'], contentType: 'video_short' },
+  { title: 'Monday Morning Bug Report Energy', tags: ['dev-humor', 'work', 'comedy'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube'], contentType: 'video_short' },
+  { title: 'The App Store Review Reading Experience', tags: ['comedy', 'tech', 'relatable'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube'], contentType: 'video_short' },
+  { title: 'Types of GitHub Issues', tags: ['dev-humor', 'coding', 'comedy'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube', 'instagram'], contentType: 'video_short' },
+  { title: 'When the Feature Is Already Built in CSS', tags: ['dev-humor', 'frontend', 'comedy'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube'], contentType: 'video_short' },
+  { title: 'Developer Imposter Syndrome Levels', tags: ['dev-humor', 'relatable', 'coding'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube'], contentType: 'video_short' },
+  { title: 'The Sprint Planning Reality Show', tags: ['work', 'agile', 'comedy'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube', 'instagram'], contentType: 'video_short' },
+  { title: 'Copy-Pasting from Stack Overflow in 2025', tags: ['dev-humor', 'coding', 'comedy'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube'], contentType: 'video_short' },
+  { title: 'Deploying on a Friday', tags: ['dev-humor', 'relatable', 'coding'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube'], contentType: 'video_short' },
+  { title: "When Someone Asks 'Is It Urgent?'", tags: ['work', 'relatable', 'comedy'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube', 'instagram'], contentType: 'video_short' },
+  { title: 'PM vs Designer vs Developer: One Feature', tags: ['work', 'comedy', 'relatable'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube'], contentType: 'video_short' },
+  { title: 'Stand-up Meeting Attention Span Chart', tags: ['work', 'dev-humor', 'comedy'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube'], contentType: 'video_short' },
+  { title: 'New Feature vs Bug Report: Same Code', tags: ['dev-humor', 'coding', 'relatable'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube', 'instagram'], contentType: 'video_short' },
+  { title: 'The Meeting That Could Have Been an Email', tags: ['work', 'relatable', 'comedy'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube'], contentType: 'video_short' },
+  { title: 'Reading Your Own Code 6 Months Later', tags: ['dev-humor', 'coding', 'relatable'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube'], contentType: 'video_short' },
+  { title: 'Tech Interview Prep vs Actual Job', tags: ['dev-humor', 'work', 'comedy'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube', 'instagram'], contentType: 'video_short' },
+  { title: 'The Agile Ceremony Collection', tags: ['work', 'agile', 'comedy'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube'], contentType: 'video_short' },
+  { title: 'When the Intern Writes Better Code Than You', tags: ['dev-humor', 'coding', 'relatable'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube'], contentType: 'video_short' },
+  { title: 'CSS Is Easy They Said', tags: ['dev-humor', 'frontend', 'comedy'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube', 'instagram'], contentType: 'video_short' },
+  { title: 'Every API Documentation Experience', tags: ['dev-humor', 'coding', 'relatable'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube'], contentType: 'video_short' },
+  { title: 'The Tech Stack Decision Flowchart', tags: ['dev-humor', 'comedy', 'tech'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube'], contentType: 'video_short' },
+  { title: "When AI Writes Your Code but It's Wrong", tags: ['AI', 'dev-humor', 'comedy'], platforms: ['douyin', 'tiktok', 'bilibili', 'youtube', 'instagram'], contentType: 'video_short' },
+];
+
+// 2 items/month × 13 months = 26 items (months 14 → 2)
+const LIFESTYLE_BANK: ContentDef[] = [
+  { title: 'My Capsule Wardrobe: 10 Pieces, 30 Outfits Under ¥500', tags: ['fashion', 'budget', 'capsule-wardrobe'], platforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'], contentType: 'image_text', reviewNotes: 'Saves through the roof. Budget fashion consistently outperforms.' },
+  { title: 'The Only Skincare Routine You Will Ever Need', tags: ['skincare', 'beauty', 'routine'], platforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'], contentType: 'image_text' },
+  { title: 'How I Redesigned My Room for Under ¥1000', tags: ['home-decor', 'budget', 'diy'], platforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'], contentType: 'image_text' },
+  { title: 'A Week of Meal Prep for Busy Professionals', tags: ['food', 'meal-prep', 'productivity'], platforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'], contentType: 'image_text' },
+  { title: 'Cherry Blossom Season: The Ultimate Outfit Guide', tags: ['fashion', 'spring', 'ootd', 'cherry-blossom'], platforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'], contentType: 'image_text' },
+  { title: 'Tokyo Ramen Spots Worth the Queue', tags: ['food', 'travel', 'japan', 'ramen'], platforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'], contentType: 'image_text' },
+  { title: 'Minimalist Home Office Setup Under ¥2000', tags: ['home-office', 'minimalist', 'setup'], platforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'], contentType: 'image_text' },
+  { title: 'The Perfect Reading Nook on a Budget', tags: ['home-decor', 'books', 'lifestyle'], platforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'], contentType: 'image_text' },
+  { title: 'Summer Skincare Essentials: What Actually Works', tags: ['skincare', 'beauty', 'summer'], platforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'], contentType: 'image_text' },
+  { title: "Shanghai's Hidden Street Food Gems", tags: ['food', 'shanghai', 'street-food', 'local'], platforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'], contentType: 'image_text' },
+  { title: 'Autumn Fashion Haul Under ¥800', tags: ['fashion', 'haul', 'autumn', 'budget'], platforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'], contentType: 'image_text' },
+  { title: 'Best Cafes in Shanghai for Remote Work', tags: ['cafe', 'shanghai', 'wfh', 'lifestyle'], platforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'], contentType: 'image_text' },
+  { title: 'How I Stopped Impulse Buying (And Built a Better Wardrobe)', tags: ['fashion', 'mindset', 'finance', 'lifestyle'], platforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'], contentType: 'image_text' },
+  { title: 'Osaka on a Budget: 5 Days Under ¥3000', tags: ['travel', 'japan', 'budget', 'osaka'], platforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'], contentType: 'image_text' },
+  { title: 'Winter Layering Masterclass: Stylish and Warm', tags: ['fashion', 'winter', 'layering', 'ootd'], platforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'], contentType: 'image_text' },
+  { title: 'Tried 5 Viral Recipes — Honest Review', tags: ['food', 'recipe', 'review', 'trending'], platforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'], contentType: 'image_text' },
+  { title: 'Spring Clean Your Wardrobe: Keep vs Toss', tags: ['fashion', 'spring', 'declutter', 'capsule'], platforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'], contentType: 'image_text' },
+  { title: 'The Self-Care Sunday Routine That Actually Works', tags: ['self-care', 'lifestyle', 'routine', 'wellness'], platforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'], contentType: 'image_text' },
+  { title: 'Affordable Luxury: What to Splurge On vs Save On', tags: ['fashion', 'beauty', 'budget', 'luxury'], platforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'], contentType: 'image_text' },
+  { title: 'Seoul Street Food Diary', tags: ['food', 'travel', 'korea', 'street-food'], platforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'], contentType: 'image_text' },
+  { title: 'Office Outfit Formula: 5 Basics, Infinite Looks', tags: ['fashion', 'office', 'ootd', 'workwear'], platforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'], contentType: 'image_text' },
+  { title: 'My Apartment Transformation: Before and After', tags: ['home-decor', 'diy', 'interior', 'lifestyle'], platforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'], contentType: 'image_text' },
+  { title: 'The Wellness Habits I Actually Kept This Year', tags: ['wellness', 'lifestyle', 'habits', 'health'], platforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'], contentType: 'image_text' },
+  { title: 'Budget Travel: Kyoto in 3 Days Under ¥2500', tags: ['travel', 'japan', 'kyoto', 'budget'], platforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'], contentType: 'image_text' },
+  { title: 'Transitional Dressing: How to Style Any Season', tags: ['fashion', 'ootd', 'style', 'versatile'], platforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'], contentType: 'image_text' },
+  { title: 'The Perfect Gift Guide: Under ¥200 Edition', tags: ['gift', 'budget', 'lifestyle', 'holiday'], platforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'], contentType: 'image_text' },
+];
+
+// 2 items/month × 13 months = 26 items (months 14 → 2)
+const TECH_BANK: ContentDef[] = [
+  { title: 'The Real Difference Between Claude 4 and GPT-5 for Developers', tags: ['AI', 'LLM', 'developer-tools', 'comparison'], platforms: ['weixin', 'x', 'bilibili', 'weixin_video'], contentType: 'article', reviewNotes: 'High shares. Technical posts with code examples perform best.' },
+  { title: 'Why Most AI Startups Will Fail in 2027', tags: ['AI', 'startup', 'prediction', 'opinion'], platforms: ['weixin', 'x', 'bilibili', 'weixin_video'], contentType: 'article' },
+  { title: 'Vibe Coding Is Real: How Junior Devs Ship Faster with AI', tags: ['AI', 'productivity', 'coding', 'junior-dev'], platforms: ['weixin', 'x', 'bilibili', 'weixin_video'], contentType: 'article' },
+  { title: 'From Prompt Engineering to Agent Architecture', tags: ['AI', 'agents', 'architecture', 'LLM'], platforms: ['weixin', 'x', 'bilibili', 'weixin_video'], contentType: 'article' },
+  { title: 'The Hidden Cost of AI-First Development', tags: ['AI', 'engineering', 'opinion', 'cost'], platforms: ['weixin', 'x', 'bilibili', 'weixin_video'], contentType: 'article' },
+  { title: 'Open Source LLMs in 2026: Llama, Mistral, and New Players', tags: ['AI', 'open-source', 'LLM', 'llama'], platforms: ['weixin', 'x', 'bilibili', 'weixin_video'], contentType: 'article' },
+  { title: 'Why TypeScript Won (And What Comes Next)', tags: ['typescript', 'javascript', 'opinion', 'frontend'], platforms: ['weixin', 'x', 'bilibili', 'weixin_video'], contentType: 'article' },
+  { title: 'The Database Choice That Will Define Your Next 5 Years', tags: ['database', 'architecture', 'postgres', 'opinion'], platforms: ['weixin', 'x', 'bilibili', 'weixin_video'], contentType: 'article' },
+  { title: 'React Is Not Dying: A Data-Driven Rebuttal', tags: ['react', 'frontend', 'opinion', 'data'], platforms: ['weixin', 'x', 'bilibili', 'weixin_video'], contentType: 'article' },
+  { title: 'Edge Computing vs Cloud: Real Trade-offs in 2026', tags: ['cloud', 'edge', 'architecture', 'infra'], platforms: ['weixin', 'x', 'bilibili', 'weixin_video'], contentType: 'article' },
+  { title: 'How AI Code Reviewers Are Changing Engineering Culture', tags: ['AI', 'code-review', 'culture', 'engineering'], platforms: ['weixin', 'x', 'bilibili', 'weixin_video'], contentType: 'article' },
+  { title: 'The Rise of Solo Developers: Building $1M Products Alone', tags: ['indie-dev', 'solo', 'startup', 'AI'], platforms: ['weixin', 'x', 'bilibili', 'weixin_video'], contentType: 'article' },
+  { title: 'Microservices vs Monolith: What I Learned After 3 Rewrites', tags: ['architecture', 'microservices', 'monolith', 'opinion'], platforms: ['weixin', 'x', 'bilibili', 'weixin_video'], contentType: 'article' },
+  { title: "Why Your Startup's Engineering Culture Is Broken", tags: ['startup', 'engineering', 'culture', 'management'], platforms: ['weixin', 'x', 'bilibili', 'weixin_video'], contentType: 'article' },
+  { title: 'Claude as a Coding Partner: 6 Months of Real Experience', tags: ['AI', 'claude', 'productivity', 'coding'], platforms: ['weixin', 'x', 'bilibili', 'weixin_video'], contentType: 'article' },
+  { title: 'Rust in Production: Honest Assessment After 1 Year', tags: ['rust', 'systems', 'opinion', 'backend'], platforms: ['weixin', 'x', 'bilibili', 'weixin_video'], contentType: 'article' },
+  { title: 'The API Design Mistakes I Made (So You Don\'t Have To)', tags: ['api', 'design', 'backend', 'rest'], platforms: ['weixin', 'x', 'bilibili', 'weixin_video'], contentType: 'article' },
+  { title: 'AI-Assisted Testing: Does It Actually Improve Quality?', tags: ['AI', 'testing', 'quality', 'engineering'], platforms: ['weixin', 'x', 'bilibili', 'weixin_video'], contentType: 'article' },
+  { title: 'The State of Developer Tools in 2026', tags: ['dev-tools', 'productivity', 'survey', 'opinion'], platforms: ['weixin', 'x', 'bilibili', 'weixin_video'], contentType: 'article' },
+  { title: 'Zero-to-Production Solo: Building Orbit in Public', tags: ['indie-dev', 'orbit', 'building-in-public', 'solo'], platforms: ['weixin', 'x', 'bilibili', 'weixin_video'], contentType: 'article' },
+  { title: 'Next.js vs Remix vs Vite: An Honest Comparison', tags: ['nextjs', 'react', 'frontend', 'comparison'], platforms: ['weixin', 'x', 'bilibili', 'weixin_video'], contentType: 'article' },
+  { title: 'The Death of the Traditional Tech Interview', tags: ['interview', 'hiring', 'AI', 'opinion'], platforms: ['weixin', 'x', 'bilibili', 'weixin_video'], contentType: 'article' },
+  { title: 'How I Reduced LLM Costs 60% by Switching Providers', tags: ['AI', 'cost', 'LLM', 'optimization'], platforms: ['weixin', 'x', 'bilibili', 'weixin_video'], contentType: 'article' },
+  { title: 'The Content Creator Tech Stack (2026 Edition)', tags: ['tools', 'creator', 'productivity', 'stack'], platforms: ['weixin', 'x', 'bilibili', 'weixin_video'], contentType: 'article' },
+  { title: 'Reflections: 1 Year Building in Public', tags: ['building-in-public', 'indie-dev', 'reflection', 'personal'], platforms: ['weixin', 'x', 'bilibili', 'weixin_video'], contentType: 'article' },
+  { title: 'What No One Tells You About Building AI Products', tags: ['AI', 'product', 'startup', 'lessons'], platforms: ['weixin', 'x', 'bilibili', 'weixin_video'], contentType: 'article' },
+];
+
 // ─── main ────────────────────────────────────────────────────────────────────
 
 async function seed() {
@@ -41,10 +247,7 @@ async function seed() {
 
   const [existing] = await db.select({ id: users.id }).from(users).where(eq(users.email, DEMO_EMAIL));
   if (existing) {
-    if (!force) {
-      console.log('Demo user already exists. Run with --force to re-seed.');
-      process.exit(0);
-    }
+    if (!force) { console.log('Demo user already exists. Run with --force to re-seed.'); process.exit(0); }
     console.log('Deleting existing demo data…');
     await db.delete(users).where(eq(users.email, DEMO_EMAIL));
   }
@@ -55,370 +258,253 @@ async function seed() {
   // ── 1. User ────────────────────────────────────────────────────────────────
   const passwordHash = await bcrypt.hash(DEMO_PASSWORD, 10);
   const [user] = await db.insert(users).values({
-    email: DEMO_EMAIL,
-    name: 'Alex Chen',
-    locale: 'en-US',
-    timezone: 'Asia/Shanghai',
-    passwordHash,
+    email: DEMO_EMAIL, username: 'Alex Chen',
+    locale: 'en-US', timezone: 'Asia/Shanghai', passwordHash,
   }).returning();
   const userId = user!.id;
 
   // ── 2. Workspaces ──────────────────────────────────────────────────────────
-  // Workspaces represent content areas/verticals, not platforms.
-  // Platform is chosen per publication.
-  const [wDouyin, wXHS, wWeChat] = await db.insert(workspaces).values([
-    {
-      userId,
-      name: 'Comedy',
-      icon: '🎭',
-      color: '#FF4757',
-      about: 'Short comedy skits and trending relatable content',
-      publishGoal: { count: 5, period: 'week' },
-      stageConfig: [],
-    },
-    {
-      userId,
-      name: 'Lifestyle',
-      icon: '🌸',
-      color: '#FF6B9D',
-      about: 'Fashion, food, travel, and daily life content',
-      publishGoal: { count: 3, period: 'week' },
-      stageConfig: [],
-    },
-    {
-      userId,
-      name: 'Tech Insights',
-      icon: '🔬',
-      color: '#2ECC71',
-      about: 'In-depth tech analysis, AI commentary, and developer perspectives',
-      publishGoal: { count: 2, period: 'week' },
-      stageConfig: [],
-    },
+  const [wComedy, wLifestyle, wTech] = await db.insert(workspaces).values([
+    { userId, name: 'Comedy', icon: '🎭', color: '#FF4757', about: 'Short comedy skits and relatable dev content', publishGoal: { count: 5, period: 'week' }, stageConfig: [] },
+    { userId, name: 'Lifestyle', icon: '🌸', color: '#FF6B9D', about: 'Fashion, food, travel, and daily life', publishGoal: { count: 3, period: 'week' }, stageConfig: [] },
+    { userId, name: 'Tech Insights', icon: '🔬', color: '#2ECC71', about: 'AI commentary, dev tools, and engineering opinion', publishGoal: { count: 2, period: 'week' }, stageConfig: [] },
   ]).returning();
-
-  const wsD = wDouyin!.id;
-  const wsX = wXHS!.id;
-  const wsW = wWeChat!.id;
+  const wsD = wComedy!.id, wsX = wLifestyle!.id, wsW = wTech!.id;
 
   // ── 3. Plan templates ──────────────────────────────────────────────────────
   await db.insert(planTemplates).values([
-    {
-      workspaceId: wsD,
-      name: 'Gen Z Comedy Hook',
-      audience: { ageRange: '18-25', personaTags: ['Gen Z', 'student', 'trend-follower'], painPoint: 'Wants to escape stress', reachScenario: 'Scrolling Douyin before bed' },
-      goals: ['grow_followers', 'branding'],
-      goalDescription: 'Grow followers through relatable, shareable comedy',
-    },
-    {
-      workspaceId: wsX,
-      name: 'Lifestyle Discovery Reader',
-      audience: { ageRange: '22-30', personaTags: ['young professional', 'fashion-conscious', 'city dweller'], painPoint: 'Looking for inspiration and product recommendations', reachScenario: 'Weekend morning browse' },
-      goals: ['traffic', 'convert'],
-      goalDescription: 'Drive traffic to affiliate links and brand partnerships',
-    },
-    {
-      workspaceId: wsW,
-      name: 'Tech Professional Reader',
-      audience: { ageRange: '25-40', personaTags: ['developer', 'product manager', 'tech enthusiast'], painPoint: 'Needs curated, high-signal tech analysis', reachScenario: 'Monday morning commute or lunch break' },
-      goals: ['branding', 'grow_followers'],
-      goalDescription: 'Build authority as a trusted tech commentator',
-    },
+    { workspaceId: wsD, name: 'Gen Z Comedy Hook', audience: { ageRange: '18-25', personaTags: ['Gen Z', 'student', 'trend-follower'], painPoint: 'Wants to escape stress', reachScenario: 'Scrolling Douyin before bed' }, goals: ['grow_followers', 'branding'], goalDescription: 'Grow followers through relatable comedy' },
+    { workspaceId: wsX, name: 'Lifestyle Discovery Reader', audience: { ageRange: '22-30', personaTags: ['young professional', 'fashion-conscious', 'city dweller'], painPoint: 'Looking for inspiration and recommendations', reachScenario: 'Weekend morning browse' }, goals: ['traffic', 'convert'], goalDescription: 'Drive traffic to affiliate links and brand partnerships' },
+    { workspaceId: wsW, name: 'Tech Professional Reader', audience: { ageRange: '25-40', personaTags: ['developer', 'product manager', 'tech enthusiast'], painPoint: 'Too much hype, needs high-signal analysis', reachScenario: 'Monday morning commute' }, goals: ['branding', 'grow_followers'], goalDescription: 'Build authority as a trusted tech commentator' },
   ]);
 
   // ── 4. Ideas ───────────────────────────────────────────────────────────────
-
-  // Insert converted ideas first so we can capture their IDs and link them to content
-  const [ideaConv1] = await db.insert(ideas).values({
-    userId, workspaceId: wsD, title: 'Expectation vs reality: remote work',
-    tags: ['relatable', 'work-from-home'], priority: 'high', attachments: [], status: 'converted',
-  }).returning();
-  const [ideaConv2] = await db.insert(ideas).values({
-    userId, workspaceId: wsX, title: 'My capsule wardrobe essentials under ¥500',
-    tags: ['fashion', 'budget'], priority: 'high', attachments: [], status: 'converted',
-  }).returning();
+  const [ideaConv1] = await db.insert(ideas).values({ userId, workspaceId: wsD, title: 'Expectation vs reality: remote work', tags: ['relatable', 'wfh'], priority: 'high', attachments: [], status: 'converted' }).returning();
+  const [ideaConv2] = await db.insert(ideas).values({ userId, workspaceId: wsX, title: 'My capsule wardrobe essentials under ¥500', tags: ['fashion', 'budget'], priority: 'high', attachments: [], status: 'converted' }).returning();
 
   await db.insert(ideas).values([
-    // Global pool — active
     { userId, workspaceId: null, title: 'React vs Vue 2026 — which is actually winning?', tags: ['tech', 'frontend'], priority: 'high', attachments: [], status: 'active' },
-    { userId, workspaceId: null, title: 'What happens when you eat McDonald\'s for 30 days', tags: ['food', 'challenge'], priority: 'medium', attachments: [], status: 'active' },
+    { userId, workspaceId: null, title: "What happens when you eat McDonald's for 30 days", tags: ['food', 'challenge'], priority: 'medium', attachments: [], status: 'active' },
     { userId, workspaceId: null, title: 'Morning routines of billionaires vs normal people', tags: ['lifestyle', 'productivity'], priority: 'low', attachments: [], status: 'active' },
-    // Douyin ideas
-    { userId, workspaceId: wsD, title: 'POV: you\'re a debugging rubber duck', tags: ['dev-humor', 'relatable'], priority: 'high', attachments: [], status: 'active' },
+    { userId, workspaceId: wsD, title: "POV: you're a debugging rubber duck", tags: ['dev-humor', 'relatable'], priority: 'high', attachments: [], status: 'active' },
     { userId, workspaceId: wsD, title: 'Types of programmers at 3am', tags: ['dev-humor', 'coding'], priority: 'medium', attachments: [], status: 'active' },
-    { userId, workspaceId: wsD, title: 'Office vibes on Monday vs Friday', tags: ['relatable', 'work'], priority: 'medium', attachments: [], status: 'active' },
-    // Xiaohongshu ideas
     { userId, workspaceId: wsX, title: 'Cherry blossom season outfit ideas', tags: ['fashion', 'spring'], priority: 'high', attachments: [], status: 'active' },
-    { userId, workspaceId: wsX, title: 'Tokyo ramen spots you can\'t miss', tags: ['food', 'travel', 'japan'], priority: 'medium', attachments: [], status: 'active' },
-    // WeChat ideas
-    { userId, workspaceId: wsW, title: 'Claude 4 vs GPT-5 — a real developer\'s take', tags: ['AI', 'LLM', 'opinion'], priority: 'high', attachments: [], status: 'active', note: 'Focus on coding use-cases specifically, not general chat.' },
+    { userId, workspaceId: wsX, title: "Tokyo ramen spots you can't miss", tags: ['food', 'travel', 'japan'], priority: 'medium', attachments: [], status: 'active' },
+    { userId, workspaceId: wsW, title: "Claude 4 vs GPT-5 — a real developer's take", tags: ['AI', 'LLM', 'opinion'], priority: 'high', attachments: [], status: 'active', note: 'Focus on coding use-cases specifically.' },
     { userId, workspaceId: wsW, title: 'Why most AI startups will fail in 2027', tags: ['AI', 'startup', 'prediction'], priority: 'medium', attachments: [], status: 'active' },
-    // Archived
     { userId, workspaceId: null, title: 'Old trend idea that faded', tags: [], priority: 'low', attachments: [], status: 'archived' },
-    { userId, workspaceId: wsD, title: 'That one meme format from 2024', tags: ['meme'], priority: 'low', attachments: [], status: 'archived' },
   ]);
 
-  // ── 5. Contents ────────────────────────────────────────────────────────────
+  // ── 5. Historical content: months 14 → 2 (all reviewed) ───────────────────
+  // Track first-inserted content IDs for briefs
+  let firstComedyId: string | null = null;
+  let firstLifestyleId: string | null = null;
+  let firstTechId: string | null = null;
 
-  // ── Douyin contents ────────────────────────────────────────────────────────
-  const [
-    dReviewed1, dReviewed2,
-    dPublished1, dPublished2, dPublished3,
-    dReady1, dReady2,
-    dCreating1, dCreating2,
-    dPlanned1, dPlanned2, dPlanned3,
-  ] = await db.insert(contents).values([
-    // Reviewed (fully done with post-mortem)
-    {
-      workspaceId: wsD, title: 'Expectation vs Reality: Remote Work Life',
-      ideaId: ideaConv1!.id, contentType: 'video_short', stage: 'reviewed',
-      tags: ['relatable', 'work-from-home', 'comedy'], targetPlatforms: ['douyin', 'tiktok'],
-      scheduledAt: daysAgo(45), publishedAt: daysAgo(44),
-      notes: 'Filmed 3 takes, final one nailed it.',
-      reviewNotes: 'Exceeded all KPIs. The surprise ending got huge engagement. Reuse format.',
-      attachments: [], stageHistory: sh(['planned', 52], ['creating', 50], ['ready', 47], ['published', 44], ['reviewed', 38]),
-    },
-    {
-      workspaceId: wsD, title: 'When The Code Finally Works After 3 Hours',
-      contentType: 'video_short', stage: 'reviewed',
-      tags: ['dev-humor', 'relatable', 'coding'], targetPlatforms: ['douyin', 'tiktok'],
-      scheduledAt: daysAgo(30), publishedAt: daysAgo(29),
-      notes: 'Keep it under 30s for max retention.',
-      reviewNotes: 'Strong performance on saves. Developers are a great niche on Douyin.',
-      attachments: [], stageHistory: sh(['planned', 38], ['creating', 35], ['ready', 32], ['published', 29], ['reviewed', 22]),
-    },
-    // Published
-    {
-      workspaceId: wsD, title: 'POV: You\'re the Only One Who Reads the Docs',
-      contentType: 'video_short', stage: 'published',
-      tags: ['dev-humor', 'relatable'], targetPlatforms: ['douyin'],
-      scheduledAt: daysAgo(15), publishedAt: daysAgo(14),
-      notes: 'Use trending audio track #0923',
-      attachments: [], stageHistory: sh(['planned', 22], ['creating', 20], ['ready', 17], ['published', 14]),
-    },
-    {
-      workspaceId: wsD, title: 'Types of Colleagues in Every Stand-up Meeting',
-      contentType: 'video_short', stage: 'published',
-      tags: ['work', 'relatable', 'comedy'], targetPlatforms: ['douyin'],
-      scheduledAt: daysAgo(8), publishedAt: daysAgo(7),
-      attachments: [], stageHistory: sh(['planned', 16], ['creating', 13], ['ready', 9], ['published', 7]),
-    },
-    {
-      workspaceId: wsD, title: 'Debugging at 3am be like…',
-      contentType: 'video_short', stage: 'published',
-      tags: ['dev-humor', 'coding', 'relatable'], targetPlatforms: ['douyin'],
-      scheduledAt: daysAgo(3), publishedAt: daysAgo(2),
-      attachments: [], stageHistory: sh(['planned', 10], ['creating', 8], ['ready', 4], ['published', 2]),
-    },
-    // Ready
-    {
-      workspaceId: wsD, title: 'When Your PM Says "It\'ll Only Take 5 Minutes"',
-      contentType: 'video_short', stage: 'ready',
-      tags: ['dev-humor', 'work', 'relatable'], targetPlatforms: ['douyin'],
-      scheduledAt: daysFromNow(2),
-      attachments: [], stageHistory: sh(['planned', 12], ['creating', 9], ['ready', 3]),
-    },
-    {
-      workspaceId: wsD, title: 'Every Developer\'s Reaction to a New JavaScript Framework',
-      contentType: 'video_short', stage: 'ready',
-      tags: ['dev-humor', 'javascript', 'comedy'], targetPlatforms: ['douyin'],
-      scheduledAt: daysFromNow(5),
-      attachments: [], stageHistory: sh(['planned', 10], ['creating', 6], ['ready', 1]),
-    },
-    // Creating
-    {
-      workspaceId: wsD, title: 'Office Monday vs Friday Energy',
-      contentType: 'video_short', stage: 'creating',
-      tags: ['work', 'relatable', 'comedy'], targetPlatforms: ['douyin'],
-      notes: 'B-roll: coffee machine, commute, slack notifications',
-      attachments: [], stageHistory: sh(['planned', 8], ['creating', 4]),
-    },
-    {
-      workspaceId: wsD, title: 'Git Commit Messages Through The Ages',
-      contentType: 'video_short', stage: 'creating',
-      tags: ['dev-humor', 'coding', 'relatable'], targetPlatforms: ['douyin'],
-      attachments: [], stageHistory: sh(['planned', 6], ['creating', 2]),
-    },
-    // Planned
-    {
-      workspaceId: wsD, title: 'The 5 Stages of Debugging Grief',
-      contentType: 'video_short', stage: 'planned',
-      tags: ['dev-humor', 'coding'], targetPlatforms: ['douyin'],
-      attachments: [], stageHistory: sh(['planned', 4]),
-    },
-    {
-      workspaceId: wsD, title: 'Zoom Call Bingo: Remote Work Edition',
-      contentType: 'video_short', stage: 'planned',
-      tags: ['work-from-home', 'relatable'], targetPlatforms: ['douyin'],
-      attachments: [], stageHistory: sh(['planned', 2]),
-    },
-    {
-      workspaceId: wsD, title: 'POV: Being the Rubber Duck in a Dev Debugging Session',
-      contentType: 'video_short', stage: 'planned',
-      tags: ['dev-humor', 'comedy'], targetPlatforms: ['douyin'],
-      attachments: [], stageHistory: sh(['planned', 0]),
-    },
-  ]).returning();
+  for (let monthBack = 14; monthBack >= 2; monthBack--) {
+    const monthIdx = 14 - monthBack; // 0 = oldest month
 
-  // ── Xiaohongshu contents ───────────────────────────────────────────────────
-  const [
-    xReviewed1,
-    xPublished1, xPublished2, xPublished3,
-    xReady1, xReady2,
-    xCreating1,
-    xPlanned1,
-  ] = await db.insert(contents).values([
-    {
-      workspaceId: wsX, title: 'My Capsule Wardrobe: 10 Pieces, 30 Outfits Under ¥500',
-      ideaId: ideaConv2!.id, contentType: 'image_text', stage: 'reviewed',
-      tags: ['fashion', 'budget', 'capsule-wardrobe'], targetPlatforms: ['xiaohongshu', 'instagram'],
-      scheduledAt: daysAgo(42), publishedAt: daysAgo(41),
-      reviewNotes: 'Saves through the roof. Budget fashion posts consistently outperform.',
-      attachments: [], stageHistory: sh(['planned', 50], ['creating', 46], ['ready', 43], ['published', 41], ['reviewed', 35]),
-    },
-    {
-      workspaceId: wsX, title: 'Spring 2026 Outfit Ideas — Cherry Blossom Season Lookbook',
-      contentType: 'image_text', stage: 'published',
-      tags: ['fashion', 'spring', 'lookbook', 'cherry-blossom'], targetPlatforms: ['xiaohongshu', 'instagram'],
-      scheduledAt: daysAgo(20), publishedAt: daysAgo(19),
-      attachments: [], stageHistory: sh(['planned', 28], ['creating', 24], ['ready', 21], ['published', 19]),
-    },
-    {
-      workspaceId: wsX, title: 'Tokyo Food Diary: 7 Ramen Spots Worth the Queue',
-      contentType: 'image_text', stage: 'published',
-      tags: ['food', 'travel', 'japan', 'ramen'], targetPlatforms: ['xiaohongshu'],
-      scheduledAt: daysAgo(11), publishedAt: daysAgo(10),
-      attachments: [], stageHistory: sh(['planned', 20], ['creating', 16], ['ready', 12], ['published', 10]),
-    },
-    {
-      workspaceId: wsX, title: 'The Only Skincare Routine You Need for Summer',
-      contentType: 'image_text', stage: 'published',
-      tags: ['skincare', 'beauty', 'summer'], targetPlatforms: ['xiaohongshu'],
-      scheduledAt: daysAgo(4), publishedAt: daysAgo(3),
-      attachments: [], stageHistory: sh(['planned', 12], ['creating', 8], ['ready', 5], ['published', 3]),
-    },
-    {
-      workspaceId: wsX, title: 'Best Cafés in Shanghai for Remote Work (2026 Edition)',
-      contentType: 'image_text', stage: 'ready',
-      tags: ['cafe', 'shanghai', 'work', 'lifestyle'], targetPlatforms: ['xiaohongshu'],
-      scheduledAt: daysFromNow(3),
-      attachments: [], stageHistory: sh(['planned', 9], ['creating', 5], ['ready', 2]),
-    },
-    {
-      workspaceId: wsX, title: 'Minimalist Home Office Setup Under ¥2000',
-      contentType: 'image_text', stage: 'ready',
-      tags: ['home-office', 'minimalist', 'setup'], targetPlatforms: ['xiaohongshu'],
-      scheduledAt: daysFromNow(6),
-      attachments: [], stageHistory: sh(['planned', 7], ['creating', 3], ['ready', 1]),
-    },
-    {
-      workspaceId: wsX, title: 'Tried 5 Viral TikTok Recipes — Honest Review',
-      contentType: 'image_text', stage: 'creating',
-      tags: ['food', 'recipe', 'review'], targetPlatforms: ['xiaohongshu'],
-      attachments: [], stageHistory: sh(['planned', 5], ['creating', 2]),
-    },
-    {
-      workspaceId: wsX, title: 'How I Stopped Impulse Buying (And Built a Better Wardrobe)',
-      contentType: 'image_text', stage: 'planned',
-      tags: ['fashion', 'mindset', 'finance'], targetPlatforms: ['xiaohongshu'],
-      attachments: [], stageHistory: sh(['planned', 1]),
-    },
-  ]).returning();
+    // Comedy: 3 items this month
+    for (let w = 0; w < 3; w++) {
+      const bankIdx = monthIdx * 3 + w;
+      if (bankIdx >= COMEDY_BANK.length) break;
+      const def = COMEDY_BANK[bankIdx]!;
+      const pubDays = monthBack * 30 + w * 9 + 3;
+      const virality = VIRALITY[bankIdx % VIRALITY.length]!;
 
-  // ── WeChat OA contents ────────────────────────────────────────────────────
-  const [
-    wPublished1,
-    wReady1, wReady2,
-    wCreating1,
-    wPlanned1, wPlanned2,
-  ] = await db.insert(contents).values([
-    {
-      workspaceId: wsW, title: 'The Real Difference Between Claude 4 and GPT-5 for Developers',
-      contentType: 'article', stage: 'published',
-      tags: ['AI', 'LLM', 'developer-tools', 'claude', 'gpt'], targetPlatforms: ['weixin', 'x'],
-      scheduledAt: daysAgo(12), publishedAt: daysAgo(11),
-      notes: 'Include code examples for tool use and function calling.',
-      attachments: [], stageHistory: sh(['planned', 21], ['creating', 17], ['ready', 13], ['published', 11]),
-    },
-    {
-      workspaceId: wsW, title: 'Why Most AI Startups Will Fail in 2027 (And What Survives)',
-      contentType: 'article', stage: 'ready',
-      tags: ['AI', 'startup', 'prediction', 'VC'], targetPlatforms: ['weixin'],
-      scheduledAt: daysFromNow(4),
-      attachments: [], stageHistory: sh(['planned', 10], ['creating', 6], ['ready', 2]),
-    },
-    {
-      workspaceId: wsW, title: 'Vibe Coding Is Real: How Junior Devs Are Shipping Faster with AI',
-      contentType: 'article', stage: 'ready',
-      tags: ['AI', 'productivity', 'coding', 'junior-dev'], targetPlatforms: ['weixin'],
-      scheduledAt: daysFromNow(8),
-      attachments: [], stageHistory: sh(['planned', 8], ['creating', 4], ['ready', 1]),
-    },
-    {
-      workspaceId: wsW, title: 'From Prompt Engineering to Agent Architecture: What Changed',
-      contentType: 'article', stage: 'creating',
-      tags: ['AI', 'agents', 'architecture', 'LLM'], targetPlatforms: ['weixin'],
-      attachments: [], stageHistory: sh(['planned', 6], ['creating', 2]),
-    },
-    {
-      workspaceId: wsW, title: 'The Hidden Cost of AI-First Development',
-      contentType: 'article', stage: 'planned',
-      tags: ['AI', 'engineering', 'opinion'], targetPlatforms: ['weixin'],
-      attachments: [], stageHistory: sh(['planned', 3]),
-    },
-    {
-      workspaceId: wsW, title: 'Open Source LLMs in 2026: Llama, Mistral, and the New Players',
-      contentType: 'article', stage: 'planned',
-      tags: ['AI', 'open-source', 'LLM', 'llama'], targetPlatforms: ['weixin'],
-      attachments: [], stageHistory: sh(['planned', 1]),
-    },
-  ]).returning();
+      const [c] = await db.insert(contents).values({
+        workspaceId: wsD, title: def.title, contentType: def.contentType,
+        stage: 'reviewed', tags: def.tags, targetPlatforms: def.platforms,
+        ideaId: bankIdx === 0 ? ideaConv1!.id : undefined,
+        scheduledAt: daysAgo(pubDays + 1), publishedAt: daysAgo(pubDays),
+        reviewNotes: def.reviewNotes, attachments: [],
+        stageHistory: sh(['planned', pubDays + 14], ['creating', pubDays + 9], ['ready', pubDays + 3], ['published', pubDays], ['reviewed', pubDays - 7]),
+      }).returning();
+      if (firstComedyId === null) firstComedyId = c!.id;
+      if (bankIdx === 0) await db.update(ideas).set({ convertedTo: c!.id }).where(eq(ideas.id, ideaConv1!.id));
 
-  // ── 5b. Close the idea → content bidirectional links ──────────────────────
-  await db.update(ideas).set({ convertedTo: dReviewed1!.id }).where(eq(ideas.id, ideaConv1!.id));
-  await db.update(ideas).set({ convertedTo: xReviewed1!.id }).where(eq(ideas.id, ideaConv2!.id));
+      await insertPublished(c!.id, def.platforms, pubDays, virality, `https://orbit.demo/c/d${bankIdx}`);
+    }
 
-  // ── 6. Content Briefs ──────────────────────────────────────────────────────
-  // Add briefs to a selection of content items for richness
-  await db.insert(contentPlans).values([
-    {
-      contentId: dReviewed1!.id,
+    // Lifestyle: 2 items this month
+    for (let w = 0; w < 2; w++) {
+      const bankIdx = monthIdx * 2 + w;
+      if (bankIdx >= LIFESTYLE_BANK.length) break;
+      const def = LIFESTYLE_BANK[bankIdx]!;
+      const pubDays = monthBack * 30 + w * 12 + 5;
+      const virality = VIRALITY[(bankIdx + 3) % VIRALITY.length]!;
+
+      const [c] = await db.insert(contents).values({
+        workspaceId: wsX, title: def.title, contentType: def.contentType,
+        stage: 'reviewed', tags: def.tags, targetPlatforms: def.platforms,
+        ideaId: bankIdx === 0 ? ideaConv2!.id : undefined,
+        scheduledAt: daysAgo(pubDays + 1), publishedAt: daysAgo(pubDays),
+        reviewNotes: def.reviewNotes, attachments: [],
+        stageHistory: sh(['planned', pubDays + 14], ['creating', pubDays + 8], ['ready', pubDays + 2], ['published', pubDays], ['reviewed', pubDays - 7]),
+      }).returning();
+      if (firstLifestyleId === null) firstLifestyleId = c!.id;
+      if (bankIdx === 0) await db.update(ideas).set({ convertedTo: c!.id }).where(eq(ideas.id, ideaConv2!.id));
+
+      await insertPublished(c!.id, def.platforms, pubDays, virality, `https://orbit.demo/c/x${bankIdx}`);
+    }
+
+    // Tech: 2 items this month
+    for (let w = 0; w < 2; w++) {
+      const bankIdx = monthIdx * 2 + w;
+      if (bankIdx >= TECH_BANK.length) break;
+      const def = TECH_BANK[bankIdx]!;
+      const pubDays = monthBack * 30 + w * 14 + 7;
+      const virality = VIRALITY[(bankIdx + 6) % VIRALITY.length]!;
+
+      const [c] = await db.insert(contents).values({
+        workspaceId: wsW, title: def.title, contentType: def.contentType,
+        stage: 'reviewed', tags: def.tags, targetPlatforms: def.platforms,
+        scheduledAt: daysAgo(pubDays + 1), publishedAt: daysAgo(pubDays),
+        reviewNotes: def.reviewNotes, attachments: [],
+        stageHistory: sh(['planned', pubDays + 14], ['creating', pubDays + 9], ['ready', pubDays + 3], ['published', pubDays], ['reviewed', pubDays - 7]),
+      }).returning();
+      if (firstTechId === null) firstTechId = c!.id;
+
+      await insertPublished(c!.id, def.platforms, pubDays, virality, `https://orbit.demo/c/w${bankIdx}`);
+    }
+  }
+
+  // ── 6. Recent published content (month 1) ─────────────────────────────────
+  const [rComedy1] = await db.insert(contents).values({
+    workspaceId: wsD, title: 'POV: You\'re the Only One Who Reads the Docs',
+    contentType: 'video_short', stage: 'published',
+    tags: ['dev-humor', 'relatable'], targetPlatforms: ['douyin', 'tiktok', 'bilibili', 'youtube'],
+    scheduledAt: daysAgo(15), publishedAt: daysAgo(14), attachments: [],
+    stageHistory: sh(['planned', 28], ['creating', 22], ['ready', 16], ['published', 14]),
+  }).returning();
+  await insertPublished(rComedy1!.id, ['douyin', 'tiktok', 'bilibili', 'youtube'], 14, 1.8, 'https://orbit.demo/c/rc1', {
+    douyin: { title: 'POV: 文档？我读过！📖', copy: '你们公司也有这种人吗？ #程序员日常 #dev', tags: ['#程序员', '#编程'] },
+    tiktok: { title: 'POV: You actually read the docs 📖', copy: 'The rarest skill in software engineering 😭 #coding #developer #relatable', tags: ['#coding', '#developer'] },
+    bilibili: { title: 'POV：你是公司里唯一看文档的人 📖', tags: ['程序员', '编程', '职场'] },
+    youtube: { title: 'POV: You\'re the Only One Who Actually Reads the Docs 📖', copy: 'The rarest dev skill: reading documentation 😭 #coding #developer', tags: ['#coding', '#developer', '#devhumor'] },
+  });
+
+  const [rLifestyle1] = await db.insert(contents).values({
+    workspaceId: wsX, title: 'Spring 2026 Outfit Ideas — Cherry Blossom Lookbook',
+    contentType: 'image_text', stage: 'published',
+    tags: ['fashion', 'spring', 'lookbook', 'cherry-blossom'], targetPlatforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'],
+    scheduledAt: daysAgo(20), publishedAt: daysAgo(19), attachments: [],
+    stageHistory: sh(['planned', 32], ['creating', 26], ['ready', 21], ['published', 19]),
+  }).returning();
+  await insertPublished(rLifestyle1!.id, ['xiaohongshu', 'instagram', 'douyin', 'weixin'], 19, 2.1, 'https://orbit.demo/c/rl1', {
+    xiaohongshu: { title: '2026春季穿搭｜赏樱花的正确打开方式🌸', copy: '春天来了！分享我的赏花穿搭合集 🌸 #春季穿搭 #樱花 #ootd', tags: ['#春季穿搭', '#樱花'] },
+    instagram: { title: 'Spring lookbook 🌸 Cherry blossom season is here', copy: 'Outfit ideas for cherry blossom season 🌸 #springfashion #ootd #cherryblossom', tags: ['#ootd', '#cherryblossom'] },
+    douyin: { title: '2026春天穿搭合集🌸赏花季必备', copy: '春天来了，来看我的赏花穿搭！#春季穿搭 #ootd', tags: ['#春季穿搭', '#ootd'] },
+    weixin: { title: '2026春季穿搭指南｜赏樱花的10种打开方式', copy: '春天是穿搭最美的季节，这些搭配你学会了吗？' },
+  });
+
+  const [rTech1] = await db.insert(contents).values({
+    workspaceId: wsW, title: 'Vibe Coding Is Real: How Junior Devs Are Shipping Faster with AI',
+    contentType: 'article', stage: 'published',
+    tags: ['AI', 'productivity', 'coding', 'junior-dev'], targetPlatforms: ['weixin', 'x', 'bilibili', 'weixin_video'],
+    scheduledAt: daysAgo(12), publishedAt: daysAgo(11), attachments: [],
+    notes: 'Include code examples and real benchmarks.',
+    stageHistory: sh(['planned', 22], ['creating', 17], ['ready', 13], ['published', 11]),
+  }).returning();
+  await insertPublished(rTech1!.id, ['weixin', 'x', 'bilibili', 'weixin_video'], 11, 2.4, 'https://orbit.demo/c/rt1', {
+    weixin: { title: 'Vibe编程是真实的：AI让初级开发者越跑越快', copy: '没有废话，直接看数据。AI辅助开发的真实效率对比。' },
+    x: { title: 'Vibe Coding Is Real — data from real junior devs using AI', copy: 'I tracked 12 junior devs for 3 months. Here\'s what AI actually did to their output 🧵 #AI #coding #developers', tags: ['#AI', '#developers'] },
+    bilibili: { title: 'Vibe编程实测：AI到底让初级开发者快了多少？', tags: ['AI', '编程', '效率'] },
+    weixin_video: { title: 'AI让初级开发者快了多少？真实数据来了', copy: '我追踪了12位初级开发者3个月，AI对他们的产出做了这些...' },
+  });
+
+  const [rComedy2] = await db.insert(contents).values({
+    workspaceId: wsD, title: 'Debugging at 3am be like…',
+    contentType: 'video_short', stage: 'published',
+    tags: ['dev-humor', 'coding', 'relatable'], targetPlatforms: ['douyin', 'tiktok', 'bilibili', 'youtube', 'instagram'],
+    scheduledAt: daysAgo(4), publishedAt: daysAgo(3), attachments: [],
+    stageHistory: sh(['planned', 12], ['creating', 8], ['ready', 4], ['published', 3]),
+  }).returning();
+  await insertPublished(rComedy2!.id, ['douyin', 'tiktok', 'bilibili', 'youtube', 'instagram'], 3, 1.5, 'https://orbit.demo/c/rc2');
+
+  // ── 7. Current pipeline ────────────────────────────────────────────────────
+
+  // Ready
+  const [pReady1] = await db.insert(contents).values({
+    workspaceId: wsD, title: "When Your PM Says 'It'll Only Take 5 Minutes'",
+    contentType: 'video_short', stage: 'ready',
+    tags: ['dev-humor', 'work', 'relatable'], targetPlatforms: ['douyin', 'tiktok', 'bilibili', 'youtube'],
+    scheduledAt: daysFromNow(2), attachments: [],
+    stageHistory: sh(['planned', 12], ['creating', 7], ['ready', 2]),
+  }).returning();
+  const [pReady2] = await db.insert(contents).values({
+    workspaceId: wsX, title: 'Best Cafés in Shanghai for Remote Work (2026 Edition)',
+    contentType: 'image_text', stage: 'ready',
+    tags: ['cafe', 'shanghai', 'work', 'lifestyle'], targetPlatforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'],
+    scheduledAt: daysFromNow(3), attachments: [],
+    stageHistory: sh(['planned', 10], ['creating', 6], ['ready', 1]),
+  }).returning();
+  const [pReady3] = await db.insert(contents).values({
+    workspaceId: wsW, title: 'Why Most AI Startups Will Fail in 2027 (And What Survives)',
+    contentType: 'article', stage: 'ready',
+    tags: ['AI', 'startup', 'prediction', 'VC'], targetPlatforms: ['weixin', 'x', 'bilibili', 'weixin_video'],
+    scheduledAt: daysFromNow(5), attachments: [],
+    stageHistory: sh(['planned', 11], ['creating', 6], ['ready', 2]),
+  }).returning();
+
+  // Creating
+  await db.insert(contents).values([
+    { workspaceId: wsD, title: 'Office Monday vs Friday Energy', contentType: 'video_short', stage: 'creating', tags: ['work', 'relatable', 'comedy'], targetPlatforms: ['douyin', 'tiktok', 'bilibili', 'youtube', 'instagram'], notes: 'B-roll: coffee machine, commute, slack notifications', attachments: [], stageHistory: sh(['planned', 9], ['creating', 3]) },
+    { workspaceId: wsX, title: 'Minimalist Home Office Setup Under ¥2000', contentType: 'image_text', stage: 'creating', tags: ['home-office', 'minimalist', 'setup'], targetPlatforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'], attachments: [], stageHistory: sh(['planned', 7], ['creating', 2]) },
+    { workspaceId: wsW, title: 'From Prompt Engineering to Agent Architecture: What Changed', contentType: 'article', stage: 'creating', tags: ['AI', 'agents', 'architecture', 'LLM'], targetPlatforms: ['weixin', 'x', 'bilibili', 'weixin_video'], attachments: [], stageHistory: sh(['planned', 8], ['creating', 2]) },
+  ]);
+
+  // Planned
+  await db.insert(contents).values([
+    { workspaceId: wsD, title: 'The 5 Stages of Debugging Grief', contentType: 'video_short', stage: 'planned', tags: ['dev-humor', 'coding'], targetPlatforms: ['douyin', 'tiktok', 'bilibili', 'youtube'], attachments: [], stageHistory: sh(['planned', 4]) },
+    { workspaceId: wsD, title: 'Zoom Call Bingo: Remote Work Edition', contentType: 'video_short', stage: 'planned', tags: ['wfh', 'relatable'], targetPlatforms: ['douyin', 'tiktok', 'bilibili', 'youtube'], attachments: [], stageHistory: sh(['planned', 2]) },
+    { workspaceId: wsX, title: 'How I Stopped Impulse Buying (And Built a Better Wardrobe)', contentType: 'image_text', stage: 'planned', tags: ['fashion', 'mindset', 'finance'], targetPlatforms: ['xiaohongshu', 'instagram', 'douyin', 'weixin'], attachments: [], stageHistory: sh(['planned', 3]) },
+    { workspaceId: wsW, title: 'The Hidden Cost of AI-First Development', contentType: 'article', stage: 'planned', tags: ['AI', 'engineering', 'opinion'], targetPlatforms: ['weixin', 'x', 'bilibili', 'weixin_video'], attachments: [], stageHistory: sh(['planned', 2]) },
+    { workspaceId: wsW, title: 'Open Source LLMs in 2026: Llama, Mistral, and the New Players', contentType: 'article', stage: 'planned', tags: ['AI', 'open-source', 'LLM'], targetPlatforms: ['weixin', 'x', 'bilibili', 'weixin_video'], attachments: [], stageHistory: sh(['planned', 1]) },
+  ]);
+
+  // Queued publications for ready items
+  await db.insert(publications).values([
+    { contentId: pReady1!.id, platform: 'douyin',  status: 'queued', scheduledAt: daysFromNow(2), platformTags: ['#职场', '#打工人', '#搞笑'], platformSettings: {}, publishLog: [], platformTitle: "当PM说'就5分钟的事' 😶‍🌫️" },
+    { contentId: pReady1!.id, platform: 'tiktok',  status: 'queued', scheduledAt: daysFromNow(2), platformTags: ['#pm', '#devlife', '#relatable'], platformSettings: {}, publishLog: [] },
+    { contentId: pReady1!.id, platform: 'bilibili', status: 'queued', scheduledAt: daysFromNow(2), platformTags: ['程序员', '职场', '打工人'], platformSettings: {}, publishLog: [], platformTitle: "当需求方说「就5分钟」😶‍🌫️" },
+    { contentId: pReady1!.id, platform: 'youtube',  status: 'queued', scheduledAt: daysFromNow(2), platformTags: ['#devhumor', '#pm', '#relatable'], platformSettings: {}, publishLog: [] },
+    { contentId: pReady2!.id, platform: 'xiaohongshu', status: 'queued', scheduledAt: daysFromNow(3), platformTags: ['#咖啡店', '#上海', '#wfh'], platformSettings: {}, publishLog: [] },
+    { contentId: pReady2!.id, platform: 'instagram',   status: 'queued', scheduledAt: daysFromNow(3), platformTags: ['#shanghai', '#cafe', '#remotework'], platformSettings: {}, publishLog: [] },
+    { contentId: pReady2!.id, platform: 'douyin',      status: 'queued', scheduledAt: daysFromNow(3), platformTags: ['#上海咖啡', '#远程办公'], platformSettings: {}, publishLog: [] },
+    { contentId: pReady2!.id, platform: 'weixin',      status: 'queued', scheduledAt: daysFromNow(3), platformTags: [], platformSettings: {}, publishLog: [] },
+    { contentId: pReady3!.id, platform: 'weixin',       status: 'queued', scheduledAt: daysFromNow(5), platformTags: [], platformSettings: {}, publishLog: [] },
+    { contentId: pReady3!.id, platform: 'x',            status: 'queued', scheduledAt: daysFromNow(5), platformTags: ['#AI', '#startups'], platformSettings: {}, publishLog: [] },
+    { contentId: pReady3!.id, platform: 'bilibili',     status: 'queued', scheduledAt: daysFromNow(5), platformTags: ['AI', '创业', '预测'], platformSettings: {}, publishLog: [] },
+    { contentId: pReady3!.id, platform: 'weixin_video', status: 'queued', scheduledAt: daysFromNow(5), platformTags: [], platformSettings: {}, publishLog: [] },
+  ]);
+
+  // ── 8. Content briefs (hero items only) ───────────────────────────────────
+  if (firstComedyId) {
+    await db.insert(contentPlans).values({
+      contentId: firstComedyId,
       formatConfig: { duration: 30, aspectRatio: '9:16', music: 'trending' },
       audience: { ageRange: '22-30', personaTags: ['office worker', 'millennial', 'remote-worker'], painPoint: 'Romanticizes WFH, reality is messier', reachScenario: 'Evening Douyin scroll, post-work' },
       goals: ['grow_followers', 'branding'],
       goalDescription: 'Grow followers with relatable content that makes office workers feel seen',
       kpiTargets: { likes: 10000, comments: 500, shares: 1000, followers: 500 },
-      hooks: { coreHook: 'The gap between imagined freedom and the reality of home distractions', conflict: 'You wanted no commute — now your couch is your prison', goldenOpening: 'Open on someone triumphantly canceling their commute, then immediate chaos', memoryAnchor: '"Remote work hits different at month 3"' },
+      hooks: { coreHook: 'The gap between imagined freedom and reality of home distractions', conflict: 'You wanted no commute — now your couch is your prison', goldenOpening: 'Open on someone triumphantly canceling commute, then immediate chaos', memoryAnchor: '"Remote work hits different at month 3"' },
       titleCandidates: [
-        { text: 'Expectation vs Reality: Remote Work Life', isPrimary: true, usedOnPlatforms: ['douyin'] },
+        { text: 'Expectation vs Reality: Working From Home', isPrimary: true, usedOnPlatforms: ['douyin', 'tiktok'] },
         { text: 'WFH Month 1 vs Month 3', isPrimary: false, usedOnPlatforms: [] },
       ],
       outline: [
         { order: 1, section: 'Hook', timeMark: '0-3s', note: 'Calendar notification: "No commute today!" — huge smile' },
-        { order: 2, section: 'Expectation montage', timeMark: '3-12s', note: 'Clean desk, focused, productive, coffee in hand' },
+        { order: 2, section: 'Expectation montage', timeMark: '3-12s', note: 'Clean desk, focused, coffee in hand' },
         { order: 3, section: 'Reality reveal', timeMark: '12-25s', note: 'Bed as office, cat on keyboard, fridge trip #12' },
         { order: 4, section: 'Punchline', timeMark: '25-30s', note: '"Still better than the commute" shrug' },
       ],
-    },
-    {
-      contentId: dPublished1!.id,
-      formatConfig: { duration: 25, aspectRatio: '9:16' },
-      audience: { ageRange: '20-28', personaTags: ['developer', 'student', 'tech-worker'], painPoint: 'Senior devs gatekeep docs knowledge', reachScenario: 'Late-night doom scroll between debugging sessions' },
-      goals: ['grow_followers'],
-      goalDescription: 'Niche down into developer humor to build a dedicated sub-audience',
-      kpiTargets: { likes: 5000, shares: 500 },
-      hooks: { coreHook: 'The lone developer who actually read the documentation', conflict: '"Why doesn\'t this work?!" vs "Did you read the docs?"', goldenOpening: 'Stack Overflow vs official docs side-by-side reaction' },
-      titleCandidates: [
-        { text: 'POV: You\'re the Only One Who Reads the Docs', isPrimary: true, usedOnPlatforms: ['douyin'] },
-        { text: 'RTFDocs — the rarest developer skill', isPrimary: false, usedOnPlatforms: [] },
-      ],
-      outline: [
-        { order: 1, section: 'Problem setup', timeMark: '0-5s', note: 'Team is confused about an API, everyone Googling' },
-        { order: 2, section: 'Hero moment', timeMark: '5-15s', note: 'Open the official docs, find answer in 30 seconds' },
-        { order: 3, section: 'Reaction', timeMark: '15-25s', note: 'Team stunned. "How did you know that?" "I read."' },
-      ],
-    },
-    {
-      contentId: xPublished1!.id,
+    });
+  }
+
+  if (firstLifestyleId) {
+    await db.insert(contentPlans).values({
+      contentId: firstLifestyleId,
       formatConfig: { imageCount: 9, aspectRatio: '3:4' },
       audience: { ageRange: '20-28', personaTags: ['student', 'young professional', 'fashion-conscious'], painPoint: 'Want style but budget is tight', reachScenario: 'Browsing Xiaohongshu for outfit inspo on weekends' },
       goals: ['convert', 'grow_followers'],
@@ -426,18 +512,21 @@ async function seed() {
       kpiTargets: { likes: 5000, saves: 8000, comments: 300 },
       hooks: { coreHook: 'Maximum outfits from minimum pieces for minimum spend', conflict: 'Fashion is expensive vs you can look great on a budget', goldenOpening: 'Grid of all 30 outfit combinations from just 10 pieces' },
       titleCandidates: [
-        { text: 'My Capsule Wardrobe: 10 Pieces, 30 Outfits Under ¥500', isPrimary: true, usedOnPlatforms: ['xiaohongshu'] },
+        { text: 'My Capsule Wardrobe: 10 Pieces, 30 Outfits Under ¥500', isPrimary: true, usedOnPlatforms: ['xiaohongshu', 'instagram'] },
         { text: 'I Spent ¥500 and Never Got Dressed Again (In a Good Way)', isPrimary: false, usedOnPlatforms: [] },
       ],
       outline: [
-        { order: 1, section: 'Opening flat lay', timeMark: '', note: 'All 10 pieces laid out on white bed' },
+        { order: 1, section: 'Opening flat lay', timeMark: '', note: 'All 10 pieces on white bed' },
         { order: 2, section: 'Each item with price tag', timeMark: '', note: 'Where bought, exact price' },
-        { order: 3, section: 'Outfit combinations x9', timeMark: '', note: '3 casual, 3 office, 3 going out — one image each' },
+        { order: 3, section: 'Outfit combinations x9', timeMark: '', note: '3 casual, 3 office, 3 going out' },
         { order: 4, section: 'Shopping links', timeMark: '', note: 'Taobao/Pinduoduo links in comments' },
       ],
-    },
-    {
-      contentId: wPublished1!.id,
+    });
+  }
+
+  if (firstTechId) {
+    await db.insert(contentPlans).values({
+      contentId: firstTechId,
       formatConfig: { wordCount: 3000, hasCodeBlocks: true },
       audience: { ageRange: '25-40', personaTags: ['developer', 'tech lead', 'CTO'], painPoint: 'Too many AI hype articles, not enough practical comparison', reachScenario: 'Monday morning, WeChat moments, first coffee' },
       goals: ['branding', 'grow_followers'],
@@ -445,8 +534,8 @@ async function seed() {
       kpiTargets: { views: 20000, likes: 1000, shares: 500 },
       hooks: { coreHook: 'A working developer actually testing both tools on real tasks', conflict: 'Marketing claims vs actual code quality', goldenOpening: 'Side-by-side code generation comparison for a real-world task' },
       titleCandidates: [
-        { text: 'The Real Difference Between Claude 4 and GPT-5 for Developers', isPrimary: true, usedOnPlatforms: ['weixin'] },
-        { text: 'I Tested Both AI Models on My Actual Work. Here\'s What I Found.', isPrimary: false, usedOnPlatforms: [] },
+        { text: 'The Real Difference Between Claude 4 and GPT-5 for Developers', isPrimary: true, usedOnPlatforms: ['weixin', 'x'] },
+        { text: "I Tested Both AI Models on My Actual Work. Here's What I Found.", isPrimary: false, usedOnPlatforms: [] },
       ],
       outline: [
         { order: 1, section: 'Introduction', timeMark: '', note: 'Why another comparison? Because most are wrong.' },
@@ -455,226 +544,32 @@ async function seed() {
         { order: 4, section: 'When to use which', timeMark: '', note: 'Decision tree for developers' },
         { order: 5, section: 'Verdict', timeMark: '', note: 'Both have a place. Context matters.' },
       ],
-    },
-  ]);
-
-  // ── Competitive references ─────────────────────────────────────────────────
-  await db.insert(contentReferences).values([
-    {
-      contentId: dReviewed1!.id,
-      authorName: '@funnyoffice99',
-      contentTitle: 'Office Life in 2025: Expectations vs Reality',
-      platform: 'douyin',
-      url: 'https://www.douyin.com/video/example1',
-      metricsSnapshot: { views: 2300000, likes: 180000, comments: 12000 },
-      takeaway: 'The slow-motion reveal of the messy reality works perfectly. Steal this transition technique.',
-      attachments: [],
-    },
-    {
-      contentId: wPublished1!.id,
-      authorName: 'Lex Fridman',
-      contentTitle: 'GPT-4 vs Claude: Which AI Is Actually Better?',
-      platform: 'youtube',
-      url: 'https://www.youtube.com/watch?v=example',
-      metricsSnapshot: { views: 1200000, likes: 45000, comments: 8000 },
-      takeaway: 'Long-form comparison works but needs a shorter, WeChat-friendly adaptation. Focus on the verdict.',
-      attachments: [],
-    },
-  ]);
-
-  // ── 7. Publications & Metrics ──────────────────────────────────────────────
-
-  // Helper: create a publication + 2 metric snapshots
-  async function pubWithMetrics(
-    contentId: string,
-    platform: string,
-    publishedDaysAgo: number,
-    m1: { daysAgo: number; views: number; likes: number; comments: number; shares: number; saves: number; followers: number },
-    m2: { daysAgo: number; views: number; likes: number; comments: number; shares: number; saves: number; followers: number },
-    platformUrl: string,
-    extraPubFields?: object,
-  ) {
-    const [pub] = await db.insert(publications).values({
-      contentId,
-      platform,
-      status: 'published',
-      platformTags: [],
-      platformSettings: {},
-      publishedAt: daysAgo(publishedDaysAgo),
-      scheduledAt: daysAgo(publishedDaysAgo),
-      platformUrl,
-      publishLog: [{ action: 'published', timestamp: daysAgo(publishedDaysAgo).toISOString(), note: platformUrl }],
-      ...extraPubFields,
-    }).returning();
-
-    await db.insert(metrics).values([
-      {
-        publicationId: pub!.id,
-        views: m1.views, likes: m1.likes, comments: m1.comments,
-        shares: m1.shares, saves: m1.saves, followersGained: m1.followers,
-        recordedAt: daysAgo(m1.daysAgo),
-      },
-      {
-        publicationId: pub!.id,
-        views: m2.views, likes: m2.likes, comments: m2.comments,
-        shares: m2.shares, saves: m2.saves, followersGained: m2.followers,
-        recordedAt: daysAgo(m2.daysAgo),
-      },
-    ]);
-
-    return pub!;
+    });
   }
 
-  // Douyin published content
-  await pubWithMetrics(
-    dReviewed1!.id, 'douyin', 44,
-    { daysAgo: 42, views: 180000, likes: 22000, comments: 3400, shares: 1800, saves: 900, followers: 1200 },
-    { daysAgo: 35, views: 341000, likes: 41000, comments: 6100, shares: 3200, saves: 1500, followers: 2100 },
-    'https://www.douyin.com/video/demo-001',
-    { platformTitle: 'Expectation vs Reality: Remote Work Life 😅', platformCopy: '这个太真实了！评论区晒出你的WFH现实 👇 #打工人 #远程工作' },
-  );
-  await pubWithMetrics(
-    dReviewed2!.id, 'douyin', 29,
-    { daysAgo: 27, views: 92000, likes: 14500, comments: 2200, shares: 1100, saves: 600, followers: 780 },
-    { daysAgo: 20, views: 157000, likes: 24000, comments: 3800, shares: 1700, saves: 950, followers: 1300 },
-    'https://www.douyin.com/video/demo-002',
-    { platformTitle: 'When The Code Finally Works 💻✨', platformCopy: '每个程序员都经历过这一刻 😂 #程序员 #编程 #debug' },
-  );
-  await pubWithMetrics(
-    dPublished1!.id, 'douyin', 14,
-    { daysAgo: 12, views: 54000, likes: 8200, comments: 1100, shares: 560, saves: 320, followers: 440 },
-    { daysAgo: 6, views: 78000, likes: 11600, comments: 1700, shares: 820, saves: 490, followers: 660 },
-    'https://www.douyin.com/video/demo-003',
-    { platformTitle: 'POV: You Actually Read The Docs 📖', platformCopy: '文档？我看过！ #程序员日常 #dev #coding' },
-  );
-  await pubWithMetrics(
-    dPublished2!.id, 'douyin', 7,
-    { daysAgo: 5, views: 43000, likes: 6100, comments: 890, shares: 430, saves: 210, followers: 320 },
-    { daysAgo: 2, views: 61000, likes: 9400, comments: 1400, shares: 690, saves: 340, followers: 480 },
-    'https://www.douyin.com/video/demo-004',
-    { platformTitle: 'Stand-up Meeting Archetypes 🎭', platformCopy: '你们公司也有这几种人吗？ #职场 #打工人 #搞笑' },
-  );
-  await pubWithMetrics(
-    dPublished3!.id, 'douyin', 2,
-    { daysAgo: 1, views: 12000, likes: 1800, comments: 240, shares: 130, saves: 70, followers: 95 },
-    { daysAgo: 0, views: 18500, likes: 2700, comments: 380, shares: 210, saves: 110, followers: 150 },
-    'https://www.douyin.com/video/demo-005',
-  );
+  // ── 9. Competitive references ──────────────────────────────────────────────
+  if (firstComedyId) {
+    await db.insert(contentReferences).values({
+      contentId: firstComedyId,
+      authorName: '@funnyoffice99', contentTitle: 'Office Life in 2025: Expectations vs Reality',
+      platform: 'douyin', url: 'https://www.douyin.com/video/example1',
+      metricsSnapshot: { views: 2300000, likes: 180000, comments: 12000 },
+      takeaway: 'Slow-motion reveal of messy reality works perfectly. Steal this transition technique.', attachments: [],
+    });
+  }
+  if (firstTechId) {
+    await db.insert(contentReferences).values({
+      contentId: firstTechId,
+      authorName: 'Lex Fridman', contentTitle: 'GPT-4 vs Claude: Which AI Is Actually Better?',
+      platform: 'youtube', url: 'https://www.youtube.com/watch?v=example',
+      metricsSnapshot: { views: 1200000, likes: 45000, comments: 8000 },
+      takeaway: 'Long-form works but needs a shorter WeChat-friendly adaptation. Focus on the verdict.', attachments: [],
+    });
+  }
 
-  // Comedy content cross-posted to TikTok
-  await pubWithMetrics(
-    dReviewed1!.id, 'tiktok', 43,
-    { daysAgo: 41, views: 95000, likes: 12400, comments: 1800, shares: 2300, saves: 800, followers: 980 },
-    { daysAgo: 34, views: 174000, likes: 22600, comments: 3200, shares: 4100, saves: 1400, followers: 1850 },
-    'https://www.tiktok.com/@demo/video/demo-001',
-    { platformTitle: 'Expectation vs Reality: Remote Work Life 😅', platformCopy: 'The reality of working from home hit different 💀 #remotework #wfh #comedy #relatable' },
-  );
-  await pubWithMetrics(
-    dReviewed2!.id, 'tiktok', 28,
-    { daysAgo: 26, views: 48000, likes: 7200, comments: 1100, shares: 1400, saves: 480, followers: 620 },
-    { daysAgo: 19, views: 81000, likes: 11800, comments: 1900, shares: 2300, saves: 790, followers: 1050 },
-    'https://www.tiktok.com/@demo/video/demo-002',
-    { platformTitle: 'When the code finally works after 3 hours 💻✨', platformCopy: 'Every developer knows this feeling 😭 #coding #developer #programming #relatable' },
-  );
-
-  // Xiaohongshu published content
-  await pubWithMetrics(
-    xReviewed1!.id, 'xiaohongshu', 41,
-    { daysAgo: 38, views: 64000, likes: 9800, comments: 1400, shares: 0, saves: 12000, followers: 890 },
-    { daysAgo: 28, views: 98000, likes: 14200, comments: 2100, shares: 0, saves: 18500, followers: 1400 },
-    'https://www.xiaohongshu.com/explore/demo-001',
-    { platformTitle: '10件单品穿出30套造型｜500元打造胶囊衣橱', platformCopy: '整理了两个月的穿搭心得 💕 所有单品链接在评论区～ #穿搭 #胶囊衣橱 #省钱' },
-  );
-  await pubWithMetrics(
-    xPublished1!.id, 'xiaohongshu', 19,
-    { daysAgo: 16, views: 31000, likes: 5200, comments: 740, shares: 0, saves: 7800, followers: 520 },
-    { daysAgo: 8, views: 47000, likes: 7600, comments: 1100, shares: 0, saves: 11200, followers: 790 },
-    'https://www.xiaohongshu.com/explore/demo-002',
-    { platformTitle: '2026春季穿搭｜赏樱花的正确打开方式🌸', platformCopy: '春天来了！和大家分享我的赏花穿搭合集 🌸 #春季穿搭 #樱花 #ootd' },
-  );
-  await pubWithMetrics(
-    xPublished2!.id, 'xiaohongshu', 10,
-    { daysAgo: 8, views: 22000, likes: 3800, comments: 520, shares: 0, saves: 5600, followers: 380 },
-    { daysAgo: 3, views: 35000, likes: 5900, comments: 830, shares: 0, saves: 8200, followers: 610 },
-    'https://www.xiaohongshu.com/explore/demo-003',
-    { platformTitle: '东京7家拉面｜值得排队的真实测评🍜', platformCopy: '上周刚从东京回来，特别整理了这份拉面地图 🗾 收藏备用！ #东京美食 #拉面 #旅行' },
-  );
-  await pubWithMetrics(
-    xPublished3!.id, 'xiaohongshu', 3,
-    { daysAgo: 2, views: 8500, likes: 1400, comments: 190, shares: 0, saves: 2300, followers: 180 },
-    { daysAgo: 0, views: 14200, likes: 2300, comments: 310, shares: 0, saves: 3900, followers: 290 },
-    'https://www.xiaohongshu.com/explore/demo-004',
-  );
-
-  // Lifestyle content cross-posted to Instagram
-  await pubWithMetrics(
-    xReviewed1!.id, 'instagram', 40,
-    { daysAgo: 37, views: 42000, likes: 6800, comments: 940, shares: 0, saves: 8900, followers: 710 },
-    { daysAgo: 27, views: 68000, likes: 10500, comments: 1500, shares: 0, saves: 14200, followers: 1120 },
-    'https://www.instagram.com/p/demo-001',
-    { platformTitle: 'Capsule Wardrobe: 10 pieces, 30 outfits 💕', platformCopy: '¥500 capsule wardrobe challenge ✨ All links in bio! #capsulewardrobe #ootd #fashion #minimalist' },
-  );
-  await pubWithMetrics(
-    xPublished1!.id, 'instagram', 18,
-    { daysAgo: 15, views: 18500, likes: 3100, comments: 420, shares: 0, saves: 5200, followers: 390 },
-    { daysAgo: 7, views: 29400, likes: 4800, comments: 650, shares: 0, saves: 7900, followers: 620 },
-    'https://www.instagram.com/p/demo-002',
-    { platformTitle: 'Spring lookbook 🌸 Cherry blossom season is here', platformCopy: 'Outfit ideas for cherry blossom season 🌸 #springfashion #ootd #cherryblossom #lookbook' },
-  );
-
-  // WeChat OA published content
-  await pubWithMetrics(
-    wPublished1!.id, 'weixin', 11,
-    { daysAgo: 9, views: 18600, likes: 1240, comments: 287, shares: 456, saves: 0, followers: 312 },
-    { daysAgo: 4, views: 27400, likes: 1890, comments: 423, shares: 698, saves: 0, followers: 461 },
-    'https://mp.weixin.qq.com/s/demo-001',
-    { platformTitle: '实测Claude 4 vs GPT-5：程序员视角的深度对比', platformCopy: '没有废话，直接测代码。5个真实任务，看谁更能打。' },
-  );
-  // Tech content cross-posted to X (Twitter)
-  await pubWithMetrics(
-    wPublished1!.id, 'x', 10,
-    { daysAgo: 8, views: 24000, likes: 1860, comments: 342, shares: 891, saves: 0, followers: 267 },
-    { daysAgo: 3, views: 38500, likes: 2940, comments: 528, shares: 1340, saves: 0, followers: 415 },
-    'https://x.com/demo/status/demo-001',
-    { platformTitle: 'Claude 4 vs GPT-5 for developers — I tested both on real work tasks', platformCopy: 'Forget the benchmarks. I tested Claude 4 and GPT-5 on 5 real dev tasks.\n\nCode review, debugging, architecture, docs, test writing.\n\nHere\'s what I found 🧵 #AI #developers #LLM' },
-  );
-
-  // Queued / ready publications
-  await db.insert(publications).values([
-    {
-      contentId: dReady1!.id, platform: 'douyin', status: 'queued',
-      scheduledAt: daysFromNow(2), platformTags: ['#职场', '#打工人', '#搞笑'],
-      platformSettings: {}, publishLog: [],
-      platformTitle: '当PM说"就5分钟的事" 😶‍🌫️',
-    },
-    {
-      contentId: dReady2!.id, platform: 'douyin', status: 'queued',
-      scheduledAt: daysFromNow(5), platformTags: ['#前端', '#javascript', '#程序员'],
-      platformSettings: {}, publishLog: [],
-    },
-    {
-      contentId: xReady1!.id, platform: 'xiaohongshu', status: 'queued',
-      scheduledAt: daysFromNow(3), platformTags: ['#咖啡店', '#上海', '#ootd', '#打工人'],
-      platformSettings: {}, publishLog: [],
-    },
-    {
-      contentId: xReady2!.id, platform: 'xiaohongshu', status: 'ready',
-      scheduledAt: daysFromNow(6), platformTags: ['#极简', '#居家', '#wfh'],
-      platformSettings: {}, publishLog: [],
-    },
-    {
-      contentId: wReady1!.id, platform: 'weixin', status: 'queued',
-      scheduledAt: daysFromNow(4), platformTags: [],
-      platformSettings: {}, publishLog: [],
-    },
-    {
-      contentId: wReady2!.id, platform: 'weixin', status: 'ready',
-      scheduledAt: daysFromNow(8), platformTags: [],
-      platformSettings: {}, publishLog: [],
-    },
-  ]);
-
+  // ── Done ───────────────────────────────────────────────────────────────────
   const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
+  const totalContent = 39 + 26 + 26 + 4 + 3 + 2 + 5; // historical + recent published + ready + creating + planned
   console.log(`\n✓ Demo account seeded in ${elapsed}s`);
   console.log('\nDemo credentials:');
   console.log('  Email:    demo@orbit.app');
@@ -682,12 +577,14 @@ async function seed() {
   console.log('\nData summary:');
   console.log('  3 workspaces (Comedy, Lifestyle, Tech Insights)');
   console.log('  3 plan templates');
-  console.log('  14 ideas (active, 2 converted with content links, archived)');
-  console.log('  26 content items (all stages represented)');
-  console.log('  4 content briefs with full outlines + references');
-  console.log('  22 publications across Douyin, TikTok, Xiaohongshu, Instagram, WeChat, X');
-  console.log('    — 3 content items cross-posted to 2 platforms each');
-  console.log('  34 metric snapshots');
+  console.log('  10 ideas (active, 2 converted, 1 archived)');
+  console.log(`  ${totalContent} content items across 15 months (all stages)`);
+  console.log('  Every content item has multiple target platforms');
+  console.log('    Comedy: douyin + tiktok (some + bilibili)');
+  console.log('    Lifestyle: xiaohongshu + instagram');
+  console.log('    Tech: weixin + x');
+  console.log('  3 content briefs with outlines + competitive references');
+  console.log('  Publications + multi-snapshot metrics spanning 15 months');
 }
 
 seed()
