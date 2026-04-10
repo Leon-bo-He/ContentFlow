@@ -798,6 +798,8 @@ function TelegramPanel() {
     setBotToken('');
     setChatId(config?.chatId ?? '');
     setFormError('');
+    setTestStatus('idle');
+    setTestError('');
     setEditing(true);
   }
 
@@ -808,6 +810,8 @@ function TelegramPanel() {
       await updateConfig.mutateAsync({ botToken: botToken || undefined, chatId: chatId || null });
       setEditing(false);
       setBotToken('');
+      setTestStatus('idle');
+      setTestError('');
     } catch (err) {
       setFormError(err instanceof Error ? err.message : t('status.error'));
     }
@@ -918,7 +922,7 @@ function TelegramPanel() {
               <input
                 type="password"
                 value={botToken}
-                onChange={(e) => setBotToken(e.target.value)}
+                onChange={(e) => { setBotToken(e.target.value); setChatId(''); }}
                 placeholder={config?.tokenSet ? t('settings.notifications.telegram_token_placeholder_set') : t('settings.notifications.telegram_token_placeholder')}
                 className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-400"
               />
@@ -965,7 +969,7 @@ function TelegramPanel() {
               </button>
               <button
                 type="button"
-                onClick={() => setEditing(false)}
+                onClick={() => { setEditing(false); setTestStatus('idle'); setTestError(''); }}
                 className="px-4 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
                 {t('action.cancel')}
