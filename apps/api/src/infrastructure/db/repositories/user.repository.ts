@@ -19,7 +19,7 @@ export class UserRepository implements IUserRepository {
     return user!;
   }
 
-  async update(id: string, data: Partial<{ username: string; email: string; locale: string; timezone: string }>) {
+  async update(id: string, data: Partial<{ username: string; email: string; locale: string; timezone: string; avatar: string | null }>) {
     const [updated] = await db.update(users).set(data).where(eq(users.id, id)).returning();
     return updated ?? null;
   }
