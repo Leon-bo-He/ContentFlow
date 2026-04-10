@@ -157,7 +157,7 @@
       "telegram_step1": "Open @BotFather in Telegram and create a new bot to get your bot token.",
       "telegram_step2": "Start a chat with your bot (send it any message).",
       "telegram_step3": "Click Connect, enter your bot token, then click \"Fetch\" to auto-detect your Chat ID.",
-      "telegram_connect": "Connect Telegram",
+      "telegram_connect": "Connect",
       "telegram_edit": "Edit",
       "telegram_disconnect": "Disconnect",
       "telegram_test": "Send test message",
