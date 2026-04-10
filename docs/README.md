@@ -1,10 +1,10 @@
 ![Orbit](logo.svg)
 
-> Content ops for solo creators managing multiple vertical accounts.
+> Content ops for creators managing multiple content verticals across any platform.
 
 Orbit handles everything *around* creation — capturing ideas before they slip away, planning content with structured briefs, tracking each piece through its full production lifecycle, coordinating multi-platform publishing, and recording performance metrics. It doesn't replace your creative tools; it connects them.
 
-**Built for:** a creator running Douyin (comedy), Xiaohongshu (fashion), and a WeChat Official Account simultaneously, who needs one place to stay on top of all three without letting anything fall through the cracks.
+**Built for:** any creator juggling multiple content areas — comedy shorts, lifestyle posts, long-form tech writing — and publishing across any combination of platforms: Douyin, YouTube, Instagram, X, Xiaohongshu, WeChat, TikTok, or a custom channel of your own. One place to stay on top of it all without letting anything fall through the cracks.
 
 ---
 
@@ -21,6 +21,8 @@ Orbit handles everything *around* creation — capturing ideas before they slip 
 | **Analytics** | Manual metric entry with auto-calculated engagement rate. Per-workspace trends and per-post breakdowns. |
 | **Multilingual** | zh-CN · zh-TW · en-US · ja-JP · ko-KR. Browser auto-detect with manual override. Locale-aware formatting throughout. |
 | **PWA + Offline** | Installable from the browser. Offline idea capture and board access. Background Sync flushes queued writes on reconnect. |
+| **Data portability** | Full JSON export of all workspaces, content, publications, metrics, and ideas. Import back from any export file. |
+| **Custom platforms** | Define custom publishing platforms beyond the built-in list. |
 
 ---
 
@@ -37,6 +39,8 @@ Orbit handles everything *around* creation — capturing ideas before they slip 
 | Cache / Sessions | Redis 7 |
 | Job Queue | BullMQ |
 | Auth | JWT (access + refresh) + OAuth 2.0 (WeChat / Google) |
+| AI | Anthropic Claude API — title suggestions, translation, brief assistance |
+| Real-time | WebSocket — collaboration presence, live notifications |
 | Infrastructure | Docker Compose |
 
 ---
@@ -66,6 +70,25 @@ pnpm dev
 ```
 
 Open [http://localhost:5173](http://localhost:5173) and register an account.
+
+### Demo account
+
+To explore the app with pre-populated data, seed the demo account:
+
+```bash
+pnpm seed:demo
+```
+
+Then log in with:
+
+| Field | Value |
+|-------|-------|
+| Email | `demo@orbit.app` |
+| Password | `demo1234` |
+
+The demo account includes 3 workspaces (Comedy, Lifestyle, Tech Insights), 26 content items across all Kanban stages, content briefs, 12 publications, and 8 weeks of metric data so every dashboard and chart renders with real content.
+
+Run `pnpm seed:demo --force` to wipe and re-seed from scratch.
 
 ### Environment variables
 
@@ -102,8 +125,10 @@ Orbit/
 │   │   └── public/
 │   └── api/              # Fastify server
 │       └── src/
-│           ├── routes/   # Route handlers
-│           └── db/       # Drizzle schema + migrations
+│           ├── domain/        # Business logic + repository interfaces
+│           ├── infrastructure/# Drizzle ORM repository implementations
+│           ├── interfaces/    # Thin HTTP route handlers
+│           └── db/            # Drizzle schema + migrations
 ├── docker-compose.yml
 ├── docs/
 │   ├── DESIGN.md         # Full product design and API reference

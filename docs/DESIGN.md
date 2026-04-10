@@ -1,6 +1,6 @@
 # Orbit — Design Document
 
-**Version:** 2.0 | **Last updated:** 2026-04-07
+**Version:** 2.1 | **Last updated:** 2026-04-10
 
 ---
 
@@ -29,7 +29,7 @@
 
 **One sentence:** Orbit doesn't replace your creative tools — it manages everything around creation: idea capture, scheduling, multi-platform distribution, and performance tracking.
 
-**Core scenario:** A creator running three vertical accounts simultaneously — Douyin (comedy), Xiaohongshu (fashion), WeChat Official Account (long-form opinion) — needs one place to plan content, manage publishing cadence, and track performance across all channels.
+**Core scenario:** A creator running multiple content verticals simultaneously — comedy shorts, lifestyle posts, long-form tech writing — and publishing each across a mix of platforms (Douyin, TikTok, Xiaohongshu, Instagram, WeChat OA, YouTube, X, or a custom channel) needs one place to plan content, manage publishing cadence, and track performance across all channels. Workspaces represent content areas, not platforms; platforms are selected per publication.
 
 ### Phase Roadmap
 
@@ -55,7 +55,7 @@ Orbit
 ├── Global Dashboard        — cross-workspace overview
 ├── Global Publish Queue    — cross-workspace timeline
 │
-├── Workspace A  (e.g. Douyin · Comedy)
+├── Workspace A  (e.g. "Comedy" — publishes to Douyin, TikTok, YouTube Shorts)
 │   ├── Idea Pool
 │   ├── Content Board (Kanban)
 │   ├── Content Brief
@@ -63,13 +63,13 @@ Orbit
 │   ├── Scheduling Calendar
 │   └── Analytics Panel
 │
-├── Workspace B  (e.g. Xiaohongshu · Fashion)
+├── Workspace B  (e.g. "Lifestyle" — publishes to Xiaohongshu, Instagram)
 │   ├── Idea Pool
 │   ├── Content Board
 │   ├── Scheduling Calendar
 │   └── Analytics Panel
 │
-├── Workspace C  (e.g. WeChat OA · Deep Dives)
+├── Workspace C  (e.g. "Tech Insights" — publishes to WeChat OA, X, newsletter)
 │   └── ...
 │
 └── Settings  — account bindings, language, notification preferences
@@ -111,14 +111,13 @@ Capture inspiration anywhere, with zero friction. Categorize later.
 
 ### 3.2 Workspaces
 
-Each vertical account or content track has its own isolated workspace. Schedules and data do not bleed between workspaces.
+Each content area or vertical has its own isolated workspace. Schedules and data do not bleed between workspaces. Platforms are not bound to a workspace — a single piece of content can be published to any combination of platforms via independent Publication records.
 
 **Workspace configuration:**
 
 | Field | Description |
 |-------|-------------|
-| Name & icon | e.g. "Douyin · Comedy", "Xiaohongshu · Fashion" |
-| Associated platform | Social media platform bound to this workspace |
+| Name & icon | e.g. "Comedy", "Lifestyle", "Tech Insights" — the content area, not the platform |
 | Content type | Short video / Image-text / Long article / Podcast (determines Kanban fields) |
 | Default tag set | Pre-set tags for this vertical |
 | Publish frequency goal | e.g. "3 posts/week" — used for calendar gap alerts |
@@ -471,15 +470,38 @@ Offline writes queue via **Background Sync** and flush automatically when connec
                    │ HTTPS / REST
 ┌──────────────────▼───────────────────────┐
 │          Fastify API Server               │
-│  ┌──────────┬──────────┬───────────────┐  │
-│  │ Content  │ Schedule │   Analytics   │  │
-│  │ Mgmt     │ Dispatch │   Service     │  │
-│  └────┬─────┴────┬─────┴───────┬───────┘  │
-└───────┼──────────┼─────────────┼──────────┘
-        ▼          ▼             ▼
+│  ┌──────────────────────────────────────┐ │
+│  │  Interfaces (src/interfaces/http/)   │ │
+│  │  Thin route handlers — extract       │ │
+│  │  params, call services, return       │ │
+│  └──────────────┬───────────────────────┘ │
+│  ┌──────────────▼───────────────────────┐ │
+│  │  Domain (src/domain/)                │ │
+│  │  Service classes + repo interfaces   │ │
+│  │  Pure business logic; no DB/HTTP     │ │
+│  └──────────────┬───────────────────────┘ │
+│  ┌──────────────▼───────────────────────┐ │
+│  │  Infrastructure (src/infrastructure/)│ │
+│  │  Drizzle ORM repo implementations   │ │
+│  │  All DB queries live here            │ │
+│  └──────────────┬───────────────────────┘ │
+└─────────────────┼────────────────────────┘
+                  ▼
    PostgreSQL    Redis         BullMQ
    (primary)  (cache/session) (jobs/reminders)
 ```
+
+### DDD Layer Responsibilities
+
+| Layer | Path | Responsibility |
+|-------|------|----------------|
+| **Interfaces** | `src/interfaces/http/routes/` | Thin Fastify handlers: extract params → call service → return response. No business logic. |
+| **Domain** | `src/domain/` | Service classes and repository interfaces. Pure business logic and domain errors. No DB or HTTP imports. |
+| **Infrastructure** | `src/infrastructure/db/repositories/` | Drizzle ORM implementations of domain interfaces. All SQL lives here. |
+
+`src/app.ts` is the **composition root**: instantiates repositories → services → calls `registerRoutes(app, services)`.
+
+Domain errors (`NotFoundError`, `ForbiddenError`, `ConflictError`, `ValidationError`) are thrown from services and mapped to HTTP status codes by the global error handler in `app.ts`.
 
 **Stack summary:**
 
@@ -630,7 +652,9 @@ metrics (
 | Method | Path | Description |
 |--------|------|-------------|
 | `POST` | `/api/ideas` | Create idea |
-| `GET` | `/api/ideas?workspace=&status=` | List ideas (filtered) |
+| `GET` | `/api/ideas?workspace=&status=&priority=&q=` | List ideas (filtered) |
+| `GET` | `/api/ideas/archived/export?workspace=&from=&to=` | Export archived ideas as JSON |
+| `DELETE` | `/api/ideas/archived?workspace=&from=&to=` | Bulk-delete archived ideas |
 | `PATCH` | `/api/ideas/:id` | Update idea |
 | `POST` | `/api/ideas/:id/convert` | Promote idea to Content |
 
@@ -649,7 +673,10 @@ metrics (
 | `POST` | `/api/contents` | Create content |
 | `GET` | `/api/contents?workspace=&stage=` | List contents (filtered) |
 | `PATCH` | `/api/contents/:id` | Update content / advance stage |
-| `GET` | `/api/contents/calendar?from=&to=` | Calendar view data |
+| `DELETE` | `/api/contents/:id` | Delete content |
+| `GET` | `/api/contents/calendar?from=&to=&workspace=` | Calendar view data |
+| `GET` | `/api/contents/archived/export?workspace=&from=&to=` | Export archived contents as JSON |
+| `DELETE` | `/api/contents/archived?workspace=&from=&to=` | Bulk-delete archived contents |
 
 ### Content Briefs
 
@@ -657,10 +684,13 @@ metrics (
 |--------|------|-------------|
 | `PUT` | `/api/contents/:id/plan` | Create or update brief |
 | `GET` | `/api/contents/:id/plan` | Get brief detail |
+| `GET` | `/api/contents/:id/references` | List competitive references |
 | `POST` | `/api/contents/:id/references` | Add competitive reference |
 | `DELETE` | `/api/contents/:id/references/:refId` | Remove competitive reference |
 | `POST` | `/api/workspaces/:id/plan-templates` | Save audience template |
 | `GET` | `/api/workspaces/:id/plan-templates` | List templates |
+| `PATCH` | `/api/workspaces/:id/plan-templates/:templateId` | Rename template |
+| `DELETE` | `/api/workspaces/:id/plan-templates/:templateId` | Delete template |
 
 ### Publication Management
 
@@ -669,6 +699,7 @@ metrics (
 | `POST` | `/api/contents/:id/publications` | Add platform to content |
 | `GET` | `/api/contents/:id/publications` | List publications for content |
 | `PATCH` | `/api/publications/:id` | Update publication config / status |
+| `DELETE` | `/api/publications/:id` | Delete publication |
 | `POST` | `/api/publications/:id/mark-published` | Mark published + record platform URL |
 | `GET` | `/api/publications/queue?status=&from=&to=` | Global publish queue |
 | `PATCH` | `/api/publications/batch` | Batch reschedule or status update |
@@ -681,11 +712,27 @@ metrics (
 | `GET` | `/api/metrics/dashboard?workspace=` | Analytics dashboard data |
 | `GET` | `/api/metrics/content/:id` | Single content metrics detail |
 
+### Data Portability
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/export` | Export all user data as a JSON archive |
+| `POST` | `/api/import` | Import a JSON archive (v1.0 format) |
+
+### Custom Platforms
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/custom-platforms` | List user-defined custom platforms |
+| `POST` | `/api/custom-platforms` | Create custom platform |
+| `DELETE` | `/api/custom-platforms/:id` | Delete custom platform |
+
 ### General
 
 | Method | Path | Description |
 |--------|------|-------------|
 | `GET` | `/api/dashboard` | Global dashboard summary |
+| `GET` | `/api/health` | Health check |
 | `POST` | `/api/auth/login` | Login |
 | `POST` | `/api/auth/refresh` | Refresh JWT |
 | `POST` | `/api/auth/logout` | Invalidate session |

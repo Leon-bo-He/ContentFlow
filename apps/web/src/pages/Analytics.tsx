@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useWorkspaces } from '../api/workspaces.js';
@@ -6,6 +6,7 @@ import { useWorkspaceAnalytics } from '../api/analytics.js';
 import { usePublishQueue } from '../api/publications.js';
 import { BarChart } from '../components/charts/BarChart.js';
 import { RecordMetricsModal } from '../components/analytics/RecordMetricsModal.js';
+import { WorkspaceIconContent } from '../components/ui/WorkspaceIcon.js';
 import type { TopContent, TagPerformanceItem } from '../api/analytics.js';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -204,19 +205,25 @@ export default function Analytics() {
   const { data: analytics, isLoading, isError } = useWorkspaceAnalytics(workspaceId);
 
   // Publish frequency: published pubs in current week/month for this workspace
-  const now = new Date();
-  const weekStart = new Date(now);
-  const dayOfWeek = weekStart.getDay();
-  weekStart.setDate(weekStart.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
-  weekStart.setHours(0, 0, 0, 0);
+  const { weekStart, monthStart, queueFilters } = useMemo(() => {
+    const now = new Date();
+    const ws = new Date(now);
+    const dayOfWeek = ws.getDay();
+    ws.setDate(ws.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+    ws.setHours(0, 0, 0, 0);
+    const ms = new Date(now.getFullYear(), now.getMonth(), 1);
+    return {
+      weekStart: ws,
+      monthStart: ms,
+      queueFilters: {
+        status: 'published',
+        from: ms.toISOString(),
+        to: new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString(),
+      },
+    };
+  }, []);
 
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-
-  const { data: queueItems = [] } = usePublishQueue({
-    status: 'published',
-    from: monthStart.toISOString(),
-    to: new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString(),
-  });
+  const { data: queueItems = [] } = usePublishQueue(queueFilters);
 
   const thisWeekCount = queueItems.filter(
     (q) =>
@@ -260,10 +267,10 @@ export default function Analytics() {
         <div className="flex items-center gap-3">
           {workspace && (
             <div
-              className="w-10 h-10 rounded-lg flex items-center justify-center text-xl"
+              className="w-10 h-10 rounded-lg flex items-center justify-center text-xl overflow-hidden"
               style={{ backgroundColor: workspace.color + '20', color: workspace.color }}
             >
-              {workspace.icon}
+              <WorkspaceIconContent icon={workspace.icon} />
             </div>
           )}
           <div>
