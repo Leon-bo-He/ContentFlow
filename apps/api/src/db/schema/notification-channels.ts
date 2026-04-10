@@ -1,5 +1,5 @@
 import { pgTable, uuid, text, timestamp, boolean, jsonb, uniqueIndex } from 'drizzle-orm/pg-core';
-import { users } from './users.js';
+import { users } from './users';
 
 export const notificationChannels = pgTable('notification_channels', {
   id: uuid('id').primaryKey().defaultRandom(),
