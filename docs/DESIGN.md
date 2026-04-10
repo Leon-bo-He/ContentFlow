@@ -391,6 +391,10 @@ users (
   locale text NOT NULL DEFAULT 'en-US',
   timezone text NOT NULL DEFAULT 'America/Los_Angeles',
   password_hash text,
+  telegram_bot_token text,
+  telegram_chat_id text,
+  telegram_notifications_enabled boolean NOT NULL DEFAULT true,
+  notification_lead_time integer NOT NULL DEFAULT 15,  -- minutes; applies to all channels
   created_at timestamptz NOT NULL
 )
 
@@ -557,6 +561,7 @@ All endpoints require a valid JWT in the `Authorization: Bearer <token>` header 
 | `GET` | `/api/workspaces` | List workspaces |
 | `PATCH` | `/api/workspaces/:id` | Update workspace |
 | `POST` | `/api/upload/workspace-icon` | Upload workspace icon (max 2 MB, JPEG/PNG/GIF/WebP) |
+| `POST` | `/api/upload/avatar` | Upload user avatar (max 2 MB, JPEG/PNG/GIF/WebP) |
 
 ### Ideas
 
@@ -622,6 +627,15 @@ All endpoints require a valid JWT in the `Authorization: Bearer <token>` header 
 |--------|------|-------------|
 | `GET` | `/api/export` | Export all user data as JSON archive |
 | `POST` | `/api/import` | Import a JSON archive |
+
+### Notifications
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/notifications/telegram` | Get Telegram config (token never returned; returns `configured`, `tokenSet`, `chatId`, `enabled`, `leadTime`) |
+| `PATCH` | `/api/notifications/telegram` | Save or clear Telegram config; also updates `enabled` toggle and `leadTime` |
+| `POST` | `/api/notifications/telegram/fetch-chat-id` | Auto-detect Chat ID via `getUpdates` |
+| `POST` | `/api/notifications/telegram/test` | Send a test message with stored credentials |
 
 ### Custom Platforms
 
