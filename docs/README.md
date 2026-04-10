@@ -21,6 +21,8 @@ Orbit handles everything *around* creation — capturing ideas before they slip 
 | **Analytics** | Manual metric entry with auto-calculated engagement rate. Per-workspace trends and per-post breakdowns. |
 | **Multilingual** | zh-CN · zh-TW · en-US · ja-JP · ko-KR. Browser auto-detect with manual override. Locale-aware formatting throughout. |
 | **PWA + Offline** | Installable from the browser. Offline idea capture and board access. Background Sync flushes queued writes on reconnect. |
+| **Data portability** | Full JSON export of all workspaces, content, publications, metrics, and ideas. Import back from any export file. |
+| **Custom platforms** | Define custom publishing platforms beyond the built-in list. |
 
 ---
 
@@ -37,6 +39,8 @@ Orbit handles everything *around* creation — capturing ideas before they slip 
 | Cache / Sessions | Redis 7 |
 | Job Queue | BullMQ |
 | Auth | JWT (access + refresh) + OAuth 2.0 (WeChat / Google) |
+| AI | Anthropic Claude API — title suggestions, translation, brief assistance |
+| Real-time | WebSocket — collaboration presence, live notifications |
 | Infrastructure | Docker Compose |
 
 ---
@@ -102,8 +106,10 @@ Orbit/
 │   │   └── public/
 │   └── api/              # Fastify server
 │       └── src/
-│           ├── routes/   # Route handlers
-│           └── db/       # Drizzle schema + migrations
+│           ├── domain/        # Business logic + repository interfaces
+│           ├── infrastructure/# Drizzle ORM repository implementations
+│           ├── interfaces/    # Thin HTTP route handlers
+│           └── db/            # Drizzle schema + migrations
 ├── docker-compose.yml
 ├── docs/
 │   ├── DESIGN.md         # Full product design and API reference
