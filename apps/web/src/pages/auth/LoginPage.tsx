@@ -144,7 +144,7 @@ export default function LoginPage() {
 
           <p className="mt-5 text-center text-sm text-gray-500 dark:text-gray-400">
             {t('auth.no_account')}{' '}
-            <Link to="/register" className="text-indigo-600 hover:text-indigo-700 font-medium">
+            <Link to="/register" onClick={() => setPassword('')} className="text-indigo-600 hover:text-indigo-700 font-medium">
               {t('auth.sign_up')}
             </Link>
           </p>
