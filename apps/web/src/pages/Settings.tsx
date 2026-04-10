@@ -937,14 +937,14 @@ function TelegramPanel() {
                 disabled={updateConfig.isPending || (!botToken && !config?.tokenSet) || !chatId}
                 className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
               >
-                {updateConfig.isPending ? t('status.saving') : t('status.save')}
+                {updateConfig.isPending ? t('status.loading') : t('action.save')}
               </button>
               <button
                 type="button"
                 onClick={() => setEditing(false)}
                 className="px-4 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
-                {t('status.cancel')}
+                {t('action.cancel')}
               </button>
             </div>
           </form>
