@@ -121,7 +121,7 @@ export function CreateWorkspaceModal({ onClose }: CreateWorkspaceModalProps) {
                 <input
                   type="text"
                   value={isIconUrl(icon) ? '' : icon}
-                  onChange={(e) => { if (e.target.value.trim()) setIcon(e.target.value.trim()); }}
+                  onChange={(e) => setIcon(e.target.value.trim() || EMOJI_OPTIONS[0]!)}
                   placeholder={t('icon_custom_placeholder')}
                   maxLength={10}
                   className={`flex-1 text-sm border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-200 dark:bg-gray-700 dark:text-white transition-colors ${
