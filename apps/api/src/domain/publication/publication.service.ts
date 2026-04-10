@@ -78,11 +78,8 @@ export class PublicationService {
     });
   }
 
-  listByContent(contentId: string, userId: string) {
-    return this.repo.verifyOwnership(contentId, userId).then((r) => {
-      if (!r) throw new ForbiddenError();
-      return this.repo.findByContent(contentId);
-    });
+  listByContent(contentId: string) {
+    return this.repo.findByContent(contentId);
   }
 
   getQueue(userId: string, filters: { status?: string; from?: string; to?: string }) {

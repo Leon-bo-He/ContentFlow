@@ -53,7 +53,8 @@ export function publicationsRoutes(
   app.get('/api/contents/:id/publications', { onRequest: [app.authenticate] }, async (req, reply) => {
     const { sub } = req.user as { sub: string };
     const { id: contentId } = req.params as { id: string };
-    return reply.send(await pubSvc.listByContent(contentId, sub));
+    await contentSvc.verifyOwnership(contentId, sub);
+    return reply.send(await pubSvc.listByContent(contentId));
   });
 
   // PATCH /api/publications/:id

@@ -80,16 +80,11 @@ describe('PublicationService', () => {
   });
 
   describe('listByContent', () => {
-    it('throws ForbiddenError when content not owned by user', async () => {
-      vi.mocked(repo.verifyOwnership).mockResolvedValue(null);
-      await expect(svc.listByContent('content-1', 'user-1')).rejects.toThrow(ForbiddenError);
-    });
-
-    it('returns publications when ownership verified', async () => {
+    it('returns publications for the content', async () => {
       const pubs = [makePub()];
-      vi.mocked(repo.verifyOwnership).mockResolvedValue({ publicationId: 'pub-1', contentId: 'content-1', workspaceId: 'ws-1' });
       vi.mocked(repo.findByContent).mockResolvedValue(pubs);
-      const result = await svc.listByContent('content-1', 'user-1');
+      const result = await svc.listByContent('content-1');
+      expect(repo.findByContent).toHaveBeenCalledWith('content-1');
       expect(result).toBe(pubs);
     });
   });
