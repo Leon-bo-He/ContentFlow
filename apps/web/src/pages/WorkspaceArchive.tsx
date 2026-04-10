@@ -10,6 +10,7 @@ import { ContentDrawer } from '../components/kanban/ContentDrawer.js';
 import { Skeleton } from '../components/ui/Skeleton.js';
 import { CalendarPicker } from '../components/ui/CalendarPicker.js';
 import { toast } from '../store/toast.store.js';
+import { WorkspaceIconContent } from '../components/ui/WorkspaceIcon.js';
 
 function fmtDate(val: Date | string | null | undefined): string {
   if (!val) return '';
@@ -281,8 +282,13 @@ export default function WorkspaceArchive() {
           {workspace && (
             <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: accentColor }} />
           )}
-          <h1 className="text-[22px] font-semibold text-gray-900 tracking-tight">
-            {workspace ? `${workspace.icon} ${workspace.name}` : ''} — {tCommon('nav.archive')}
+          <h1 className="text-[22px] font-semibold text-gray-900 tracking-tight flex items-center gap-2">
+            {workspace && (
+              <span className="w-7 h-7 flex items-center justify-center text-xl overflow-hidden rounded-md flex-shrink-0">
+                <WorkspaceIconContent icon={workspace.icon} />
+              </span>
+            )}
+            {workspace ? `${workspace.name} — ` : ''}{tCommon('nav.archive')}
           </h1>
           <span className="ml-1 text-sm text-gray-400 font-normal">{archived.length}</span>
         </div>
