@@ -9,8 +9,8 @@ import { WorkspaceIconContent, isIconUrl } from '../ui/WorkspaceIcon.js';
 const EMOJI_OPTIONS = [
   '🎬', '📸', '✍️', '🎙', '📺', '🎮',
   '💄', '👗', '🍜', '✈️', '💪', '🐱',
-  '🌿', '🎨', '🏋️', '📚', '🎵', '🏠',
-  '💼', '🌍', '🍕', '🎯', '🚀', '💡',
+  '🌿', '🎨', '📚', '🎵', '🏠',
+  '💼', '🍕', '🎯', '🚀', '💡',
 ];
 
 interface CreateWorkspaceModalProps {
@@ -104,7 +104,7 @@ export function CreateWorkspaceModal({ onClose }: CreateWorkspaceModalProps) {
               {nameError && <p className="mt-1 text-xs text-red-500">{nameError}</p>}
             </div>
 
-            {/* Icon — preset grid + custom emoji input + image upload */}
+            {/* Icon — 3 rows of 8: 22 presets + custom emoji cell + upload cell */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('icon_label')}</label>
               <div className="grid grid-cols-8 gap-1">
@@ -122,9 +122,7 @@ export function CreateWorkspaceModal({ onClose }: CreateWorkspaceModalProps) {
                     {emoji}
                   </button>
                 ))}
-              </div>
-              <div className="mt-2 flex gap-2">
-                {/* Custom emoji text input */}
+                {/* Custom emoji — one grid cell */}
                 <input
                   type="text"
                   value={customEmoji}
@@ -133,15 +131,14 @@ export function CreateWorkspaceModal({ onClose }: CreateWorkspaceModalProps) {
                     setCustomEmoji(e.target.value);
                     setIcon(val || EMOJI_OPTIONS[0]!);
                   }}
-                  placeholder="✏️"
                   maxLength={10}
-                  className={`w-10 h-9 text-xl text-center border rounded-lg outline-none focus:ring-2 focus:ring-indigo-200 dark:bg-gray-700 dark:text-white transition-colors ${
+                  className={`text-xl text-center border rounded-lg py-1.5 outline-none focus:ring-2 focus:ring-indigo-200 dark:bg-gray-700 dark:text-white transition-colors min-w-0 ${
                     customEmoji
                       ? 'border-indigo-400 bg-indigo-50 dark:bg-indigo-900/30'
                       : 'border-gray-200 dark:border-gray-600'
                   }`}
                 />
-                {/* Upload image */}
+                {/* Upload image — one grid cell */}
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -154,14 +151,14 @@ export function CreateWorkspaceModal({ onClose }: CreateWorkspaceModalProps) {
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploadIcon.isPending}
                   title={isIconUrl(icon) ? t('icon_change_image') : t('icon_upload_image')}
-                  className={`flex items-center justify-center gap-1.5 text-sm px-3 py-2 rounded-lg border transition-colors flex-shrink-0 ${
+                  className={`flex items-center justify-center rounded-lg py-1.5 border transition-colors min-w-0 ${
                     isIconUrl(icon)
                       ? 'border-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'
                       : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
                   }`}
                 >
                   {uploadIcon.isPending ? (
-                    <span className="text-xs">{t('uploading')}</span>
+                    <span className="text-xs">…</span>
                   ) : isIconUrl(icon) ? (
                     <img src={icon} alt="" className="w-4 h-4 rounded-full object-cover" />
                   ) : (
