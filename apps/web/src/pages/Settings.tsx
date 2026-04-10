@@ -880,6 +880,19 @@ function TelegramPanel() {
               <span className="text-gray-500 dark:text-gray-400">{t('settings.notifications.telegram_chat_id')}</span>
               <span className="font-mono text-gray-800 dark:text-gray-200">{config.chatId}</span>
             </div>
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-500 dark:text-gray-400">{t('settings.notifications.telegram_notifications')}</span>
+              <button
+                role="switch"
+                aria-checked={config.enabled}
+                onClick={() => void updateConfig.mutateAsync({ enabled: !config.enabled })}
+                disabled={updateConfig.isPending}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 flex-shrink-0 disabled:opacity-50 ${config.enabled ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-600'}`}
+              >
+                <span className={`inline-block transform rounded-full bg-white shadow-sm transition-transform duration-200 ${config.enabled ? 'translate-x-6' : 'translate-x-1'}`}
+                  style={{ width: '18px', height: '18px' }} />
+              </button>
+            </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => void handleTest()}

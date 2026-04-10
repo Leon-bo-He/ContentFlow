@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, timestamp, boolean } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -10,6 +10,7 @@ export const users = pgTable('users', {
   passwordHash: text('password_hash'),
   telegramBotToken: text('telegram_bot_token'),
   telegramChatId: text('telegram_chat_id'),
+  telegramNotificationsEnabled: boolean('telegram_notifications_enabled').notNull().default(true),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
