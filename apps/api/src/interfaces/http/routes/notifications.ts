@@ -2,6 +2,7 @@ import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import type { UserService } from '../../../domain/user/user.service.js';
 import { sendMessage, validateToken, getLatestChatId } from '../../../lib/telegram.js';
+import { getTelegramMessages } from '../../../lib/telegram-messages.js';
 
 export function notificationsRoutes(app: FastifyInstance, svc: UserService) {
   // GET /api/notifications/telegram — return masked config (never expose the token)
@@ -15,6 +16,7 @@ export function notificationsRoutes(app: FastifyInstance, svc: UserService) {
       chatId: user.telegramChatId ?? null,
       // token is never returned — client only knows whether it's set
       tokenSet: !!user.telegramBotToken,
+      enabled: user.telegramNotificationsEnabled,
     });
   });
 
@@ -23,12 +25,13 @@ export function notificationsRoutes(app: FastifyInstance, svc: UserService) {
     const schema = z.object({
       // undefined = don't change; null = clear; string = update
       botToken: z.string().min(1).nullable().optional(),
-      chatId: z.string().min(1).nullable(),
+      chatId: z.string().min(1).nullable().optional(),
+      enabled: z.boolean().optional(),
     });
     const parsed = schema.safeParse(req.body);
     if (!parsed.success) return reply.code(400).send({ error: parsed.error.errors[0]?.message ?? 'Invalid input' });
 
-    const { botToken, chatId } = parsed.data;
+    const { botToken, chatId, enabled } = parsed.data;
     const { sub } = req.user as { sub: string };
 
     // Only validate the token if a new one was explicitly provided
@@ -37,8 +40,10 @@ export function notificationsRoutes(app: FastifyInstance, svc: UserService) {
       if (!check.ok) return reply.code(400).send({ error: `Invalid bot token: ${check.error ?? 'unknown error'}` });
     }
 
-    const payload: Parameters<typeof svc.update>[1] = { telegramChatId: chatId };
+    const payload: Parameters<typeof svc.update>[1] = {};
+    if (chatId !== undefined) payload.telegramChatId = chatId;
     if (botToken !== undefined) payload.telegramBotToken = botToken;
+    if (enabled !== undefined) payload.telegramNotificationsEnabled = enabled;
 
     const updated = await svc.update(sub, payload);
     if (!updated) return reply.code(404).send({ error: 'User not found' });
@@ -47,6 +52,7 @@ export function notificationsRoutes(app: FastifyInstance, svc: UserService) {
       configured: !!(updated.telegramBotToken && updated.telegramChatId),
       chatId: updated.telegramChatId ?? null,
       tokenSet: !!updated.telegramBotToken,
+      enabled: updated.telegramNotificationsEnabled,
     });
   });
 
@@ -81,10 +87,11 @@ export function notificationsRoutes(app: FastifyInstance, svc: UserService) {
       return reply.code(400).send({ error: 'Telegram is not configured' });
     }
 
+    const msg = getTelegramMessages(user.locale);
     const result = await sendMessage(
       user.telegramBotToken,
       user.telegramChatId,
-      '✅ <b>Orbit</b> — Telegram notifications are working!',
+      msg.test,
     );
 
     if (!result.ok) {

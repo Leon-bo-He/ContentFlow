@@ -168,7 +168,8 @@
       "telegram_token_placeholder_set": "Token이 저장되었습니다. 새 Token을 입력하면 교체됩니다",
       "telegram_chat_id": "Chat ID",
       "telegram_chat_id_hint": "봇에 메시지를 보낸 후 「가져오기」를 클릭하면 자동으로 입력됩니다.",
-      "telegram_fetch_chat_id": "가져오기"
+      "telegram_fetch_chat_id": "가져오기",
+      "telegram_notifications": "알림 활성화"
     },
     "account": {
       "name": "사용자명",
