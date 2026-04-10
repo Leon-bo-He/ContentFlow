@@ -788,6 +788,7 @@ function TelegramPanel() {
   const fetchChatId = useFetchTelegramChatId();
 
   const [editing, setEditing] = useState(false);
+  const [showDisconnectConfirm, setShowDisconnectConfirm] = useState(false);
   const [botToken, setBotToken] = useState('');
   const [chatId, setChatId] = useState('');
   const [formError, setFormError] = useState('');
@@ -908,7 +909,7 @@ function TelegramPanel() {
                 {t('settings.notifications.telegram_edit')}
               </button>
               <button
-                onClick={() => void handleDisconnect()}
+                onClick={() => setShowDisconnectConfirm(true)}
                 disabled={updateConfig.isPending}
                 className="px-3 py-1.5 text-sm text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50 ml-auto"
               >
@@ -991,6 +992,35 @@ function TelegramPanel() {
           </form>
         )}
       </div>
+
+      {showDisconnectConfirm && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[60] p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-xl w-full max-w-sm">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-700">
+              <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{t('settings.notifications.telegram_disconnect_title')}</h2>
+              <button onClick={() => setShowDisconnectConfirm(false)} className="text-gray-400 hover:text-gray-600 text-sm">✕</button>
+            </div>
+            <div className="px-5 py-4 space-y-4">
+              <p className="text-sm text-gray-600 dark:text-gray-300">{t('settings.notifications.telegram_disconnect_desc')}</p>
+              <div className="flex justify-end gap-2 pt-1">
+                <button
+                  onClick={() => setShowDisconnectConfirm(false)}
+                  className="px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                >
+                  {t('action.cancel')}
+                </button>
+                <button
+                  onClick={() => { setShowDisconnectConfirm(false); void handleDisconnect(); }}
+                  disabled={updateConfig.isPending}
+                  className="px-3 py-1.5 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50"
+                >
+                  {t('settings.notifications.telegram_disconnect')}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

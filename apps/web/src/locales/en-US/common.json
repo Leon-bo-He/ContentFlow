@@ -169,7 +169,9 @@
       "telegram_chat_id": "Chat ID",
       "telegram_chat_id_hint": "Send any message to your bot, then click \"Fetch\" to auto-fill.",
       "telegram_fetch_chat_id": "Fetch",
-      "telegram_notifications": "Notifications enabled"
+      "telegram_notifications": "Notifications enabled",
+      "telegram_disconnect_title": "Disconnect Telegram",
+      "telegram_disconnect_desc": "This will remove your bot token and chat ID. You can reconnect at any time."
     },
     "account": {
       "name": "Username",

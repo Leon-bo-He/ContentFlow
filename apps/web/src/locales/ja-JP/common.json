@@ -169,7 +169,9 @@
       "telegram_chat_id": "Chat ID",
       "telegram_chat_id_hint": "ボットにメッセージを送ってから「取得」をクリックすると自動入力されます。",
       "telegram_fetch_chat_id": "取得",
-      "telegram_notifications": "通知を有効にする"
+      "telegram_notifications": "通知を有効にする",
+      "telegram_disconnect_title": "Telegram の接続を解除",
+      "telegram_disconnect_desc": "Bot Token と Chat ID が削除されます。いつでも再接続できます。"
     },
     "account": {
       "name": "ユーザー名",

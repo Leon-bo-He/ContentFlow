@@ -169,7 +169,9 @@
       "telegram_chat_id": "Chat ID",
       "telegram_chat_id_hint": "봇에 메시지를 보낸 후 「가져오기」를 클릭하면 자동으로 입력됩니다.",
       "telegram_fetch_chat_id": "가져오기",
-      "telegram_notifications": "알림 활성화"
+      "telegram_notifications": "알림 활성화",
+      "telegram_disconnect_title": "Telegram 연결 해제",
+      "telegram_disconnect_desc": "Bot Token과 Chat ID가 삭제됩니다. 언제든지 다시 연결할 수 있습니다."
     },
     "account": {
       "name": "사용자명",

@@ -169,7 +169,9 @@
       "telegram_chat_id": "Chat ID",
       "telegram_chat_id_hint": "先向机器人发送任意消息，然后点击「获取」自动填入。",
       "telegram_fetch_chat_id": "获取",
-      "telegram_notifications": "启用通知"
+      "telegram_notifications": "启用通知",
+      "telegram_disconnect_title": "断开 Telegram 连接",
+      "telegram_disconnect_desc": "这将移除你的 Bot Token 和 Chat ID，你可以随时重新连接。"
     },
     "account": {
       "name": "用户名",
