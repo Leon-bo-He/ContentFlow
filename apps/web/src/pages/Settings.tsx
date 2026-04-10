@@ -114,7 +114,7 @@ function EditWorkspaceModal({ workspace, onClose }: { workspace: Workspace; onCl
               />
             </div>
 
-            {/* Icon — emoji grid + image upload */}
+            {/* Icon — preset grid + custom emoji input + image upload */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('icon_label')}</label>
               <div className="grid grid-cols-8 gap-1">
@@ -133,39 +133,50 @@ function EditWorkspaceModal({ workspace, onClose }: { workspace: Workspace; onCl
                   </button>
                 ))}
               </div>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/jpeg,image/png,image/gif,image/webp"
-                className="hidden"
-                onChange={(e) => void handleFileChange(e)}
-              />
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploadIcon.isPending}
-                className={`mt-2 w-full flex items-center justify-center gap-2 text-sm px-3 py-2 rounded-lg border transition-colors ${
-                  isIconUrl(icon)
-                    ? 'border-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'
-                    : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
-                }`}
-              >
-                {uploadIcon.isPending ? (
-                  <span>{t('uploading')}</span>
-                ) : isIconUrl(icon) ? (
-                  <>
+              <div className="mt-2 flex gap-2">
+                {/* Custom emoji text input */}
+                <input
+                  type="text"
+                  value={isIconUrl(icon) ? '' : icon}
+                  onChange={(e) => { if (e.target.value.trim()) setIcon(e.target.value.trim()); }}
+                  placeholder={t('icon_custom_placeholder')}
+                  maxLength={10}
+                  className={`flex-1 text-sm border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-200 dark:bg-gray-700 dark:text-white transition-colors ${
+                    !isIconUrl(icon) && !EMOJI_OPTIONS.includes(icon)
+                      ? 'border-indigo-400 bg-indigo-50 dark:bg-indigo-900/30'
+                      : 'border-gray-200 dark:border-gray-600'
+                  }`}
+                />
+                {/* Upload image */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/gif,image/webp"
+                  className="hidden"
+                  onChange={(e) => void handleFileChange(e)}
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadIcon.isPending}
+                  title={isIconUrl(icon) ? t('icon_change_image') : t('icon_upload_image')}
+                  className={`flex items-center justify-center gap-1.5 text-sm px-3 py-2 rounded-lg border transition-colors flex-shrink-0 ${
+                    isIconUrl(icon)
+                      ? 'border-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'
+                      : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  {uploadIcon.isPending ? (
+                    <span className="text-xs">{t('uploading')}</span>
+                  ) : isIconUrl(icon) ? (
                     <img src={icon} alt="" className="w-4 h-4 rounded-full object-cover" />
-                    <span>{t('icon_change_image')}</span>
-                  </>
-                ) : (
-                  <>
+                  ) : (
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <span>{t('icon_upload_image')}</span>
-                  </>
-                )}
-              </button>
+                  )}
+                </button>
+              </div>
             </div>
 
             {/* Color */}
