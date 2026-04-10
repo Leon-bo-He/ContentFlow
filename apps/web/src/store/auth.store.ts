@@ -9,6 +9,7 @@ export interface AuthUser {
   email: string;
   username: string;
   locale: string;
+  avatar: string | null;
 }
 
 interface AuthState {

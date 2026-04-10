@@ -168,6 +168,7 @@
       "password_too_short": "パスワードは8文字以上にしてください",
       "delete_my_account": "アカウントを削除する",
       "profile": "プロフィール",
+      "change_avatar": "プロフィール写真を変更",
       "section_preferences": "設定",
       "security": "セキュリティ",
       "password_desc": "アカウントを守る強力なパスワードを設定",

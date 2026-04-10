@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { apiFetch, ApiError } from './client.js';
+import { apiFetch, getAccessToken, ApiError } from './client.js';
 import type { AuthUser } from '../store/auth.store.js';
 
 interface AuthResponse {
@@ -46,12 +46,30 @@ export function useRefreshToken() {
 }
 
 export function useUpdateProfile() {
-  return useMutation<AuthUser, ApiError, { username?: string; email?: string; locale?: string; timezone?: string }>({
+  return useMutation<AuthUser, ApiError, { username?: string; email?: string; locale?: string; timezone?: string; avatar?: string | null }>({
     mutationFn: (body) =>
       apiFetch<AuthUser>('/api/auth/profile', {
         method: 'PATCH',
         body: JSON.stringify(body),
       }),
+  });
+}
+
+export function useUploadAvatar() {
+  return useMutation<{ url: string }, ApiError, File>({
+    mutationFn: async (file) => {
+      const form = new FormData();
+      form.append('file', file);
+      const token = getAccessToken();
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const res = await fetch('/api/upload/avatar', { method: 'POST', body: form, headers });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({})) as { error?: string };
+        throw new ApiError(res.status, body.error ?? 'Upload failed');
+      }
+      return res.json() as Promise<{ url: string }>;
+    },
   });
 }
 

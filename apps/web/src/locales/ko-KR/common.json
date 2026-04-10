@@ -168,6 +168,7 @@
       "password_too_short": "비밀번호는 8자 이상이어야 합니다",
       "delete_my_account": "내 계정 삭제",
       "profile": "프로필",
+      "change_avatar": "프로필 사진 변경",
       "section_preferences": "환경 설정",
       "security": "보안",
       "password_desc": "계정을 보호하는 강력한 비밀번호 설정",

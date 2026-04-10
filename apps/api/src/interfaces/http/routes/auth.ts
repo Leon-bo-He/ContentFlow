@@ -111,6 +111,7 @@ export function authRoutes(app: FastifyInstance, svc: UserService) {
       email: z.string().email().optional(),
       locale: z.string().optional(),
       timezone: z.string().optional(),
+      avatar: z.string().url().nullable().optional(),
     }).refine((d) => Object.values(d).some((v) => v !== undefined), { message: 'At least one field required' });
 
     const parsed = schema.safeParse(req.body);
@@ -129,10 +130,11 @@ export function authRoutes(app: FastifyInstance, svc: UserService) {
     if (updates.email !== undefined) updatePayload.email = updates.email;
     if (updates.locale !== undefined) updatePayload.locale = updates.locale;
     if (updates.timezone !== undefined) updatePayload.timezone = updates.timezone;
+    if (updates.avatar !== undefined) updatePayload.avatar = updates.avatar;
     const updated = await svc.update(sub, updatePayload);
     if (!updated) return reply.code(404).send({ error: 'User not found' });
 
-    return reply.send({ id: updated.id, email: updated.email, username: updated.username, locale: updated.locale });
+    return reply.send({ id: updated.id, email: updated.email, username: updated.username, locale: updated.locale, avatar: updated.avatar ?? null });
   });
 
   // PATCH /api/auth/password

@@ -5,7 +5,7 @@ import type { Workspace } from '@orbit/shared';
 import { useWorkspaces, useUpdateWorkspace, useUploadWorkspaceIcon } from '../api/workspaces.js';
 import { useCustomPlatforms, useCreateCustomPlatform, useDeleteCustomPlatform } from '../api/custom-platforms.js';
 import type { CustomPlatform } from '../api/custom-platforms.js';
-import { useUpdateProfile, useChangePassword, useDeleteAccount, useLogout } from '../api/auth.js';
+import { useUpdateProfile, useUploadAvatar, useChangePassword, useDeleteAccount, useLogout } from '../api/auth.js';
 import { apiFetch } from '../api/client.js';
 import { queryClient } from '../api/query-client.js';
 import { useAuthStore } from '../store/auth.store.js';
@@ -1088,13 +1088,29 @@ function AccountPanel() {
   const updateUser = useAuthStore((s) => s.updateUser);
   const clearAuth = useAuthStore((s) => s.clearAuth);
   const updateProfile = useUpdateProfile();
+  const uploadAvatar = useUploadAvatar();
   const logoutMutation = useLogout();
   const navigate = useNavigate();
   const locale = useUiStore((s) => s.locale);
   const setLocale = useUiStore((s) => s.setLocale);
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [showDeleteAccount, setShowDeleteAccount] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
   const initial = user?.username ? (user.username[0]?.toUpperCase() ?? 'U') : 'U';
+
+  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const { url } = await uploadAvatar.mutateAsync(file);
+      const updated = await updateProfile.mutateAsync({ avatar: url });
+      updateUser(updated);
+    } catch {
+      toast.error(t('status.error'));
+    } finally {
+      if (avatarInputRef.current) avatarInputRef.current.value = '';
+    }
+  }
 
   // Sync browser timezone to DB once on mount
   useEffect(() => {
@@ -1123,9 +1139,39 @@ function AccountPanel() {
     <div className="space-y-5">
       {/* Profile card */}
       <div className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-        <div className="w-14 h-14 rounded-full bg-indigo-600 text-white flex items-center justify-center text-2xl font-semibold flex-shrink-0">
-          {initial}
-        </div>
+        <button
+          type="button"
+          onClick={() => avatarInputRef.current?.click()}
+          disabled={uploadAvatar.isPending || updateProfile.isPending}
+          className="relative w-14 h-14 rounded-full flex-shrink-0 group focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+          aria-label={t('settings.account.change_avatar')}
+        >
+          {user?.avatar ? (
+            <img src={user.avatar} alt={user.username} className="w-14 h-14 rounded-full object-cover" />
+          ) : (
+            <div className="w-14 h-14 rounded-full bg-indigo-600 text-white flex items-center justify-center text-2xl font-semibold">
+              {uploadAvatar.isPending ? (
+                <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : initial}
+            </div>
+          )}
+          {/* camera overlay on hover */}
+          {!uploadAvatar.isPending && (
+            <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <svg viewBox="0 0 24 24" className="w-6 h-6 text-white" fill="currentColor">
+                <path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z" />
+                <path d="M9 2 7.17 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-3.17L15 2H9Zm3 15a5 5 0 1 1 0-10 5 5 0 0 1 0 10Z" />
+              </svg>
+            </div>
+          )}
+        </button>
+        <input
+          ref={avatarInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/gif,image/webp"
+          className="hidden"
+          onChange={(e) => void handleAvatarChange(e)}
+        />
         <div className="min-w-0">
           <p className="text-base font-semibold text-gray-900 dark:text-white truncate">{user?.username}</p>
           <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>

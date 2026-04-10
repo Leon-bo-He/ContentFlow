@@ -168,6 +168,7 @@
       "password_too_short": "Password must be at least 8 characters",
       "delete_my_account": "Delete my account",
       "profile": "Profile",
+      "change_avatar": "Change profile photo",
       "section_preferences": "Preferences",
       "security": "Security",
       "password_desc": "Set a strong password to protect your account",
