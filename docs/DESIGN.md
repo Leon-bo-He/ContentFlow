@@ -1,6 +1,6 @@
 # Orbit — Design Document
 
-**Version:** 2.0 | **Last updated:** 2026-04-07
+**Version:** 2.1 | **Last updated:** 2026-04-10
 
 ---
 
@@ -471,15 +471,38 @@ Offline writes queue via **Background Sync** and flush automatically when connec
                    │ HTTPS / REST
 ┌──────────────────▼───────────────────────┐
 │          Fastify API Server               │
-│  ┌──────────┬──────────┬───────────────┐  │
-│  │ Content  │ Schedule │   Analytics   │  │
-│  │ Mgmt     │ Dispatch │   Service     │  │
-│  └────┬─────┴────┬─────┴───────┬───────┘  │
-└───────┼──────────┼─────────────┼──────────┘
-        ▼          ▼             ▼
+│  ┌──────────────────────────────────────┐ │
+│  │  Interfaces (src/interfaces/http/)   │ │
+│  │  Thin route handlers — extract       │ │
+│  │  params, call services, return       │ │
+│  └──────────────┬───────────────────────┘ │
+│  ┌──────────────▼───────────────────────┐ │
+│  │  Domain (src/domain/)                │ │
+│  │  Service classes + repo interfaces   │ │
+│  │  Pure business logic; no DB/HTTP     │ │
+│  └──────────────┬───────────────────────┘ │
+│  ┌──────────────▼───────────────────────┐ │
+│  │  Infrastructure (src/infrastructure/)│ │
+│  │  Drizzle ORM repo implementations   │ │
+│  │  All DB queries live here            │ │
+│  └──────────────┬───────────────────────┘ │
+└─────────────────┼────────────────────────┘
+                  ▼
    PostgreSQL    Redis         BullMQ
    (primary)  (cache/session) (jobs/reminders)
 ```
+
+### DDD Layer Responsibilities
+
+| Layer | Path | Responsibility |
+|-------|------|----------------|
+| **Interfaces** | `src/interfaces/http/routes/` | Thin Fastify handlers: extract params → call service → return response. No business logic. |
+| **Domain** | `src/domain/` | Service classes and repository interfaces. Pure business logic and domain errors. No DB or HTTP imports. |
+| **Infrastructure** | `src/infrastructure/db/repositories/` | Drizzle ORM implementations of domain interfaces. All SQL lives here. |
+
+`src/app.ts` is the **composition root**: instantiates repositories → services → calls `registerRoutes(app, services)`.
+
+Domain errors (`NotFoundError`, `ForbiddenError`, `ConflictError`, `ValidationError`) are thrown from services and mapped to HTTP status codes by the global error handler in `app.ts`.
 
 **Stack summary:**
 
@@ -630,7 +653,9 @@ metrics (
 | Method | Path | Description |
 |--------|------|-------------|
 | `POST` | `/api/ideas` | Create idea |
-| `GET` | `/api/ideas?workspace=&status=` | List ideas (filtered) |
+| `GET` | `/api/ideas?workspace=&status=&priority=&q=` | List ideas (filtered) |
+| `GET` | `/api/ideas/archived/export?workspace=&from=&to=` | Export archived ideas as JSON |
+| `DELETE` | `/api/ideas/archived?workspace=&from=&to=` | Bulk-delete archived ideas |
 | `PATCH` | `/api/ideas/:id` | Update idea |
 | `POST` | `/api/ideas/:id/convert` | Promote idea to Content |
 
@@ -649,7 +674,10 @@ metrics (
 | `POST` | `/api/contents` | Create content |
 | `GET` | `/api/contents?workspace=&stage=` | List contents (filtered) |
 | `PATCH` | `/api/contents/:id` | Update content / advance stage |
-| `GET` | `/api/contents/calendar?from=&to=` | Calendar view data |
+| `DELETE` | `/api/contents/:id` | Delete content |
+| `GET` | `/api/contents/calendar?from=&to=&workspace=` | Calendar view data |
+| `GET` | `/api/contents/archived/export?workspace=&from=&to=` | Export archived contents as JSON |
+| `DELETE` | `/api/contents/archived?workspace=&from=&to=` | Bulk-delete archived contents |
 
 ### Content Briefs
 
@@ -657,10 +685,13 @@ metrics (
 |--------|------|-------------|
 | `PUT` | `/api/contents/:id/plan` | Create or update brief |
 | `GET` | `/api/contents/:id/plan` | Get brief detail |
+| `GET` | `/api/contents/:id/references` | List competitive references |
 | `POST` | `/api/contents/:id/references` | Add competitive reference |
 | `DELETE` | `/api/contents/:id/references/:refId` | Remove competitive reference |
 | `POST` | `/api/workspaces/:id/plan-templates` | Save audience template |
 | `GET` | `/api/workspaces/:id/plan-templates` | List templates |
+| `PATCH` | `/api/workspaces/:id/plan-templates/:templateId` | Rename template |
+| `DELETE` | `/api/workspaces/:id/plan-templates/:templateId` | Delete template |
 
 ### Publication Management
 
@@ -669,6 +700,7 @@ metrics (
 | `POST` | `/api/contents/:id/publications` | Add platform to content |
 | `GET` | `/api/contents/:id/publications` | List publications for content |
 | `PATCH` | `/api/publications/:id` | Update publication config / status |
+| `DELETE` | `/api/publications/:id` | Delete publication |
 | `POST` | `/api/publications/:id/mark-published` | Mark published + record platform URL |
 | `GET` | `/api/publications/queue?status=&from=&to=` | Global publish queue |
 | `PATCH` | `/api/publications/batch` | Batch reschedule or status update |
@@ -681,11 +713,27 @@ metrics (
 | `GET` | `/api/metrics/dashboard?workspace=` | Analytics dashboard data |
 | `GET` | `/api/metrics/content/:id` | Single content metrics detail |
 
+### Data Portability
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/export` | Export all user data as a JSON archive |
+| `POST` | `/api/import` | Import a JSON archive (v1.0 format) |
+
+### Custom Platforms
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/api/custom-platforms` | List user-defined custom platforms |
+| `POST` | `/api/custom-platforms` | Create custom platform |
+| `DELETE` | `/api/custom-platforms/:id` | Delete custom platform |
+
 ### General
 
 | Method | Path | Description |
 |--------|------|-------------|
 | `GET` | `/api/dashboard` | Global dashboard summary |
+| `GET` | `/api/health` | Health check |
 | `POST` | `/api/auth/login` | Login |
 | `POST` | `/api/auth/refresh` | Refresh JWT |
 | `POST` | `/api/auth/logout` | Invalidate session |
