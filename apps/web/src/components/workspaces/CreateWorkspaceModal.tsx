@@ -133,9 +133,9 @@ export function CreateWorkspaceModal({ onClose }: CreateWorkspaceModalProps) {
                     setCustomEmoji(e.target.value);
                     setIcon(val || EMOJI_OPTIONS[0]!);
                   }}
-                  placeholder={t('icon_custom_placeholder')}
+                  placeholder="✏️"
                   maxLength={10}
-                  className={`flex-1 text-sm border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-200 dark:bg-gray-700 dark:text-white transition-colors ${
+                  className={`w-10 h-9 text-xl text-center border rounded-lg outline-none focus:ring-2 focus:ring-indigo-200 dark:bg-gray-700 dark:text-white transition-colors ${
                     customEmoji
                       ? 'border-indigo-400 bg-indigo-50 dark:bg-indigo-900/30'
                       : 'border-gray-200 dark:border-gray-600'
