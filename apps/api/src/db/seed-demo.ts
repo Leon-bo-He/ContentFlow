@@ -126,7 +126,18 @@ async function seed() {
   ]);
 
   // ── 4. Ideas ───────────────────────────────────────────────────────────────
-  const [idea1, idea2, idea3] = await db.insert(ideas).values([
+
+  // Insert converted ideas first so we can capture their IDs and link them to content
+  const [ideaConv1] = await db.insert(ideas).values({
+    userId, workspaceId: wsD, title: 'Expectation vs reality: remote work',
+    tags: ['relatable', 'work-from-home'], priority: 'high', attachments: [], status: 'converted',
+  }).returning();
+  const [ideaConv2] = await db.insert(ideas).values({
+    userId, workspaceId: wsX, title: 'My capsule wardrobe essentials under ¥500',
+    tags: ['fashion', 'budget'], priority: 'high', attachments: [], status: 'converted',
+  }).returning();
+
+  await db.insert(ideas).values([
     // Global pool — active
     { userId, workspaceId: null, title: 'React vs Vue 2026 — which is actually winning?', tags: ['tech', 'frontend'], priority: 'high', attachments: [], status: 'active' },
     { userId, workspaceId: null, title: 'What happens when you eat McDonald\'s for 30 days', tags: ['food', 'challenge'], priority: 'medium', attachments: [], status: 'active' },
@@ -141,13 +152,10 @@ async function seed() {
     // WeChat ideas
     { userId, workspaceId: wsW, title: 'Claude 4 vs GPT-5 — a real developer\'s take', tags: ['AI', 'LLM', 'opinion'], priority: 'high', attachments: [], status: 'active', note: 'Focus on coding use-cases specifically, not general chat.' },
     { userId, workspaceId: wsW, title: 'Why most AI startups will fail in 2027', tags: ['AI', 'startup', 'prediction'], priority: 'medium', attachments: [], status: 'active' },
-    // Converted
-    { userId, workspaceId: wsD, title: 'Expectation vs reality: remote work', tags: ['relatable', 'work-from-home'], priority: 'high', attachments: [], status: 'converted' },
-    { userId, workspaceId: wsX, title: 'My capsule wardrobe essentials under ¥500', tags: ['fashion', 'budget'], priority: 'high', attachments: [], status: 'converted' },
     // Archived
     { userId, workspaceId: null, title: 'Old trend idea that faded', tags: [], priority: 'low', attachments: [], status: 'archived' },
     { userId, workspaceId: wsD, title: 'That one meme format from 2024', tags: ['meme'], priority: 'low', attachments: [], status: 'archived' },
-  ]).returning();
+  ]);
 
   // ── 5. Contents ────────────────────────────────────────────────────────────
 
@@ -162,7 +170,7 @@ async function seed() {
     // Reviewed (fully done with post-mortem)
     {
       workspaceId: wsD, title: 'Expectation vs Reality: Remote Work Life',
-      ideaId: idea1?.id ?? null, contentType: 'video_short', stage: 'reviewed',
+      ideaId: ideaConv1!.id, contentType: 'video_short', stage: 'reviewed',
       tags: ['relatable', 'work-from-home', 'comedy'], targetPlatforms: ['douyin'],
       scheduledAt: daysAgo(45), publishedAt: daysAgo(44),
       notes: 'Filmed 3 takes, final one nailed it.',
@@ -261,7 +269,7 @@ async function seed() {
   ] = await db.insert(contents).values([
     {
       workspaceId: wsX, title: 'My Capsule Wardrobe: 10 Pieces, 30 Outfits Under ¥500',
-      contentType: 'image_text', stage: 'reviewed',
+      ideaId: ideaConv2!.id, contentType: 'image_text', stage: 'reviewed',
       tags: ['fashion', 'budget', 'capsule-wardrobe'], targetPlatforms: ['xiaohongshu'],
       scheduledAt: daysAgo(42), publishedAt: daysAgo(41),
       reviewNotes: 'Saves through the roof. Budget fashion posts consistently outperform.',
@@ -364,6 +372,10 @@ async function seed() {
       attachments: [], stageHistory: sh(['planned', 1]),
     },
   ]).returning();
+
+  // ── 5b. Close the idea → content bidirectional links ──────────────────────
+  await db.update(ideas).set({ convertedTo: dReviewed1!.id }).where(eq(ideas.id, ideaConv1!.id));
+  await db.update(ideas).set({ convertedTo: xReviewed1!.id }).where(eq(ideas.id, ideaConv2!.id));
 
   // ── 6. Content Briefs ──────────────────────────────────────────────────────
   // Add briefs to a selection of content items for richness
@@ -549,6 +561,22 @@ async function seed() {
     'https://www.douyin.com/video/demo-005',
   );
 
+  // Comedy content cross-posted to TikTok
+  await pubWithMetrics(
+    dReviewed1!.id, 'tiktok', 43,
+    { daysAgo: 41, views: 95000, likes: 12400, comments: 1800, shares: 2300, saves: 800, followers: 980 },
+    { daysAgo: 34, views: 174000, likes: 22600, comments: 3200, shares: 4100, saves: 1400, followers: 1850 },
+    'https://www.tiktok.com/@demo/video/demo-001',
+    { platformTitle: 'Expectation vs Reality: Remote Work Life 😅', platformCopy: 'The reality of working from home hit different 💀 #remotework #wfh #comedy #relatable' },
+  );
+  await pubWithMetrics(
+    dReviewed2!.id, 'tiktok', 28,
+    { daysAgo: 26, views: 48000, likes: 7200, comments: 1100, shares: 1400, saves: 480, followers: 620 },
+    { daysAgo: 19, views: 81000, likes: 11800, comments: 1900, shares: 2300, saves: 790, followers: 1050 },
+    'https://www.tiktok.com/@demo/video/demo-002',
+    { platformTitle: 'When the code finally works after 3 hours 💻✨', platformCopy: 'Every developer knows this feeling 😭 #coding #developer #programming #relatable' },
+  );
+
   // Xiaohongshu published content
   await pubWithMetrics(
     xReviewed1!.id, 'xiaohongshu', 41,
@@ -578,6 +606,22 @@ async function seed() {
     'https://www.xiaohongshu.com/explore/demo-004',
   );
 
+  // Lifestyle content cross-posted to Instagram
+  await pubWithMetrics(
+    xReviewed1!.id, 'instagram', 40,
+    { daysAgo: 37, views: 42000, likes: 6800, comments: 940, shares: 0, saves: 8900, followers: 710 },
+    { daysAgo: 27, views: 68000, likes: 10500, comments: 1500, shares: 0, saves: 14200, followers: 1120 },
+    'https://www.instagram.com/p/demo-001',
+    { platformTitle: 'Capsule Wardrobe: 10 pieces, 30 outfits 💕', platformCopy: '¥500 capsule wardrobe challenge ✨ All links in bio! #capsulewardrobe #ootd #fashion #minimalist' },
+  );
+  await pubWithMetrics(
+    xPublished1!.id, 'instagram', 18,
+    { daysAgo: 15, views: 18500, likes: 3100, comments: 420, shares: 0, saves: 5200, followers: 390 },
+    { daysAgo: 7, views: 29400, likes: 4800, comments: 650, shares: 0, saves: 7900, followers: 620 },
+    'https://www.instagram.com/p/demo-002',
+    { platformTitle: 'Spring lookbook 🌸 Cherry blossom season is here', platformCopy: 'Outfit ideas for cherry blossom season 🌸 #springfashion #ootd #cherryblossom #lookbook' },
+  );
+
   // WeChat OA published content
   await pubWithMetrics(
     wPublished1!.id, 'weixin', 11,
@@ -585,6 +629,14 @@ async function seed() {
     { daysAgo: 4, views: 27400, likes: 1890, comments: 423, shares: 698, saves: 0, followers: 461 },
     'https://mp.weixin.qq.com/s/demo-001',
     { platformTitle: '实测Claude 4 vs GPT-5：程序员视角的深度对比', platformCopy: '没有废话，直接测代码。5个真实任务，看谁更能打。' },
+  );
+  // Tech content cross-posted to X (Twitter)
+  await pubWithMetrics(
+    wPublished1!.id, 'x', 10,
+    { daysAgo: 8, views: 24000, likes: 1860, comments: 342, shares: 891, saves: 0, followers: 267 },
+    { daysAgo: 3, views: 38500, likes: 2940, comments: 528, shares: 1340, saves: 0, followers: 415 },
+    'https://x.com/demo/status/demo-001',
+    { platformTitle: 'Claude 4 vs GPT-5 for developers — I tested both on real work tasks', platformCopy: 'Forget the benchmarks. I tested Claude 4 and GPT-5 on 5 real dev tasks.\n\nCode review, debugging, architecture, docs, test writing.\n\nHere\'s what I found 🧵 #AI #developers #LLM' },
   );
 
   // Queued / ready publications
@@ -630,11 +682,12 @@ async function seed() {
   console.log('\nData summary:');
   console.log('  3 workspaces (Comedy, Lifestyle, Tech Insights)');
   console.log('  3 plan templates');
-  console.log('  14 ideas (active, converted, archived)');
+  console.log('  14 ideas (active, 2 converted with content links, archived)');
   console.log('  26 content items (all stages represented)');
   console.log('  4 content briefs with full outlines + references');
-  console.log('  12 publications (5 published with metrics, 6 queued/ready)');
-  console.log('  18 metric snapshots (8 weeks of trend data)');
+  console.log('  22 publications across Douyin, TikTok, Xiaohongshu, Instagram, WeChat, X');
+  console.log('    — 3 content items cross-posted to 2 platforms each');
+  console.log('  34 metric snapshots');
 }
 
 seed()
