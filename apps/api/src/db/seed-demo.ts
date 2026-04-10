@@ -171,7 +171,7 @@ async function seed() {
     {
       workspaceId: wsD, title: 'Expectation vs Reality: Remote Work Life',
       ideaId: ideaConv1!.id, contentType: 'video_short', stage: 'reviewed',
-      tags: ['relatable', 'work-from-home', 'comedy'], targetPlatforms: ['douyin'],
+      tags: ['relatable', 'work-from-home', 'comedy'], targetPlatforms: ['douyin', 'tiktok'],
       scheduledAt: daysAgo(45), publishedAt: daysAgo(44),
       notes: 'Filmed 3 takes, final one nailed it.',
       reviewNotes: 'Exceeded all KPIs. The surprise ending got huge engagement. Reuse format.',
@@ -180,7 +180,7 @@ async function seed() {
     {
       workspaceId: wsD, title: 'When The Code Finally Works After 3 Hours',
       contentType: 'video_short', stage: 'reviewed',
-      tags: ['dev-humor', 'relatable', 'coding'], targetPlatforms: ['douyin'],
+      tags: ['dev-humor', 'relatable', 'coding'], targetPlatforms: ['douyin', 'tiktok'],
       scheduledAt: daysAgo(30), publishedAt: daysAgo(29),
       notes: 'Keep it under 30s for max retention.',
       reviewNotes: 'Strong performance on saves. Developers are a great niche on Douyin.',
@@ -270,7 +270,7 @@ async function seed() {
     {
       workspaceId: wsX, title: 'My Capsule Wardrobe: 10 Pieces, 30 Outfits Under ¥500',
       ideaId: ideaConv2!.id, contentType: 'image_text', stage: 'reviewed',
-      tags: ['fashion', 'budget', 'capsule-wardrobe'], targetPlatforms: ['xiaohongshu'],
+      tags: ['fashion', 'budget', 'capsule-wardrobe'], targetPlatforms: ['xiaohongshu', 'instagram'],
       scheduledAt: daysAgo(42), publishedAt: daysAgo(41),
       reviewNotes: 'Saves through the roof. Budget fashion posts consistently outperform.',
       attachments: [], stageHistory: sh(['planned', 50], ['creating', 46], ['ready', 43], ['published', 41], ['reviewed', 35]),
@@ -278,7 +278,7 @@ async function seed() {
     {
       workspaceId: wsX, title: 'Spring 2026 Outfit Ideas — Cherry Blossom Season Lookbook',
       contentType: 'image_text', stage: 'published',
-      tags: ['fashion', 'spring', 'lookbook', 'cherry-blossom'], targetPlatforms: ['xiaohongshu'],
+      tags: ['fashion', 'spring', 'lookbook', 'cherry-blossom'], targetPlatforms: ['xiaohongshu', 'instagram'],
       scheduledAt: daysAgo(20), publishedAt: daysAgo(19),
       attachments: [], stageHistory: sh(['planned', 28], ['creating', 24], ['ready', 21], ['published', 19]),
     },
@@ -334,7 +334,7 @@ async function seed() {
     {
       workspaceId: wsW, title: 'The Real Difference Between Claude 4 and GPT-5 for Developers',
       contentType: 'article', stage: 'published',
-      tags: ['AI', 'LLM', 'developer-tools', 'claude', 'gpt'], targetPlatforms: ['weixin'],
+      tags: ['AI', 'LLM', 'developer-tools', 'claude', 'gpt'], targetPlatforms: ['weixin', 'x'],
       scheduledAt: daysAgo(12), publishedAt: daysAgo(11),
       notes: 'Include code examples for tool use and function calling.',
       attachments: [], stageHistory: sh(['planned', 21], ['creating', 17], ['ready', 13], ['published', 11]),
