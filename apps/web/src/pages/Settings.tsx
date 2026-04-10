@@ -928,7 +928,7 @@ function TelegramPanel() {
         )}
 
         {editing && (
-          <form onSubmit={(e) => void handleSave(e)} className="space-y-3">
+          <form onSubmit={(e) => void handleSave(e)} className="space-y-3" autoComplete="off">
             <div>
               <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
                 {t('settings.notifications.telegram_bot_token')}
@@ -938,6 +938,8 @@ function TelegramPanel() {
                 value={botToken}
                 onChange={(e) => { setBotToken(e.target.value); setChatId(''); setFormError(''); }}
                 placeholder={config?.tokenSet ? t('settings.notifications.telegram_token_placeholder_set') : t('settings.notifications.telegram_token_placeholder')}
+                autoComplete="off"
+                data-1p-ignore
                 className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-400"
               />
             </div>
