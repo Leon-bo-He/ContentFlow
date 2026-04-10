@@ -2,9 +2,9 @@
 
 > Content ops for creators managing multiple content verticals across any platform.
 
-Orbit handles everything *around* creation — capturing ideas before they slip away, planning content with structured briefs, tracking each piece through its full production lifecycle, coordinating multi-platform publishing, and recording performance metrics. It doesn't replace your creative tools; it connects them.
+Orbit handles everything *around* creation — capturing ideas before they slip away, planning content with structured briefs, tracking each piece through its full production lifecycle, coordinating multi-platform publishing, and recording performance metrics.
 
-**Built for:** any creator juggling multiple content areas — comedy shorts, lifestyle posts, long-form tech writing — and publishing across any combination of platforms: Douyin, YouTube, Instagram, X, Xiaohongshu, WeChat, TikTok, or a custom channel of your own. One place to stay on top of it all without letting anything fall through the cracks.
+**Built for:** creators juggling multiple content areas — comedy shorts, lifestyle posts, long-form tech writing — publishing across any combination of platforms: Douyin, YouTube, Instagram, X, Xiaohongshu, WeChat, TikTok, or a custom channel of your own.
 
 ---
 
@@ -12,17 +12,17 @@ Orbit handles everything *around* creation — capturing ideas before they slip 
 
 | Feature | Description |
 |---------|-------------|
-| **Idea capture** | Zero-friction capture from anywhere. Ideas land in a global pool — no forced categorization required. Promote to a content item when ready. |
-| **Workspaces** | Each account or vertical gets its own isolated workspace with independent board, calendar, and analytics. |
-| **Content Kanban** | Full lifecycle tracking: Planned → Creating → Ready → Published → Reviewed. Drag-and-drop between stages. |
-| **Content Brief** | Structured creative planning — audience profile, goals & KPIs, hook analysis, title candidates, outline, and reference links. |
-| **Scheduling Calendar** | Month / week / list views. Schedule by dragging. Color-coded by workspace. |
+| **Idea capture** | Zero-friction capture from anywhere. Ideas land in a global pool — no forced categorization. Promote to a content item when ready. |
+| **Workspaces** | Each content vertical gets its own isolated workspace with independent Kanban board, calendar, and analytics. |
+| **Content Kanban** | Full lifecycle tracking: Planned → Creating → Ready → Published → Reviewed. Stage history auto-logged on every transition. |
+| **Content Brief** | Structured creative planning — audience profile, goals & KPIs, hook analysis, title candidates, outline, and competitive references. |
+| **Scheduling Calendar** | Month / week / list views. Schedule by dragging. Color-coded by workspace. Gap alerts when publish goals are falling behind. |
 | **Publication Management** | One content item → independent per-platform records (copy, hashtags, cover, settings). Manual-assist publishing with push reminders. |
-| **Analytics** | Manual metric entry with auto-calculated engagement rate. Per-workspace trends and per-post breakdowns. |
-| **Multilingual** | zh-CN · zh-TW · en-US · ja-JP · ko-KR. Browser auto-detect with manual override. Locale-aware formatting throughout. |
+| **Analytics** | Manual metric entry (views, likes, comments, shares, saves, followers gained) with auto-calculated engagement rate. Per-workspace trends and per-post breakdowns. |
+| **Custom platforms** | Define publishing channels beyond the built-in list (Douyin, WeChat, Xiaohongshu, YouTube, X, TikTok, Instagram, Bilibili). |
+| **Multilingual** | zh-CN · zh-TW · en-US · ja-JP · ko-KR. Browser auto-detect with manual override. |
 | **PWA + Offline** | Installable from the browser. Offline idea capture and board access. Background Sync flushes queued writes on reconnect. |
 | **Data portability** | Full JSON export of all workspaces, content, publications, metrics, and ideas. Import back from any export file. |
-| **Custom platforms** | Define custom publishing platforms beyond the built-in list. |
 
 ---
 
@@ -30,7 +30,7 @@ Orbit handles everything *around* creation — capturing ideas before they slip 
 
 | Phase | Focus | Status |
 |-------|-------|--------|
-| **Phase 1 — MVP** | Idea capture, Kanban, content briefs, scheduling calendar, manual-assist publishing, analytics dashboard, 5-locale i18n, PWA/offline | **Done** |
+| **Phase 1 — MVP** | Idea capture, Kanban, content briefs, scheduling calendar, manual-assist publishing, analytics, 5-locale i18n, PWA/offline, custom platforms | **Done** |
 | **Phase 2 — Platform Integration** | Multi-platform API auto-publish, inbound and outbound webhooks | **In progress** |
 | **Phase 3 — AI Skills** | Hot topic discovery, AI-assisted titling, translation suggestions, brief generation, content idea expansion | Planned |
 | **Phase 4 — Advanced Analytics** | Cross-platform performance comparison, trend charts, funnel analysis, audience insights, scheduled reports | Planned |
@@ -51,9 +51,7 @@ Orbit handles everything *around* creation — capturing ideas before they slip 
 | Cache / Sessions | Redis 7 |
 | Job Queue | BullMQ |
 | Auth | JWT (access + refresh) + OAuth 2.0 (WeChat / Google) |
-| AI | Anthropic Claude API — title suggestions, translation, brief assistance |
-| Real-time | WebSocket — collaboration presence, live notifications |
-| Infrastructure | Docker Compose |
+| Deploy | Docker Compose |
 
 ---
 
@@ -77,7 +75,7 @@ pnpm install
 # Run database migrations
 pnpm migrate
 
-# Start API (port 3000) and web app (port 5173) together
+# Start API (port 3000) and web app (port 5173)
 pnpm dev
 ```
 
@@ -85,40 +83,37 @@ Open [http://localhost:5173](http://localhost:5173) and register an account.
 
 ### Demo account
 
-To explore the app with pre-populated data, seed the demo account:
+Seed the demo account to explore with pre-populated data:
 
 ```bash
 pnpm seed:demo
 ```
-
-Then log in with:
 
 | Field | Value |
 |-------|-------|
 | Email | `demo@orbit.app` |
 | Password | `demo1234` |
 
-The demo account includes 3 workspaces (Comedy, Lifestyle, Tech Insights), 26 content items across all Kanban stages, content briefs, 12 publications, and 8 weeks of metric data so every dashboard and chart renders with real content.
+The demo account includes 3 workspaces (Comedy, Lifestyle, Tech Insights), content across all Kanban stages, briefs, publications, and 8 weeks of metric data.
 
-Run `pnpm seed:demo --force` to wipe and re-seed from scratch.
+Run `pnpm seed:demo --force` to wipe and re-seed.
 
 ### Environment variables
-
-Copy `.env.example` to `.env`:
 
 ```bash
 cp .env.example .env
 ```
 
-The defaults work out of the box for local development. OAuth credentials are optional — leave them blank to use email/password auth only.
-
-| Variable | Description |
-|----------|-------------|
-| `DATABASE_URL` | PostgreSQL connection string |
-| `REDIS_URL` | Redis connection string |
-| `JWT_SECRET` | Secret for signing tokens (min 32 chars in production) |
-| `WECHAT_APP_ID` / `WECHAT_APP_SECRET` | WeChat OAuth (optional) |
-| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth (optional) |
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DATABASE_URL` | Yes | PostgreSQL connection string |
+| `REDIS_URL` | Yes | Redis connection string |
+| `JWT_SECRET` | Yes | Min 32 chars in production |
+| `JWT_ACCESS_TTL` | No | Access token TTL in seconds (default: 900) |
+| `JWT_REFRESH_TTL` | No | Refresh token TTL in seconds (default: 2592000) |
+| `CORS_ORIGIN` | No | Default: `http://localhost:5173` |
+| `WECHAT_APP_ID` / `WECHAT_APP_SECRET` | No | WeChat OAuth |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | No | Google OAuth |
 
 ---
 
@@ -128,31 +123,33 @@ The defaults work out of the box for local development. OAuth credentials are op
 Orbit/
 ├── apps/
 │   ├── web/              # React PWA client
-│   │   ├── src/
-│   │   │   ├── api/      # TanStack Query hooks
-│   │   │   ├── components/
-│   │   │   ├── pages/
-│   │   │   ├── store/    # Zustand stores
-│   │   │   └── locales/  # i18n translation files
-│   │   └── public/
+│   │   └── src/
+│   │       ├── api/      # TanStack Query hooks
+│   │       ├── components/
+│   │       ├── pages/
+│   │       ├── store/    # Zustand stores
+│   │       └── locales/  # i18n translation files (5 locales)
 │   └── api/              # Fastify server
 │       └── src/
 │           ├── domain/        # Business logic + repository interfaces
 │           ├── infrastructure/# Drizzle ORM repository implementations
 │           ├── interfaces/    # Thin HTTP route handlers
+│           ├── queue/         # BullMQ queues and workers
 │           └── db/            # Drizzle schema + migrations
+├── packages/
+│   └── shared/           # Shared TypeScript types
 ├── docker-compose.yml
-├── docs/
-│   ├── DESIGN.md         # Full product design and API reference
-│   └── CLAUDE.md         # Code conventions and domain glossary
-└── .env.example
+└── docs/
+    ├── DESIGN.md
+    ├── CLAUDE.md
+    └── README.md
 ```
 
 ---
 
 ## Documentation
 
-- **[DESIGN.md](DESIGN.md)** — Product design, data model, API reference, and domain decisions.
+- **[DESIGN.md](DESIGN.md)** — Full product design, data model, and API reference.
 - **[CLAUDE.md](CLAUDE.md)** — Code conventions, architectural rules, and domain glossary.
 
 ---

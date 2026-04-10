@@ -1,6 +1,6 @@
 # Orbit — Design Document
 
-**Version:** 2.1 | **Last updated:** 2026-04-10
+**Version:** 3.0 | **Last updated:** 2026-04-10
 
 ---
 
@@ -8,11 +8,11 @@
 
 1. [Product Positioning](#1-product-positioning)
 2. [Information Architecture](#2-information-architecture)
-3. [Phase 1 Core Features](#3-phase-1-core-features)
+3. [Core Features](#3-core-features)
    - 3.1 [Idea Capture](#31-idea-capture)
    - 3.2 [Workspaces](#32-workspaces)
    - 3.3 [Content Lifecycle (Kanban)](#33-content-lifecycle-kanban)
-   - 3.4 [Content Brief (Planning)](#34-content-brief-planning)
+   - 3.4 [Content Brief](#34-content-brief)
    - 3.5 [Scheduling Calendar](#35-scheduling-calendar)
    - 3.6 [Publication Management](#36-publication-management)
    - 3.7 [Analytics Dashboard](#37-analytics-dashboard)
@@ -21,7 +21,6 @@
 6. [Technical Architecture](#6-technical-architecture)
 7. [Data Model](#7-data-model)
 8. [API Reference](#8-api-reference)
-9. [Phase 1 Milestones](#9-phase-1-milestones)
 
 ---
 
@@ -35,7 +34,7 @@
 
 | Phase | Focus | Status |
 |-------|-------|--------|
-| **Phase 1 — MVP** | Idea capture, multi-workspace Kanban, content briefs, scheduling calendar, manual-assist publishing, analytics dashboard, 5-locale i18n, PWA/offline | **Done** |
+| **Phase 1 — MVP** | Idea capture, multi-workspace Kanban, content briefs, scheduling calendar, manual-assist publishing, analytics dashboard, 5-locale i18n, PWA/offline, custom platforms | **Done** |
 | **Phase 2 — Platform Integration** | Multi-platform API auto-publish (Douyin, WeChat, Xiaohongshu, YouTube, etc.), inbound and outbound webhooks | **In progress** |
 | **Phase 3 — AI Skills** | Hot topic discovery, AI-assisted titling, translation suggestions, brief generation, content idea expansion | Planned |
 | **Phase 4 — Advanced Analytics** | Cross-platform performance comparison, trend charts, funnel analysis, audience insights, scheduled report delivery | Planned |
@@ -50,34 +49,27 @@ Orbit
 │
 ├── Global Dashboard        — cross-workspace overview
 ├── Global Publish Queue    — cross-workspace timeline
+├── Ideas                   — global idea pool
 │
-├── Workspace A  (e.g. "Comedy" — publishes to Douyin, TikTok, YouTube Shorts)
-│   ├── Idea Pool
+├── Workspace A  (e.g. "Comedy")
 │   ├── Content Board (Kanban)
-│   ├── Content Brief
-│   ├── Publication Management
 │   ├── Scheduling Calendar
-│   └── Analytics Panel
+│   ├── Analytics Panel
+│   └── Archive
 │
-├── Workspace B  (e.g. "Lifestyle" — publishes to Xiaohongshu, Instagram)
-│   ├── Idea Pool
-│   ├── Content Board
-│   ├── Scheduling Calendar
-│   └── Analytics Panel
-│
-├── Workspace C  (e.g. "Tech Insights" — publishes to WeChat OA, X, newsletter)
+├── Workspace B  (e.g. "Lifestyle")
 │   └── ...
 │
-└── Settings  — account bindings, language, notification preferences
+└── Settings  — account, appearance, language, custom platforms
 ```
 
 ---
 
-## 3. Phase 1 Core Features
+## 3. Core Features
 
 ### 3.1 Idea Capture
 
-Capture inspiration anywhere, with zero friction. Categorize later.
+Capture inspiration anywhere with zero friction. Categorize later.
 
 **Entry points:**
 
@@ -87,99 +79,91 @@ Capture inspiration anywhere, with zero friction. Categorize later.
 | Desktop | Global shortcut `Cmd/Ctrl + Shift + I` opens a quick-entry overlay |
 | Android | PWA notification bar shortcut |
 
-**Idea card fields:**
+**Idea fields:**
 
 | Field | Required | Notes |
 |-------|----------|-------|
-| One-line summary | Yes | |
-| Extended note | No | Plain text |
+| Title | Yes | One-line summary |
+| Note | No | Extended plain text |
 | Tags | No | Free-form |
 | Workspace | No | Assignable later; defaults to global pool |
 | Attachments | No | Images, links, screenshots |
-| Priority | No | Low / Medium / High |
+| Priority | No | low / medium / high |
 
-**Key design decisions:**
-- Ideas default to the **global idea pool** — no forced workspace selection, lowering capture friction.
+**Key decisions:**
+- Ideas default to the **global idea pool** — no forced workspace selection.
 - Ideas can be promoted to a full Content item at any time.
-- Ideas support cross-workspace assignment (one idea → multiple workspaces).
+- Promoted ideas retain a back-link (`converted_to`) for traceability.
 
 ---
 
 ### 3.2 Workspaces
 
-Each content area or vertical has its own isolated workspace. Schedules and data do not bleed between workspaces. Platforms are not bound to a workspace — a single piece of content can be published to any combination of platforms via independent Publication records.
+Each content vertical has its own isolated workspace. Platforms are not bound to a workspace — any content can publish to any combination of platforms via independent Publication records.
 
-**Workspace configuration:**
+**Workspace fields:**
 
 | Field | Description |
 |-------|-------------|
-| Name & icon | e.g. "Comedy", "Lifestyle", "Tech Insights" — the content area, not the platform |
-| Content type | Short video / Image-text / Long article / Podcast (determines Kanban fields) |
-| Default tag set | Pre-set tags for this vertical |
-| Publish frequency goal | e.g. "3 posts/week" — used for calendar gap alerts |
-| Timezone | Per-workspace timezone support for international accounts |
-| Kanban stages | Configurable; see §3.3 |
+| Name & icon | e.g. "Comedy", "Lifestyle" — the content area, not the platform |
+| Color | Workspace accent color, used in calendar and labels |
+| About | Optional description |
+| Publish goal | e.g. `{ count: 3, period: "week" }` — drives calendar gap alerts |
+| Stage config | Custom Kanban stage list (JSON) |
 
-**Cross-workspace relationships:**
-- One idea can be assigned to multiple workspaces.
-- A content item can be marked "cross-platform" and tracked across workspaces.
-- The Global Dashboard aggregates data from all workspaces.
+**Custom platforms:** Users can define their own publishing platforms beyond the built-in list (Douyin, WeChat, Xiaohongshu, YouTube, etc.). Each custom platform has a name and emoji icon.
 
 ---
 
 ### 3.3 Content Lifecycle (Kanban)
 
-Every content item moves through well-defined stages, fully tracked from idea to post-mortem.
+Every content item moves through well-defined stages with a full `stage_history` audit trail.
 
-**Default stage pipeline (Phase 1 — no approval flow):**
+**Default stage pipeline:**
 
 ```
-Idea → Planned → Planning → Creating → Ready → Publishing → Published → Reviewed
+Planned → Creating → Ready → Publishing → Published → Reviewed
 ```
 
-**Kanban board layout:**
+**Kanban board:**
 
 ```
 ┌──────────┬──────────┬──────────┬────────────┬───────────┬──────────┐
 │ Planned  │ Creating │  Ready   │ Publishing │ Published │ Reviewed │
 ├──────────┼──────────┼──────────┼────────────┼───────────┼──────────┤
 │ Card 1   │ Card 3   │ Card 5   │            │           │          │
-│ Apr 15   │ Filming  │ Sched    │            │           │          │
-│          │          │ Apr 12   │            │           │          │
+│ Apr 15   │ Filming  │ Apr 12   │            │           │          │
 │ Card 2   │ Card 4   │          │            │           │          │
-│ Apr 18   │ Editing  │          │            │           │          │
 └──────────┴──────────┴──────────┴────────────┴───────────┴──────────┘
 ```
 
-**Content card fields:**
+**Content fields:**
 
 | Field | Notes |
 |-------|-------|
 | Title | |
 | Stage | Current Kanban column |
-| Content type | Short video, image-text, etc. |
-| Target platforms | e.g. Douyin, WeChat Video |
+| Content type | short_video, image_text, long_video, podcast, live, article |
+| Target platforms | e.g. Douyin, WeChat Video, custom platforms |
 | Tags | |
-| Planned publish date | |
-| Production notes | Free text; tracks progress |
+| Scheduled publish date | |
+| Notes | Production progress notes |
+| Review notes | Filled in the Reviewed stage |
 | Source idea | Link to originating Idea |
-| Attachments / reference links | |
-| Post-publish metrics | Auto-shown once published |
-| Post-mortem notes | Filled in Reviewed stage |
+| Attachments | |
+| Stage history | Auto-logged on every stage transition |
 
 **Stage customization:** Workspace settings allow adding/removing stages. Phase 5 can insert "In Review" between Creating and Ready as part of the approval workflow.
 
 ---
 
-### 3.4 Content Brief (Planning)
+### 3.4 Content Brief
 
-When an idea is confirmed as a topic, it enters the Planning stage and receives a structured **Content Brief** — a production guide covering seven sub-modules.
-
-**Brief structure:**
+When a content item enters the Planning stage it receives a structured **Brief** — a production guide with seven sub-modules.
 
 #### ① Content Type
-Select format: Image-text / Short video / Long video / Podcast / Live.  
-Type-specific auxiliary fields appear on selection (video duration, aspect ratio, etc.).
+Select format: Image-text / Short video / Long video / Podcast / Live.
+Type-specific fields appear on selection (duration, aspect ratio, etc.).
 
 #### ② Target Audience Profile
 
@@ -187,13 +171,13 @@ Type-specific auxiliary fields appear on selection (video duration, aspect ratio
 |-------|---------|
 | Age range | 18–25 |
 | Persona tags | University students, early-career, side-hustle seekers |
-| Core pain point | Want to do self-media but can't edit; intimidated |
+| Core pain point | Want to do self-media but can't edit |
 | Reach scenario | Scrolling Douyin during fragmented downtime |
 
-Profiles can be saved as workspace-level templates for reuse.
+Audience profiles can be saved as workspace-level templates for reuse.
 
 #### ③ Content Goals
-Select one or more: Grow followers / Conversion / Traffic referral / Brand awareness.  
+Select one or more: Grow followers / Conversion / Traffic referral / Brand awareness.
 Add a goal description and KPI targets (e.g. Likes ≥ 500, Comments ≥ 50).
 
 #### ④ Hook Analysis
@@ -201,41 +185,24 @@ Add a goal description and KPI targets (e.g. Likes ≥ 500, Comments ≥ 50).
 | Element | Description |
 |---------|-------------|
 | Core hook | e.g. "Learn in 3 days" — time anchor creates urgency |
-| Conflict / contrast | "Others pay ¥3,000 for a class; here are 3 free apps" |
-| Golden-3-second design | Show before/after editing comparison immediately |
+| Conflict / contrast | "Others pay ¥3,000; here are 3 free apps" |
+| Golden-3-second design | Show before/after comparison immediately |
 | Memory anchor | "The editing triad: cut, color, caption" |
 
 #### ⑤ Title Candidates
-
-List multiple candidate titles; mark primary / backup.  
-After publishing, record which title was actually used per platform.
+List multiple candidates; mark primary/backup. After publishing, record which was used per platform.
 
 #### ⑥ Content Outline
-Ordered list with time markers and per-section notes. Drag to reorder. Designed for video script use cases.
-
-Example:
+Ordered list with time markers. Example:
 ```
 1. Intro (0–3s):    Before/after edit comparison
-2. Pain point (3–8s):  "Want to make videos but can't edit?"
-3. Tip 1 (8–25s):   App recommendation — CapCut basics
-4. Tip 2 (25–40s):  Transitions + subtitles
-5. Tip 3 (40–55s):  Music + thumbnail creation
-6. CTA (55–65s):    Follow + WeChat OA resource pack
+2. Pain point (3–8s): "Want to make videos but can't edit?"
+3. Tip 1 (8–25s):  CapCut basics
+4. CTA (55–65s):   Follow + resource pack
 ```
 
 #### ⑦ Competitive References
-
-| Field | Notes |
-|-------|-------|
-| Author / account name | |
-| Content title | |
-| Platform | |
-| URL | |
-| Metrics snapshot | Views, likes, comments at time of reference |
-| Takeaway | What's worth borrowing |
-| Attachments | Screenshots |
-
-**Template system:** Audience profile + goals can be saved as workspace templates and applied to new briefs in one click. Only differentiated fields (title, outline, hooks) need to be filled each time.
+Reference accounts: author, title, platform, URL, metrics snapshot, takeaway, attachments.
 
 ---
 
@@ -243,58 +210,31 @@ Example:
 
 Visualize all content on a publication timeline.
 
-**View modes:**
-
-| Mode | Purpose |
-|------|---------|
-| Month view | Spot gaps in publishing cadence at a glance |
-| Week view | Precise time-slot planning per day |
-| List view | Chronological scan, best for quick review |
+**View modes:** Month · Week · List
 
 **Core interactions:**
 - Drag content cards onto calendar slots to set publish time.
-- Workspace content color-coded on the calendar.
+- Workspaces color-coded on the calendar.
 - Gap alerts: "Thursday has no Xiaohongshu post (goal: 3/week)."
-- Frequency progress bar: "This week: 2 of 3 posts scheduled."
-- Cross-timezone display for international accounts.
-
-**Week view example:**
-
-```
-   Mon     Tue      Wed      Thu      Fri     Sat/Sun
-            🔴       🟢               🔴
-           Douyin  Xiaohongshu       WeChat OA
-          "Edit    "Spring            "AI
-           Tips"   Fashion"           Opinion"
-
-  ⚠ Thu gap: Xiaohongshu — only 1 post scheduled this week (goal: 3)
-```
+- Frequency progress: "This week: 2 of 3 posts scheduled."
 
 ---
 
 ### 3.6 Publication Management
 
-Once content reaches "Ready", Publication Management tracks its complete publish lifecycle across every platform independently.
+Once content reaches "Ready", Publication Management tracks its publish lifecycle across every platform independently.
 
-**Publishing overview panel:**
-
-| Platform | Status | Scheduled | Actions |
-|----------|--------|-----------|---------|
-| Douyin | Published | Apr 15 18:00 | View · Analytics |
-| WeChat Video | Pending | Apr 15 20:00 | Mark Published · Edit |
-| Xiaohongshu | Queued | Apr 16 12:00 | Edit · Cancel |
-
-**Per-platform publish configuration:**
+**Per-platform publish fields:**
 
 | Section | Fields |
 |---------|--------|
-| Title | Select from brief's title candidates or write platform-specific |
-| Copy | Platform-specific text (Douyin conversational vs. WeChat OA formal) |
+| Title | Select from brief title candidates or write platform-specific |
+| Copy | Platform-specific text |
 | Hashtags | Platform-specific tag list |
 | Cover | Upload or select from attachments |
 | Platform settings | Visibility, comments, location, collection/series |
-| Scheduled time | UTC offset shown explicitly |
-| Publish result | Status, platform post ID, platform URL, failure reason |
+| Scheduled time | |
+| Result | Status, platform post ID, platform URL, failure reason |
 | Publish log | Timestamped action history |
 
 **Publication status flow:**
@@ -307,151 +247,86 @@ draft → queued → ready → posting → published
 
 | Status | Description |
 |--------|-------------|
-| `draft` | Platform added; configuration incomplete |
+| `draft` | Config incomplete |
 | `queued` | Config complete; waiting for scheduled time |
-| `ready` | Scheduled time reached; awaiting manual publish (Phase 1) |
-| `posting` | Sending via API (Phase 2 auto-publish) |
+| `ready` | Time reached; awaiting manual publish (Phase 1) or auto-publish (Phase 2) |
+| `posting` | API call in progress (Phase 2) |
 | `published` | Successfully published; platform URL recorded |
 | `failed` | Auto-publish failed; requires manual intervention |
-| `skipped` | Intentionally cancelled for this platform |
+| `skipped` | Intentionally cancelled |
 
-**Global publish queue (cross-workspace):**
-
-```
-Today, Apr 15
-  18:00  Douyin        "3-Day Editing Guide"      Published
-  20:00  WeChat Video  "3-Day Editing Guide"      Pending
-  21:00  X             "AI Tools Thread"          Pending
-
-Tomorrow, Apr 16
-  12:00  Xiaohongshu   "3-Day Editing Guide"      Queued
-  18:00  Douyin        "Fashion Vol.12"           Queued
-```
-
-**Phase 1 vs Phase 2 publishing:**
+**Phase 1 vs Phase 2:**
 
 | Phase 1 (manual-assist) | Phase 2 (auto-publish) |
 |------------------------|----------------------|
-| Go to each platform manually | API integration handles posting |
-| System notifies you when it's time | System posts automatically at scheduled time |
+| Manually publish on each platform | API integration handles posting |
+| System notifies when it's time | System posts automatically at scheduled time |
 | Return and mark published + paste URL | Auto-captures platform URL and initial metrics |
-| Fill per-platform config manually | Smart pre-fill from history |
-
-**Key capabilities:**
-
-| Feature | Description |
-|---------|-------------|
-| One-content, multi-platform | Each platform gets its own copy, tags, cover, and status |
-| Platform copy adaptation | Per-platform text (tone, length, hashtag format varies) |
-| Title selection per platform | Pick the most suitable title candidate per platform |
-| Publish reminders | PWA push notification when scheduled time arrives |
-| One-tap mark-as-published | Paste URL, tap confirm — done |
-| Publish audit log | Timestamped record of every status change and action |
-| Batch operations | Bulk reschedule or bulk mark-published |
 
 ---
 
 ### 3.7 Analytics Dashboard
 
-Track content performance via manual entry in Phase 1; migrate to API auto-collection in Phase 2.
-
-**Phase 1 data collection:**
-- Manually enter key metrics on the content card after publishing (views, likes, comments, etc.).
-- Batch entry mode (spreadsheet-style) for bulk updates.
-- System auto-calculates derived metrics: engagement rate, growth trends.
+Track content performance via manual metric entry (Phase 1); platform API auto-collection planned for Phase 2.
 
 **Dashboard hierarchy:**
 
 ```
 Global Dashboard
 ├── Total content count, published count, weekly/monthly cadence
-├── Cross-platform aggregated totals (total views, total engagement)
+├── Cross-platform aggregated totals
 ├── Top 10 content by performance
-└── Per-workspace health summary
+└── Per-workspace summary
 
-Workspace Analytics Panel
+Workspace Analytics
 ├── Account KPI trend charts (weekly / monthly)
 ├── Per-post data table (sortable)
 ├── Publish frequency achievement rate
-└── Tag-dimension analysis (which content types perform best)
+└── Tag-dimension analysis
 
 Single Content Detail
-├── Per-platform data comparison (same content: Douyin vs WeChat Video)
+├── Per-platform data comparison
 ├── Metrics-over-time curve
 └── Post-mortem notes
 ```
 
-**Phase 2:** Connect platform Open APIs for automatic metric collection on a scheduled refresh cycle.
+**Metrics recorded per publication:** views, likes, comments, shares, saves, followers_gained.
 
 ---
 
 ## 4. Multilingual Support
-
-### UI Internationalization
 
 **Supported locales:** `zh-CN` (default) · `zh-TW` · `en-US` · `ja-JP` · `ko-KR`
 
 - `react-i18next` with async on-demand locale bundle loading.
 - Browser language auto-detection; manual override in Settings.
 - Dates and numbers formatted via `Intl.DateTimeFormat` / `Intl.NumberFormat`.
-- Calendar week start follows locale convention (Mon vs. Sun).
-- RTL layout reserved via CSS Logical Properties.
-
-### Content Language Tracking
-
-- Content cards carry a `locale` field ("this video is in English").
-- One topic can link to multiple locale variants (zh-CN → en-US → ja-JP versions).
-- Workspaces have a default content locale.
-- Analytics track performance separately per locale variant.
+- Calendar week start follows locale convention.
 
 ---
 
 ## 5. PWA & Mobile
 
-### Why PWA over Native App
-
-| Aspect | PWA | Native App |
-|--------|-----|-----------|
-| Development cost | Single codebase | iOS + Android separately |
-| Install friction | Install from browser | App store review required |
-| Update delivery | Automatic, transparent | Manual user update |
-| Offline capability | Service Worker | Native support |
-| Push notifications | Web Push (iOS 16.4+) | Native push |
-| Stage fit | MVP / early validation | Post-scale |
-
-### Mobile Experience Priorities
-
 **Primary scenario — quick idea capture on phone:**
-- Floating `+` FAB at screen bottom; tap → write.
-- Voice input via browser Speech API.
+- Floating `+` FAB; tap → write; voice input via browser Speech API.
 - Android notification bar quick-action shortcut.
 
 **Secondary scenario — check schedule and metrics on phone:**
 - Calendar defaults to week view on mobile.
-- Analytics dashboard responsive layout; key metrics as swipeable cards.
-- Push notifications: publish deadline reminders and metric milestones (e.g. "Your video hit 10K views").
+- Analytics responsive layout with swipeable metric cards.
+- Push notifications: publish deadline reminders and metric milestones.
 
-### Offline Capabilities
+**Offline capabilities:**
 
 | Available Offline | Requires Network |
 |-------------------|-----------------|
-| Record ideas | Refresh analytics panel |
+| Record ideas | Refresh analytics |
 | View scheduling calendar | Publish actions |
 | View content board | Sync to server |
 | Edit content card notes | |
-| View cached historical metrics | |
+| View cached metrics | |
 
-Offline writes queue via **Background Sync** and flush automatically when connectivity returns.
-
-### Service Worker Caching Strategy
-
-| Resource Type | Strategy | Rationale |
-|---------------|----------|-----------|
-| App Shell | Precache | Cached on first load; instant subsequent opens |
-| Locale bundles | CacheFirst | Cache loaded language; serve offline |
-| API data | NetworkFirst | Fresh data preferred; cache as fallback |
-| Images / covers | StaleWhileRevalidate | Show cached instantly; refresh in background |
-| Publish / sync operations | BackgroundSync | Queue offline writes; flush on reconnect |
+Offline writes queue via **Background Sync** and flush automatically on reconnect.
 
 ---
 
@@ -460,60 +335,47 @@ Offline writes queue via **Background Sync** and flush automatically when connec
 ```
 ┌──────────────────────────────────────────┐
 │          PWA Client (React 18)            │
-│  Zustand + React Query + react-i18next    │
+│  Zustand + TanStack Query + react-i18next │
 │  Workbox SW + IndexedDB (Dexie.js)        │
 └──────────────────┬───────────────────────┘
                    │ HTTPS / REST
 ┌──────────────────▼───────────────────────┐
 │          Fastify API Server               │
-│  ┌──────────────────────────────────────┐ │
-│  │  Interfaces (src/interfaces/http/)   │ │
-│  │  Thin route handlers — extract       │ │
-│  │  params, call services, return       │ │
-│  └──────────────┬───────────────────────┘ │
-│  ┌──────────────▼───────────────────────┐ │
-│  │  Domain (src/domain/)                │ │
-│  │  Service classes + repo interfaces   │ │
-│  │  Pure business logic; no DB/HTTP     │ │
-│  └──────────────┬───────────────────────┘ │
-│  ┌──────────────▼───────────────────────┐ │
-│  │  Infrastructure (src/infrastructure/)│ │
-│  │  Drizzle ORM repo implementations   │ │
-│  │  All DB queries live here            │ │
-│  └──────────────┬───────────────────────┘ │
-└─────────────────┼────────────────────────┘
+│  ┌─────────────────────────────────────┐  │
+│  │  Interfaces (src/interfaces/http/)  │  │
+│  │  Thin route handlers                │  │
+│  └──────────────┬──────────────────────┘  │
+│  ┌──────────────▼──────────────────────┐  │
+│  │  Domain (src/domain/)               │  │
+│  │  Service classes + repo interfaces  │  │
+│  │  Pure business logic; no DB/HTTP    │  │
+│  └──────────────┬──────────────────────┘  │
+│  ┌──────────────▼──────────────────────┐  │
+│  │  Infrastructure                     │  │
+│  │  (src/infrastructure/db/repos/)     │  │
+│  │  Drizzle ORM implementations        │  │
+│  └──────────────┬──────────────────────┘  │
+└─────────────────┼─────────────────────────┘
                   ▼
    PostgreSQL    Redis         BullMQ
-   (primary)  (cache/session) (jobs/reminders)
+   (primary)  (cache/session) (jobs)
 ```
 
-### DDD Layer Responsibilities
+**Stack:**
 
-| Layer | Path | Responsibility |
-|-------|------|----------------|
-| **Interfaces** | `src/interfaces/http/routes/` | Thin Fastify handlers: extract params → call service → return response. No business logic. |
-| **Domain** | `src/domain/` | Service classes and repository interfaces. Pure business logic and domain errors. No DB or HTTP imports. |
-| **Infrastructure** | `src/infrastructure/db/repositories/` | Drizzle ORM implementations of domain interfaces. All SQL lives here. |
-
-`src/app.ts` is the **composition root**: instantiates repositories → services → calls `registerRoutes(app, services)`.
-
-Domain errors (`NotFoundError`, `ForbiddenError`, `ConflictError`, `ValidationError`) are thrown from services and mapped to HTTP status codes by the global error handler in `app.ts`.
-
-**Stack summary:**
-
-| Layer | Choice | Notes |
-|-------|--------|-------|
-| Frontend | React 18 + TypeScript + Vite + Tailwind CSS | |
-| State — local | Zustand | UI state, offline queue |
-| State — server | React Query (TanStack Query) | Caching, background refetch |
-| i18n | react-i18next | Async bundle loading |
-| PWA | Workbox + Dexie.js (IndexedDB) | Offline-first |
-| Backend | Fastify (Node.js) + TypeScript | High-throughput, low overhead |
-| Database | PostgreSQL 16 | Primary data store |
-| Cache / sessions | Redis 7 | JWT session store, hot data |
-| Job queue | BullMQ | Scheduled reminders, Phase 2 auto-publish |
-| Auth | JWT + OAuth 2.0 (WeChat / Google) | |
-| Deployment | Docker Compose | Single-host for MVP |
+| Layer | Choice |
+|-------|--------|
+| Frontend | React 18 + TypeScript + Vite + Tailwind CSS |
+| State (local) | Zustand |
+| State (server) | TanStack Query |
+| i18n | react-i18next |
+| PWA | Workbox + Dexie.js (IndexedDB) |
+| Backend | Fastify (Node.js) + TypeScript |
+| Database | PostgreSQL 16 |
+| Cache / sessions | Redis 7 |
+| Job queue | BullMQ |
+| Auth | JWT (access + refresh) + OAuth 2.0 (WeChat / Google) |
+| Deploy | Docker Compose |
 
 ---
 
@@ -522,115 +384,149 @@ Domain errors (`NotFoundError`, `ForbiddenError`, `ConflictError`, `ValidationEr
 ```sql
 -- Users
 users (
-  id, email, username, avatar,
-  locale,    -- preferred UI language
-  timezone,
-  created_at
+  id uuid PK,
+  email text UNIQUE NOT NULL,
+  username text NOT NULL,
+  avatar text,
+  locale text NOT NULL DEFAULT 'en-US',
+  timezone text NOT NULL DEFAULT 'America/Los_Angeles',
+  password_hash text,
+  created_at timestamptz NOT NULL
 )
 
 -- Workspaces
 workspaces (
-  id, user_id,
-  name, icon, color,
-  about,
-  publish_goal,       -- JSON: { count: 3, period: 'week' }
-  stage_config,       -- JSON: custom Kanban stage list
-  created_at
+  id uuid PK,
+  user_id uuid FK→users CASCADE,
+  name text NOT NULL,
+  icon text NOT NULL,
+  color text NOT NULL,
+  about text,
+  publish_goal jsonb,          -- { count: 3, period: "week" }
+  stage_config jsonb NOT NULL, -- custom Kanban stage list
+  created_at timestamptz NOT NULL
 )
 
 -- Ideas
 ideas (
-  id, user_id,
-  workspace_id,       -- nullable — global idea pool when null
-  title, note,
-  tags[],
-  priority,           -- low | medium | high
-  attachments,        -- JSON: [{ type, url, name }]
-  status,             -- active | converted | archived
-  converted_to,       -- FK → contents.id (set when promoted)
-  created_at
+  id uuid PK,
+  user_id uuid FK→users CASCADE,
+  workspace_id uuid FK→workspaces SET NULL,  -- null = global pool
+  title text NOT NULL,
+  note text,
+  tags jsonb NOT NULL DEFAULT [],
+  priority text NOT NULL DEFAULT 'medium',   -- low | medium | high
+  attachments jsonb NOT NULL DEFAULT [],
+  status text NOT NULL DEFAULT 'active',     -- active | converted | archived
+  converted_to uuid FK→contents SET NULL,
+  created_at timestamptz NOT NULL
 )
 
--- Contents  (core entity)
+-- Contents
 contents (
-  id, workspace_id,
-  idea_id,            -- source idea (nullable)
-  title, description,
-  content_type,       -- video_short | video_long | image_text | article | podcast | live
-  stage,              -- planned | planning | creating | ready | publishing | published | reviewed
-  tags[],
-  target_platforms[],
-  scheduled_at,
-  published_at,
-  notes,
-  review_notes,
-  attachments,        -- JSON: [{ type, url, name }]
-  created_at, updated_at
+  id uuid PK,
+  workspace_id uuid FK→workspaces CASCADE,
+  idea_id uuid,                -- source idea (nullable)
+  title text NOT NULL,
+  description text,
+  content_type text NOT NULL,  -- short_video | long_video | image_text | article | podcast | live
+  stage text NOT NULL DEFAULT 'planned',
+  tags jsonb NOT NULL DEFAULT [],
+  target_platforms jsonb NOT NULL DEFAULT [],
+  scheduled_at timestamptz,
+  published_at timestamptz,
+  notes text,
+  review_notes text,
+  attachments jsonb NOT NULL DEFAULT [],
+  stage_history jsonb NOT NULL DEFAULT [],   -- [{ stage, timestamp, actor }]
+  created_at timestamptz NOT NULL,
+  updated_at timestamptz NOT NULL
 )
 
 -- Content Briefs  (1-to-1 with contents)
 content_plans (
-  id, content_id,
-  format_config,          -- JSON: { duration, aspect_ratio, ... }
-  audience,               -- JSON: { age_range, persona_tags[], pain_points, reach_scenario }
-  audience_template_id,   -- FK → plan_templates.id (nullable)
-  goals[],                -- ['grow_followers', 'convert', 'traffic', 'branding']
-  goal_description,
-  kpi_targets,            -- JSON: { likes: 500, comments: 50, ... }
-  hooks,                  -- JSON: { core_hook, conflict, golden_opening, memory_point }
-  title_candidates,       -- JSON: [{ text, is_primary, used_on_platforms[] }]
-  outline,                -- JSON: [{ order, section, time_mark, note }]
-  created_at, updated_at
+  id uuid PK,
+  content_id uuid FK→contents CASCADE UNIQUE,
+  format_config jsonb NOT NULL DEFAULT {},
+  audience jsonb,              -- { age_range, persona_tags[], pain_points, reach_scenario }
+  audience_template_id uuid,
+  goals jsonb NOT NULL DEFAULT [],
+  goal_description text,
+  kpi_targets jsonb NOT NULL DEFAULT {},
+  hooks jsonb,                 -- { core_hook, conflict, golden_opening, memory_point }
+  title_candidates jsonb NOT NULL DEFAULT [],
+  outline jsonb NOT NULL DEFAULT [],
+  created_at timestamptz NOT NULL,
+  updated_at timestamptz NOT NULL
 )
 
 -- Competitive References  (many-to-1 with contents)
 content_references (
-  id, content_id,
-  author_name,
-  content_title,
-  platform,
-  url,
-  metrics_snapshot,   -- JSON: { views, likes, comments }
-  takeaway,
-  attachments,
-  created_at
+  id uuid PK,
+  content_id uuid FK→contents CASCADE,
+  author_name text NOT NULL,
+  content_title text NOT NULL,
+  platform text NOT NULL,
+  url text NOT NULL,
+  metrics_snapshot jsonb NOT NULL DEFAULT {},
+  takeaway text NOT NULL,
+  attachments jsonb NOT NULL DEFAULT [],
+  created_at timestamptz NOT NULL
 )
 
 -- Brief Templates  (workspace-level reuse)
 plan_templates (
-  id, workspace_id,
-  name,
-  audience,           -- preset audience profile
-  goals[],
-  goal_description,
-  created_at
+  id uuid PK,
+  workspace_id uuid FK→workspaces CASCADE,
+  name text NOT NULL,
+  audience jsonb,
+  goals jsonb NOT NULL DEFAULT [],
+  goal_description text,
+  created_at timestamptz NOT NULL
 )
 
 -- Publications  (1 content × 1 platform = 1 publication)
 publications (
-  id, content_id,
-  platform,               -- douyin | xiaohongshu | weixin | bilibili | x | youtube | ...
-  platform_title,
-  platform_copy,
-  platform_tags[],
-  cover_url,
-  platform_settings,      -- JSON: { visibility, allow_comments, location, collection }
-  scheduled_at,
-  published_at,
-  status,                 -- draft | queued | ready | posting | published | failed | skipped
-  platform_post_id,
-  platform_url,
-  failure_reason,
-  publish_log,            -- JSON: [{ action, timestamp, actor, note }]
-  created_at, updated_at
+  id uuid PK,
+  content_id uuid FK→contents CASCADE,
+  platform text NOT NULL,
+  platform_title text,
+  platform_copy text,
+  platform_tags jsonb NOT NULL DEFAULT [],
+  cover_url text,
+  platform_settings jsonb NOT NULL DEFAULT {},
+  scheduled_at timestamptz,
+  published_at timestamptz,
+  status text NOT NULL DEFAULT 'draft',  -- draft | queued | ready | posting | published | failed | skipped
+  platform_post_id text,
+  platform_url text,
+  failure_reason text,
+  publish_log jsonb NOT NULL DEFAULT [],
+  created_at timestamptz NOT NULL,
+  updated_at timestamptz NOT NULL
 )
 
 -- Metrics  (time-series snapshots per publication)
 metrics (
-  id, publication_id,
-  views, likes, comments, shares, saves, followers_gained,
-  recorded_at,
-  created_at
+  id uuid PK,
+  publication_id uuid FK→publications CASCADE,
+  views integer NOT NULL DEFAULT 0,
+  likes integer NOT NULL DEFAULT 0,
+  comments integer NOT NULL DEFAULT 0,
+  shares integer NOT NULL DEFAULT 0,
+  saves integer NOT NULL DEFAULT 0,
+  followers_gained integer NOT NULL DEFAULT 0,
+  recorded_at timestamptz NOT NULL,
+  created_at timestamptz NOT NULL
+)
+
+-- Custom Platforms
+custom_platforms (
+  id text PK,            -- format: "custom_${timestamp}"
+  user_id uuid FK→users CASCADE,
+  name text NOT NULL,
+  icon text NOT NULL DEFAULT '📌',
+  created_at timestamptz NOT NULL
 )
 ```
 
@@ -638,16 +534,20 @@ metrics (
 
 ## 8. API Reference
 
-### Ideas
+All endpoints require a valid JWT in the `Authorization: Bearer <token>` header unless noted otherwise.
 
-| Method | Path | Description |
-|--------|------|-------------|
-| `POST` | `/api/ideas` | Create idea |
-| `GET` | `/api/ideas?workspace=&status=&priority=&q=` | List ideas (filtered) |
-| `GET` | `/api/ideas/archived/export?workspace=&from=&to=` | Export archived ideas as JSON |
-| `DELETE` | `/api/ideas/archived?workspace=&from=&to=` | Bulk-delete archived ideas |
-| `PATCH` | `/api/ideas/:id` | Update idea |
-| `POST` | `/api/ideas/:id/convert` | Promote idea to Content |
+### Auth
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| `POST` | `/api/auth/register` | No | Register new user |
+| `POST` | `/api/auth/login` | No | Login, returns access token |
+| `POST` | `/api/auth/refresh` | Cookie | Refresh access token via refresh cookie |
+| `POST` | `/api/auth/logout` | Yes | Invalidate session |
+| `GET` | `/api/auth/me` | Yes | Get current user profile |
+| `PATCH` | `/api/auth/profile` | Yes | Update username, email, locale, timezone |
+| `PATCH` | `/api/auth/password` | Yes | Change password |
+| `DELETE` | `/api/auth/account` | Yes | Delete account |
 
 ### Workspaces
 
@@ -655,14 +555,26 @@ metrics (
 |--------|------|-------------|
 | `POST` | `/api/workspaces` | Create workspace |
 | `GET` | `/api/workspaces` | List workspaces |
-| `PATCH` | `/api/workspaces/:id` | Update workspace config |
+| `PATCH` | `/api/workspaces/:id` | Update workspace |
+| `POST` | `/api/upload/workspace-icon` | Upload workspace icon (max 2 MB, JPEG/PNG/GIF/WebP) |
+
+### Ideas
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/api/ideas` | Create idea |
+| `GET` | `/api/ideas?workspace=&status=&priority=&q=` | List ideas |
+| `PATCH` | `/api/ideas/:id` | Update idea |
+| `POST` | `/api/ideas/:id/convert` | Promote idea to Content |
+| `GET` | `/api/ideas/archived/export?workspace=&from=&to=` | Export archived ideas as JSON |
+| `DELETE` | `/api/ideas/archived?workspace=&from=&to=` | Bulk-delete archived ideas |
 
 ### Contents
 
 | Method | Path | Description |
 |--------|------|-------------|
 | `POST` | `/api/contents` | Create content |
-| `GET` | `/api/contents?workspace=&stage=` | List contents (filtered) |
+| `GET` | `/api/contents?workspace=&stage=` | List contents |
 | `PATCH` | `/api/contents/:id` | Update content / advance stage |
 | `DELETE` | `/api/contents/:id` | Delete content |
 | `GET` | `/api/contents/calendar?from=&to=&workspace=` | Calendar view data |
@@ -673,11 +585,11 @@ metrics (
 
 | Method | Path | Description |
 |--------|------|-------------|
-| `PUT` | `/api/contents/:id/plan` | Create or update brief |
-| `GET` | `/api/contents/:id/plan` | Get brief detail |
+| `PUT` | `/api/contents/:id/plan` | Upsert brief |
+| `GET` | `/api/contents/:id/plan` | Get brief |
 | `GET` | `/api/contents/:id/references` | List competitive references |
-| `POST` | `/api/contents/:id/references` | Add competitive reference |
-| `DELETE` | `/api/contents/:id/references/:refId` | Remove competitive reference |
+| `POST` | `/api/contents/:id/references` | Add reference |
+| `DELETE` | `/api/contents/:id/references/:refId` | Remove reference |
 | `POST` | `/api/workspaces/:id/plan-templates` | Save audience template |
 | `GET` | `/api/workspaces/:id/plan-templates` | List templates |
 | `PATCH` | `/api/workspaces/:id/plan-templates/:templateId` | Rename template |
@@ -691,7 +603,7 @@ metrics (
 | `GET` | `/api/contents/:id/publications` | List publications for content |
 | `PATCH` | `/api/publications/:id` | Update publication config / status |
 | `DELETE` | `/api/publications/:id` | Delete publication |
-| `POST` | `/api/publications/:id/mark-published` | Mark published + record platform URL |
+| `POST` | `/api/publications/:id/mark-published` | Mark published + record URL |
 | `GET` | `/api/publications/queue?status=&from=&to=` | Global publish queue |
 | `PATCH` | `/api/publications/batch` | Batch reschedule or status update |
 
@@ -699,45 +611,28 @@ metrics (
 
 | Method | Path | Description |
 |--------|------|-------------|
-| `POST` | `/api/metrics` | Record / update metrics snapshot |
-| `GET` | `/api/metrics/dashboard?workspace=` | Analytics dashboard data |
-| `GET` | `/api/metrics/content/:id` | Single content metrics detail |
+| `POST` | `/api/metrics` | Record metric snapshot |
+| `GET` | `/api/metrics/dashboard?workspace=` | Workspace analytics |
+| `GET` | `/api/metrics/content/:id` | Single content metrics |
+| `GET` | `/api/dashboard` | Global dashboard summary |
 
 ### Data Portability
 
 | Method | Path | Description |
 |--------|------|-------------|
-| `GET` | `/api/export` | Export all user data as a JSON archive |
-| `POST` | `/api/import` | Import a JSON archive (v1.0 format) |
+| `GET` | `/api/export` | Export all user data as JSON archive |
+| `POST` | `/api/import` | Import a JSON archive |
 
 ### Custom Platforms
 
 | Method | Path | Description |
 |--------|------|-------------|
-| `GET` | `/api/custom-platforms` | List user-defined custom platforms |
+| `GET` | `/api/custom-platforms` | List custom platforms |
 | `POST` | `/api/custom-platforms` | Create custom platform |
 | `DELETE` | `/api/custom-platforms/:id` | Delete custom platform |
 
-### General
+### System
 
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/api/dashboard` | Global dashboard summary |
-| `GET` | `/api/health` | Health check |
-| `POST` | `/api/auth/login` | Login |
-| `POST` | `/api/auth/refresh` | Refresh JWT |
-| `POST` | `/api/auth/logout` | Invalidate session |
-
----
-
-## 9. Phase 1 Milestones
-
-| Sprint | Deliverable |
-|--------|-------------|
-| **W1–2** | Project scaffold: React + Fastify + PWA baseline + i18n framework + DB schema + Docker Compose |
-| **W3–4** | Idea module: quick capture, global idea pool, tag filtering, mobile experience |
-| **W5–6** | Workspaces + Content Board: Kanban drag-and-drop, stage transitions, content cards |
-| **W7–8** | Content Brief: all 7 sub-modules, audience templates, competitive references |
-| **W9–10** | Scheduling Calendar + Publication Management: calendar views, per-platform config, publish queue, status tracking |
-| **W11–12** | Analytics Dashboard: manual data entry, global dashboard, workspace panel, trend charts |
-| **W13–14** | Polish: offline experience, push notifications, locale QA, performance optimization, launch |
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| `GET` | `/health` | No | Health check (Postgres + Redis) |
