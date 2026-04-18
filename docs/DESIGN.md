@@ -35,9 +35,9 @@
 | Phase | Focus | Status |
 |-------|-------|--------|
 | **Phase 1 — MVP** | Idea capture, multi-workspace Kanban, content briefs, scheduling calendar, manual-assist publishing, analytics dashboard, 5-locale i18n, PWA/offline, custom platforms | **Done** |
-| **Phase 2 — Platform Integration** | Multi-platform API auto-publish (Douyin, WeChat, Xiaohongshu, YouTube, etc.), inbound and outbound webhooks | **In progress** |
-| **Phase 3 — AI Skills** | Hot topic discovery, AI-assisted titling, translation suggestions, brief generation, content idea expansion | Planned |
-| **Phase 4 — Advanced Analytics** | Cross-platform performance comparison, trend charts, funnel analysis, audience insights, scheduled report delivery | Planned |
+| **Phase 2 — AI Skills** | Hot topic discovery, AI-assisted titling, translation suggestions, brief generation, content idea expansion | **In progress** |
+| **Phase 3 — Advanced Analytics** | Cross-platform performance comparison, trend charts, funnel analysis, audience insights, scheduled report delivery | Planned |
+| **Phase 4 — Platform Integration** | Multi-platform API auto-publish (Douyin, WeChat, Xiaohongshu, YouTube, etc.), inbound and outbound webhooks | Planned |
 | **Phase 5 — Collaboration** | Multi-user team workspaces, approval workflows, role-based access control, member invites, activity audit logs | Planned |
 
 ---
@@ -249,15 +249,15 @@ draft → queued → ready → posting → published
 |--------|-------------|
 | `draft` | Config incomplete |
 | `queued` | Config complete; waiting for scheduled time |
-| `ready` | Time reached; awaiting manual publish (Phase 1) or auto-publish (Phase 2) |
-| `posting` | API call in progress (Phase 2) |
+| `ready` | Time reached; awaiting manual publish (Phase 1) or auto-publish (Phase 4) |
+| `posting` | API call in progress (Phase 4) |
 | `published` | Successfully published; platform URL recorded |
 | `failed` | Auto-publish failed; requires manual intervention |
 | `skipped` | Intentionally cancelled |
 
-**Phase 1 vs Phase 2:**
+**Phase 1 vs Phase 4:**
 
-| Phase 1 (manual-assist) | Phase 2 (auto-publish) |
+| Phase 1 (manual-assist) | Phase 4 (auto-publish) |
 |------------------------|----------------------|
 | Manually publish on each platform | API integration handles posting |
 | System notifies when it's time | System posts automatically at scheduled time |
@@ -267,7 +267,7 @@ draft → queued → ready → posting → published
 
 ### 3.7 Analytics Dashboard
 
-Track content performance via manual metric entry (Phase 1); platform API auto-collection planned for Phase 2.
+Track content performance via manual metric entry (Phase 1); platform API auto-collection planned for Phase 4.
 
 **Dashboard hierarchy:**
 
